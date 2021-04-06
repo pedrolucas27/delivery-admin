@@ -33,6 +33,7 @@ function Flavors() {
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
 	const [data, setData] = useState([]);
+	const [idUpdate, setIdUpdate] = useState(null);
 	const [form] = Form.useForm();
 
 	useEffect(() => {
@@ -43,7 +44,8 @@ function Flavors() {
 					key: flavor?.id,
 					code: flavor?.code,
 					name: flavor?.name_flavor,
-					status: flavor?.is_active ? "Ativo" : "Inativo"
+					description: flavor?.description,
+					status: flavor?.is_active 
 				})
 			})
 		  	setData(array);
@@ -56,25 +58,68 @@ function Flavors() {
 	const columns = [
 	  { title: 'Código', dataIndex: 'code', key: 'code' },
 	  { title: 'Nome', dataIndex: 'name', key: 'name' },
-	  { title: 'Status', dataIndex: 'status', key: 'status' },
+	  { title: 'Descrição', dataIndex: 'description', key: 'description' },
+	  { 
+	  	title: 'Status', 
+	  	dataIndex: 'status', 
+	  	key: 'status',
+	  	render: (__, record) => {
+	  		return(
+	  			<div>
+	  				{ record?.status ? "Ativo" : "Inativo" }
+	  			</div>
+	  		);
+	  	} 
+	  },
   	  {
 	    title: 'Ações',
 	    dataIndex: '',
 	    key: 'x',
-	    render: () => {
+	    render: (__, record) => {
 	    	return(
 	    		<div>
-	    			<Tooltip placement="top" title='Deletar categoria'>
-	    				<DeleteOutlined className="icon-table" />
+	    			<Tooltip placement="top" title='Deletar sabor'>
+	    				<DeleteOutlined className="icon-table" onClick={() => deleteFlavor(record?.key)}/>
 	    			</Tooltip>
-	    			<Tooltip placement="top" title='Editar categoria'>
-	    				<EditOutlined className="icon-table" onClick={() => setExpandEditRow(!expandEditRow)}/>
+	    			<Tooltip placement="top" title='Editar sabor'>
+	    				<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record?.key)}/>
 	    			</Tooltip>
 	    		</div>
 	    	)
 	    },
   	  },
     ];
+
+
+    const deleteFlavor = async (id) => {
+    	const response = await axios.delete(BASE_URL+"delFlavor", { data: { id: id } } );
+    	console.log(response);
+    }
+
+    const updateFlavor = async (values) => {
+		const response = await axios.put(BASE_URL+"updateFlavor", 
+			{  
+			  id: idUpdate, 
+			  name_flavor: values?.name_flavor, 
+			  description: values?.description, 
+			  is_active: values?.is_active
+			} 
+		);
+    	console.log(response);
+    }
+
+    const setFildsDrawer = (id) => {
+    	const line = data?.filter((item) => item?.key === id)[0];
+    	setIdUpdate(id);
+
+    	form.setFieldsValue({
+    		name_flavor: line?.name,
+    		description: line?.description,
+    		is_active: line?.status
+    	});
+
+    	setExpandEditRow(!expandEditRow);
+    }
 
    
 	return (
@@ -100,27 +145,27 @@ function Flavors() {
 	          	onClose={() => setExpandEditRow(!expandEditRow)} 
 	          	visible={expandEditRow}
 	          	bodyStyle={{ paddingBottom: 80 }}>
-	          		<Form layout="vertical" form={form}>   			  
+	          		<Form layout="vertical" form={form} onFinish={updateFlavor}>   			  
 				        <Row gutter={[16, 16]}>
 					      <Col span={20}>
-							<Form.Item label="Nome">
+							<Form.Item label="Nome" name="name_flavor">
 					          <Input className="input-radius"/>
 					        </Form.Item>
 					      </Col>
 					      <Col span={4}>
-							<Form.Item label="Status">
-					          <Switch defaultChecked />
+							<Form.Item label="Status" name="is_active" valuePropName="checked">
+					          <Switch />
 					         </Form.Item>
 					      </Col>
 					      
 					      <Col span={24}>
-					      	<Form.Item label="Descrição">
+					      	<Form.Item label="Descrição" name="description">
 					      	  <TextArea rows={4} className="input-radius"/>
 					        </Form.Item>
 					      </Col>
 					      
 					      <Col span={24}>
-					      	<Button shape="round" className="button ac">
+					      	<Button onClick={() => form.submit()} shape="round" className="button ac">
 						       Salvar
 						    </Button>
 							<Button shape="round" className="button-cancel ac">
