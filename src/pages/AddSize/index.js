@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 import { 
 	Layout,
@@ -23,10 +24,54 @@ import FooterSite from "../../components/Footer";
 
 const { TextArea } = Input;
 const { Content } = Layout;
+const { Option } = Select;
+
+const BASE_URL = "http://localhost:4020/";
 
 function AddSize() {
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
+	const [dataUnitMenusuration, setDataUnitMenusuration] = useState([]);
+
+	useEffect(() => {
+
+		axios.get(BASE_URL+"addSize").then((response) => {
+			let array = [];
+			response?.data.forEach((unit_mensuration) => {
+				array.push({
+					id_unit: unit_mensuration?.id_unit,
+					code: unit_mensuration?.code,
+					unit: unit_mensuration?.unit,
+					abreviation: unit_mensuration?.abreviation,
+					is_active: unit_mensuration?.is_active 
+				})
+			})
+			console.log(array);
+		  	setDataUnitMenusuration(array);
+		}).catch((error) => {
+			console.log("BUGOU: "+ error);
+		});
+
+	}, []);
+
+
+	const onSaveSize = async (values) => {
+		if(values.size_value && values.unit){
+			const response = await axios.post(BASE_URL+"addSize",
+				{
+					id_unit_fk: values.unit,
+					size: values.size_value,
+					description: values.description, 
+					is_active: values.is_active ? true:values.is_active
+				}
+			);
+		}else{
+			console.log("INFORME OS CAMPOS PEDIDOS, POR FAVOR!");
+		}
+
+		form.resetFields();
+	}
+
 
 	return (
 		<div>
@@ -37,28 +82,41 @@ function AddSize() {
 		          <Content className="container-main">
 		            
 
-			      	<Form layout="vertical" form={form}>   			  
+			      	<Form layout="vertical" form={form} onFinish={onSaveSize}>   			  
 				        <Row gutter={[16, 16]}>
 					      <Col span={6}>
-							<Form.Item label="Valor">
+							<Form.Item label="Valor" name="size_value">
 					          <Input className="input-radius"/>
 					        </Form.Item>
 					      </Col>
 					      <Col span={6}>
-							<Form.Item label="Unidade">
-					          <Select style={{ borderRadius: '30px !important' }}>
+							<Form.Item label="Unidade" name="unit">
+					          <Select>
+					          	{
+					          		dataUnitMenusuration.map((item) => (
+											<Option key={item?.code} value={item?.id_unit}>
+												{item?.unit} - ({item?.abreviation})
+						          			</Option>
+					          			)
+					          		)
+					          	}
   							  </Select>
 					        </Form.Item>
 					      </Col>
 					      <Col span={4}>
-							<Form.Item label="Status">
+							<Form.Item label="Status" name="is_active">
 					          <Switch defaultChecked />
+					        </Form.Item>
+					      </Col>
+					      <Col span={24}>
+							<Form.Item label="Observação" name="description">
+					        	<TextArea rows={4} className="input-radius"/>
 					        </Form.Item>
 					      </Col>
 					      
 					     
 					      <Col span={24}>
-					      	<Button shape="round" className="button ac">
+					      	<Button onClick={() => form.submit()} shape="round" className="button ac">
 						       Salvar
 						    </Button>
 							<Button shape="round" className="button-cancel ac">

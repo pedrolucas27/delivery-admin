@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 import { 
 	Layout,
@@ -26,16 +27,51 @@ import FooterSite from "../../components/Footer";
 
 const { Content } = Layout;
 
+const BASE_URL = "http://localhost:4020/";
+
 function Sizes() {
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
+	const [data, setData] = useState([]);
 	const [form] = Form.useForm();
+
+	useEffect(() => {
+		axios.get(BASE_URL+"sizes").then((response) => {
+			let array = [];
+			response?.data.forEach((size) => {
+				array.push({
+					key: size?.id_size,
+					code: size?.code,
+					value: size?.size,
+					unit: size?.unit + " - ("+ size?.abreviation +")",
+					id_unit: size?.id_unit,
+					status: size?.is_active 
+				})
+			})
+			console.log(array);
+		  	setData(array);
+		}).catch((error) => {
+			console.log("BUGOU: "+ error);
+		});
+	}, []);
+
 
 	const columns = [
 	  { title: 'Código', dataIndex: 'code', key: 'code' },
 	  { title: 'Valor', dataIndex: 'value', key: 'value' },
-	  { title: 'Únidade', dataIndex: 'unit', key: 'unit' },
-	  { title: 'Status', dataIndex: 'status', key: 'status' },
+	  { title: 'Unidade', dataIndex: 'unit', key: 'unit' },
+	  { 
+	  	title: 'Status', 
+	  	dataIndex: 'status', 
+	  	key: 'status',
+	  	render: (__, record) => {
+	  		return(
+	  			<div>
+	  				{ record?.status ? "Ativo" : "Inativo" }
+	  			</div>
+	  		);
+	  	} 
+	  },
   	  {
 	    title: 'Ações',
 	    dataIndex: '',
@@ -55,15 +91,7 @@ function Sizes() {
   	  },
     ];
 
-    const data = [
-	  {
-	    key: '1',
-	    code: '988343',
-	    value: '200',
-	    unit: 'Gramas (g)',
-	    status: 'Ativo',
-	  }
-	];
+ 
 
 	return (
 		<div>

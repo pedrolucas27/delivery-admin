@@ -48,6 +48,7 @@ function Flavors() {
 					status: flavor?.is_active 
 				})
 			})
+			console.log(array);
 		  	setData(array);
 		}).catch((error) => {
 			console.log("BUGOU: "+ error);
