@@ -56,13 +56,15 @@ function AddSize() {
 
 
 	const onSaveSize = async (values) => {
-		if(values.size_value && values.unit){
+		console.log(values);
+
+		if(values?.size_value && values?.unit){
 			const response = await axios.post(BASE_URL+"addSize",
 				{
-					id_unit_fk: values.unit,
-					size: values.size_value,
-					description: values.description, 
-					is_active: values.is_active ? true:values.is_active
+					id_unit_fk: values?.unit,
+					size: values?.size_value,
+					description: values?.description, 
+					is_active: values?.is_active !== undefined ? values?.is_active:true
 				}
 			);
 		}else{

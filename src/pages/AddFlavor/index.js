@@ -32,12 +32,12 @@ function AddFlavor() {
 
 	const onSaveFlavor = async (values) => {
 
-		if(values.name_flavor){
+		if(values?.name_flavor){
 			const response = await axios.post(BASE_URL+"addFlavor",
 				{
-					name_flavor: values.name_flavor,
-					description: values.description, 
-					is_active: values.is_active ? true:values.is_active
+					name_flavor: values?.name_flavor,
+					description: values?.description, 
+					is_active: values?.is_active !== undefined ? values?.is_active:true
 				}
 			);
 		}else{
