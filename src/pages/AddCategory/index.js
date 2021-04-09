@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 import { 
 	Layout,
@@ -8,7 +9,6 @@ import {
 	Switch,
 	Row, 
 	Col,
-	Select
 } from 'antd';
 import {
   PlusOutlined
@@ -20,14 +20,28 @@ import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 
-const { TextArea } = Input;
 const { Content } = Layout;
+
+const BASE_URL = "http://localhost:4020/";
 
 function AddCategory() {
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
-
 	
+
+	const onSaveCategory = async (values) => {
+		if(values?.name_category){
+			const response = await axios.post(BASE_URL+"category",
+				{
+					name_category: values?.name_category, 
+					is_active: values?.is_active !== undefined ? values?.is_active:true
+				}
+			);
+		}else{
+			console.log("INFORME OS CAMPOS PEDIDOS, POR FAVOR!");
+		}
+		form.resetFields();
+	}
 
 	return (
 		<div>
@@ -37,37 +51,24 @@ function AddCategory() {
 		          <HeaderSite title={'Cadastro de categoria'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 		          <Content className="container-main">
 
-			      	<Form layout="vertical" form={form}>   			  
+			      	<Form layout="vertical" form={form} onFinish={onSaveCategory}>   			  
 				        <Row gutter={[16, 16]}>
-					      <Col span={10}>
-							<Form.Item label="Nome">
+
+					      <Col span={20}>
+							<Form.Item label="Nome" name="name_category">
 					          <Input className="input-radius"/>
 					        </Form.Item>
 					      </Col>
-					      <Col span={10}>
-							<Form.Item label="Disponibilidade">
-					          <Select
-							    mode="multiple"
-							    placeholder="Selecione os dias"
-							    style={{ width: '100%' }}
-							  >
-							        
-							  </Select>
-					        </Form.Item>
-					      </Col>
+
 					      <Col span={4}>
-							<Form.Item label="Status">
+							<Form.Item label="Status" name="is_active">
 					          <Switch defaultChecked />
-					         </Form.Item>
+					        </Form.Item>
 					      </Col>
 					      
+
 					      <Col span={24}>
-					      	<Form.Item label="Descrição">
-					      	  <TextArea rows={4} className="input-radius"/>
-					        </Form.Item>
-					      </Col>
-					      <Col span={24}>
-					      	<Button shape="round" className="button ac">
+					      	<Button onClick={() => form.submit()} shape="round" className="button ac">
 						       Salvar
 						    </Button>
 							<Button shape="round" className="button-cancel ac">
