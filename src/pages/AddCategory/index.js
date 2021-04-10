@@ -37,10 +37,11 @@ function AddCategory() {
 					is_active: values?.is_active !== undefined ? values?.is_active:true
 				}
 			);
+			form.resetFields();
 		}else{
 			console.log("INFORME OS CAMPOS PEDIDOS, POR FAVOR!");
 		}
-		form.resetFields();
+		
 	}
 
 	return (

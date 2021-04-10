@@ -55,9 +55,28 @@ function AddProduct() {
 		}).catch((error) => {
 			console.log("BUGOU: "+ error);
 		});
-
-
 	}, []);
+
+
+	const onSaveProduct = async (values) => {
+		if(values?.name_product && values?.price_product && values?.flavor && values?.category && values?.size){
+			const response = await axios.post(BASE_URL+"product",
+				{
+					name_product: values?.name_product,
+					description: values?.description || null,
+					price: parseFloat(values?.price_product),
+					is_active: values?.is_active !== undefined ? values?.is_active:true,
+					fk_id_flavor: values?.flavor,
+					fk_id_category: values?.category,
+					fk_id_size: values?.size
+				}
+			);
+			form.resetFields();
+		}else{
+			console.log("INFORME OS CAMPOS PEDIDOS, POR FAVOR!");
+		}
+		
+	}
 
 
 	return (
@@ -69,7 +88,7 @@ function AddProduct() {
 		          <Content className="container-main">
 		            
 
-			      	<Form layout="vertical" form={form}>   			  
+			      	<Form layout="vertical" form={form} onFinish={onSaveProduct}>   			  
 				        <Row gutter={[16, 16]}>
 
 					      <Col span={20}>
@@ -135,10 +154,6 @@ function AddProduct() {
 					        </Form.Item>
 					      </Col>
 
-					      
-
-
-
 					      <Col span={24}>
 					      	<Form.Item label="Descrição" name="description">
 					      	  <TextArea rows={4} className="input-radius"/>
@@ -146,7 +161,7 @@ function AddProduct() {
 					      </Col>
 
 					      <Col span={24}>
-					      	<Button shape="round" className="button ac">
+					      	<Button onClick={() => form.submit()} shape="round" className="button ac">
 						       Salvar
 						    </Button>
 							<Button shape="round" className="button-cancel ac">

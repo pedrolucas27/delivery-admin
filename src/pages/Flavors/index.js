@@ -167,7 +167,7 @@ function Flavors() {
 					      
 					      <Col span={24}>
 					      	<Button onClick={() => form.submit()} shape="round" className="button ac">
-						       Salvar
+						       Editar
 						    </Button>
 							<Button shape="round" className="button-cancel ac">
 						       Cancelar
