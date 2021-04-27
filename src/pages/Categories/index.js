@@ -12,7 +12,9 @@ import {
 	Input,
 	Switch,
 	Select, 
-	Form
+	Form,
+	message,
+	Spin
 } from 'antd';
 import {
   DeleteOutlined,
@@ -36,6 +38,7 @@ function Categories() {
 	const [form] = Form.useForm();
 	const [dataCategory, setDataCategory] = useState([]);
 	const [idUpdate, setIdUpdate] = useState(null);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		axios.get(BASE_URL+"category").then((response) => {
@@ -89,13 +92,46 @@ function Categories() {
     ];
 
 
+    const getCategories = async () => {
+    	await axios.get(BASE_URL+"category").then((response) => {
+			let array = [];
+			response?.data.forEach((category) => {
+				array.push({
+					key: category?.id_category,
+					code: category?.code,
+					name: category?.name_category,
+					status: category?.is_active 
+				})
+			})
+			setDataCategory(array);						
+		}).catch((error) => {
+			console.log("BUGOU: "+ error);
+		});
+    }
+
+
 
     const deleteCategory = async (id) => {
-    	const response = await axios.delete(BASE_URL+"category", { data: { id: id } } );
-    	console.log(response);
+    	setLoading(true);
+
+    	await axios.delete(BASE_URL+"category/"+id).then(response => {
+      		if(response?.status === 200){
+				getCategories();
+				setLoading(false);
+				message.success(response?.data?.message);
+			}else{
+				setLoading(false);
+				message.error(response?.data?.message);
+			}
+    	}).catch(error => {
+    		setLoading(false);
+    		message.error(error);
+    	});
+
     }
 
     const updateCategory = async (values) => {
+    	setLoading(true);
     	if(values?.name_category){
 			const response = await axios.put(BASE_URL+"category",
 				{
@@ -104,9 +140,20 @@ function Categories() {
 					is_active: values?.is_active !== undefined ? values?.is_active:true
 				}
 			);
-			form.resetFields();
+			
+	    	if(response?.status === 200){
+				getCategories();
+				setLoading(false);
+				message.success(response?.data?.message);
+				setExpandEditRow(!expandEditRow);
+			}else{
+				setLoading(false);
+				message.error(response?.data?.message);
+			}
+
 		}else{
-			console.log("INFORME OS CAMPOS PEDIDOS, POR FAVOR!");
+			setLoading(false);
+			message.error("Informe o nome da categoria, por favor !");
 		}
     }
 
@@ -125,56 +172,56 @@ function Categories() {
 
 	return (
 		<div>
-			<Layout>
-				<MenuSite open={expand} menuItem={['sub2-2']} subMenu={['sub2']}/>
-		        <Layout className="site-layout">
-		          <HeaderSite title={'Listagem de categorias'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
-		          <Content className="container-main">
-		            <Table
-		              size="middle"
-					  columns={columns}
-					  dataSource={dataCategory}
-					/>
-		          </Content>
-		          <FooterSite />
-		        </Layout>
-	      	</Layout>
+			<Spin size="large" spinning={loading}>
+				<Layout>
+					<MenuSite open={expand} />
+			        <Layout className="site-layout">
+			          <HeaderSite title={'Listagem de categorias'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
+			          <Content className="container-main">
+			            <Table
+			              size="middle"
+						  columns={columns}
+						  dataSource={dataCategory}
+						/>
+			          </Content>
+			          <FooterSite />
+			        </Layout>
+		      	</Layout>
 
-	      	 <Drawer
-	          	title="Editar categoria"
-	          	width={720}
-	          	onClose={() => setExpandEditRow(!expandEditRow)} 
-	          	visible={expandEditRow}
-	          	bodyStyle={{ paddingBottom: 80 }}>
-	          		<Form layout="vertical" form={form} onFinish={updateCategory}>   			  
-				        <Row gutter={[16, 16]}>
+		      	<Drawer
+		          	title="Editar categoria"
+		          	width={720}
+		          	onClose={() => setExpandEditRow(!expandEditRow)} 
+		          	visible={expandEditRow}
+		          	bodyStyle={{ paddingBottom: 80 }}>
+		          		<Form layout="vertical" form={form} onFinish={updateCategory}>   			  
+					        <Row gutter={[16, 16]}>
 
-					      <Col span={20}>
-							<Form.Item label="Nome" name="name_category">
-					          <Input className="input-radius"/>
-					        </Form.Item>
-					      </Col>
+						      <Col span={20}>
+								<Form.Item label="Nome" name="name_category">
+						          <Input className="input-radius"/>
+						        </Form.Item>
+						      </Col>
 
-					      <Col span={4}>
-							<Form.Item label="Status" name="is_active" valuePropName="checked">
-					          <Switch />
-					        </Form.Item>
-					      </Col>
-					      
+						      <Col span={4}>
+								<Form.Item label="Status" name="is_active" valuePropName="checked">
+						          <Switch />
+						        </Form.Item>
+						      </Col>
+						      
 
-					      <Col span={24}>
-					      	<Button onClick={() => form.submit()} shape="round" className="button ac">
-						       Editar
-						    </Button>
-							<Button shape="round" className="button-cancel ac">
-						       Cancelar
-						    </Button>
-					      </Col>
-					    </Row>
-			      	</Form>
-             </Drawer>
-
-
+						      <Col span={24}>
+						      	<Button onClick={() => form.submit()} shape="round" className="button ac">
+							       Editar
+							    </Button>
+								<Button onClick={() => setExpandEditRow(!expandEditRow)} shape="round" className="button-cancel ac">
+							       Cancelar
+							    </Button>
+						      </Col>
+						    </Row>
+				      	</Form>
+	            </Drawer>
+			</Spin>
   		</div>
   	);
 }

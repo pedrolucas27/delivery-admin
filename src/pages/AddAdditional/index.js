@@ -6,17 +6,14 @@ import {
 	Form, 
 	Input, 
 	Button, 
-	Radio,
 	Switch,
+	Select,
 	Row, 
 	Col,
-	Select,
 	message,
 	Spin
 } from 'antd';
-import {
-  PlusOutlined
-} from '@ant-design/icons';
+
 import 'antd/dist/antd.css';
 import '../../global.css';
 
@@ -24,48 +21,37 @@ import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 
-const { TextArea } = Input;
 const { Content } = Layout;
 const { Option } = Select;
+const { TextArea } = Input;
 
 const BASE_URL = "http://localhost:4020/";
 
-function AddSize() {
+function AddAdditional() {
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
-	const [dataUnitMenusuration, setDataUnitMenusuration] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const [dataCategory, setDataCategory] = useState([]);
 
 	useEffect(() => {
-		axios.get(BASE_URL+"unitMensuration").then((response) => {
-			let array = [];
-			response?.data.forEach((unit_mensuration) => {
-				array.push({
-					id_unit: unit_mensuration?.id_unit,
-					code: unit_mensuration?.code,
-					unit: unit_mensuration?.unit,
-					abreviation: unit_mensuration?.abreviation,
-					is_active: unit_mensuration?.is_active 
-				})
-			})
-			console.log(array);
-		  	setDataUnitMenusuration(array);
+		axios.get(BASE_URL+"category").then((response) => {
+			setDataCategory(response?.data);						
 		}).catch((error) => {
 			console.log("BUGOU: "+ error);
 		});
-
 	}, []);
 
-
-	const onSaveSize = async (values) => {
+	const onSaveAdditional = async (values) => {
 		setLoading(true);
-		if(values?.size_value && values?.unit){
-			const response = await axios.post(BASE_URL+"size",
+		if(values?.name_additional && values?.category && values?.price){
+			const response = await axios.post(BASE_URL+"additional",
 				{
-					id_unit_fk: values?.unit,
-					size: values?.size_value,
-					description: values?.description, 
-					is_active: values?.is_active !== undefined ? values?.is_active:true
+					name: values?.name_additional,
+					description: values?.description || null,
+					is_default: values?.is_default !== undefined ? values?.is_default:true,
+					price: parseFloat(values?.price),
+					is_active: values?.is_active !== undefined ? values?.is_active:true,
+					id_category: values?.category
 				}
 			);
 
@@ -81,9 +67,7 @@ function AddSize() {
 			setLoading(false);
 			message.error("Informe os campos pedidos, por favor !");
 		}
-
 	}
-
 
 	return (
 		<div>
@@ -91,42 +75,58 @@ function AddSize() {
 				<Layout>
 					<MenuSite open={expand} />
 			        <Layout className="site-layout">
-			          <HeaderSite title={'Cadastro de tamanho'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
+			          <HeaderSite title={'Cadastro de adicional'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 			          <Content className="container-main">
-			            
-				      	<Form layout="vertical" form={form} onFinish={onSaveSize}>   			  
+
+				      	<Form layout="vertical" form={form} onFinish={onSaveAdditional}>   			  
 					        <Row gutter={[16, 16]}>
+
 						      <Col span={6}>
-								<Form.Item label="Valor" name="size_value">
-						          <Input className="input-radius"/>
+								<Form.Item label="Nome" name="name_additional">
+						          <Input className="input-radius" />
 						        </Form.Item>
 						      </Col>
-						      <Col span={6}>
-								<Form.Item label="Unidade" name="unit">
+
+						      <Col span={5}>
+								<Form.Item label="Categoria" name="category">
 						          <Select>
-						          	{
-						          		dataUnitMenusuration.map((item) => (
-												<Option key={item?.code} value={item?.id_unit}>
-													{item?.unit} - ({item?.abreviation})
-							          			</Option>
-						          			)
-						          		)
-						          	}
-	  							  </Select>
+							          	{
+							          		dataCategory.map((item) => (
+												<Option key={item?.code} value={item?.id_category}>
+													{item?.name_category}
+								          		</Option>
+							          			)
+							          		)
+							          	}
+  							  		</Select>
 						        </Form.Item>
 						      </Col>
+
+						      <Col span={5}>
+								<Form.Item label="Preço (R$)" name="price">
+						          <Input className="input-radius" />
+						        </Form.Item>
+						      </Col>
+
+						      <Col span={4}>
+								<Form.Item label="Adiconal padrão" name="is_default">
+						          <Switch />
+						        </Form.Item>
+						      </Col>
+
 						      <Col span={4}>
 								<Form.Item label="Status" name="is_active">
 						          <Switch defaultChecked />
 						        </Form.Item>
 						      </Col>
+
 						      <Col span={24}>
-								<Form.Item label="Observação" name="description">
-						        	<TextArea rows={4} className="input-radius"/>
+						      	<Form.Item label="Descrição" name="description">
+						      	  <TextArea rows={4} className="input-radius"/>
 						        </Form.Item>
 						      </Col>
 						      
-						     
+
 						      <Col span={24}>
 						      	<Button onClick={() => form.submit()} shape="round" className="button ac">
 							       Salvar
@@ -138,6 +138,7 @@ function AddSize() {
 						    </Row>
 				      	</Form>
 
+
 			          </Content>
 			          <FooterSite />
 			        </Layout>
@@ -147,4 +148,4 @@ function AddSize() {
   	);
 }
 
-export default AddSize;
+export default AddAdditional;

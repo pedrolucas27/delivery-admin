@@ -12,7 +12,9 @@ import {
 	Col,
 	Table,
 	Tooltip,
-	Drawer
+	Drawer,
+	message,
+	Spin
 } from 'antd';
 import {
   DeleteOutlined,
@@ -38,10 +40,11 @@ function Sizes() {
 	const [data, setData] = useState([]);
 	const [dataUnitMenusuration, setDataUnitMenusuration] = useState([]);
 	const [form] = Form.useForm();
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 
-		axios.get(BASE_URL+"sizes").then((response) => {
+		axios.get(BASE_URL+"size").then((response) => {
 			let array = [];
 			response?.data.forEach((size) => {
 				array.push({
@@ -54,13 +57,12 @@ function Sizes() {
 					status: size?.is_active 
 				})
 			})
-			console.log(array);
 		  	setData(array);
 		}).catch((error) => {
 			console.log("BUGOU: "+ error);
 		});
 
-		axios.get(BASE_URL+"addSize").then((response) => {
+		axios.get(BASE_URL+"unitMensuration").then((response) => {
 			let array = [];
 			response?.data.forEach((unit_mensuration) => {
 				array.push({
@@ -71,7 +73,6 @@ function Sizes() {
 					is_active: unit_mensuration?.is_active 
 				})
 			})
-			console.log(array);
 		  	setDataUnitMenusuration(array);
 		}).catch((error) => {
 			console.log("BUGOU: "+ error);
@@ -104,10 +105,10 @@ function Sizes() {
 	    render: (__, record) => {
 	    	return(
 	    		<div>
-	    			<Tooltip placement="top" title='Deletar categoria'>
+	    			<Tooltip placement="top" title='Deletar tamanho'>
 	    				<DeleteOutlined className="icon-table" onClick={() => deleteSize(record?.key)}/>
 	    			</Tooltip>
-	    			<Tooltip placement="top" title='Editar categoria'>
+	    			<Tooltip placement="top" title='Editar tamanho'>
 	    				<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record?.key)}/>
 	    			</Tooltip>
 	    		</div>
@@ -116,23 +117,73 @@ function Sizes() {
   	  },
     ];
 
+    const getSizes = async () => {
+    	await axios.get(BASE_URL+"size").then((response) => {
+			let array = [];
+			response?.data.forEach((size) => {
+				array.push({
+					key: size?.id_size,
+					code: size?.code,
+					value: size?.size,
+					unit: size?.unit + " - ("+ size?.abreviation +")",
+					description: size?.description,
+					id_unit: size?.id_unit,
+					status: size?.is_active 
+				})
+			})
+		  	setData(array);
+		}).catch((error) => {
+			console.log("BUGOU: "+ error);
+		});
+    }
+
 
     const deleteSize = async (id) => {
-    	const response = await axios.delete(BASE_URL+"delSize", { data: { id: id } } );
-    	console.log(response);
+    	setLoading(true);
+    	    	
+		await axios.delete(BASE_URL+"size/"+id).then(response => {
+      		if(response?.status === 200){
+				getSizes();
+				setLoading(false);
+				message.success(response?.data?.message);
+			}else{
+				setLoading(false);
+				message.error(response?.data?.message);
+			}
+    	}).catch(error => {
+    		setLoading(false);
+    		message.error(error);
+    	});
     }
 
     const updateSize = async (values) => {
-		const response = await axios.put(BASE_URL+"updateSize", 
-			{  
-			  id_size: idUpdate,
-			  id_unit_fk: values?.unit, 
-			  size: values?.size_value, 
-			  description: values?.description, 
-			  is_active: values?.is_active
-			} 
-		);
-    	console.log(response);
+    	setLoading(true);
+    	if(values?.size_value && values?.unit){
+			const response = await axios.put(BASE_URL+"size", 
+				{  
+				  id_size: idUpdate,
+				  id_unit_fk: values?.unit, 
+				  size: values?.size_value, 
+				  description: values?.description, 
+				  is_active: values?.is_active
+				} 
+			);
+
+			if(response?.status === 200){
+				getSizes();
+				setLoading(false);
+				message.success(response?.data?.message);
+				setExpandEditRow(!expandEditRow);
+			}else{
+				setLoading(false);
+				message.error(response?.data?.message);
+			}
+
+		}else{
+			setLoading(false);
+			message.error("Informe os campos pedidos, por favor !");
+		}
+
     }
 
 
@@ -153,77 +204,75 @@ function Sizes() {
     }
 
 
-
- 
-
 	return (
 		<div>
-			<Layout>
-				<MenuSite open={expand} menuItem={['sub2-4']} subMenu={['sub2']}/>
-		        <Layout className="site-layout">
-		          <HeaderSite title={'Listagem de tamanhos'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
-		          <Content className="container-main">
-		            <Table
-		              size="middle"
-					  columns={columns}
-					  dataSource={data}
-					/>
-		          </Content>
-		          <FooterSite />
-		        </Layout>
-	      	</Layout>
+			<Spin size="large" spinning={loading}>
+				<Layout>
+					<MenuSite open={expand} />
+			        <Layout className="site-layout">
+			          <HeaderSite title={'Listagem de tamanhos'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
+			          <Content className="container-main">
+			            <Table
+			              size="middle"
+						  columns={columns}
+						  dataSource={data}
+						/>
+			          </Content>
+			          <FooterSite />
+			        </Layout>
+		      	</Layout>
 
-	      	<Drawer
-	          	title="Editar tamanho"
-	          	width={720}
-	          	onClose={() => setExpandEditRow(!expandEditRow)} 
-	          	visible={expandEditRow}
-	          	bodyStyle={{ paddingBottom: 80 }}>
-	          		<Form layout="vertical" form={form} onFinish={updateSize}>   			  
-				        <Row gutter={[16, 16]}>
-					      <Col span={6}>
-							<Form.Item label="Valor" name="size_value">
-					          <Input className="input-radius"/>
-					        </Form.Item>
-					      </Col>
-					      <Col span={6}>
-							<Form.Item label="Unidade" name="unit">
-					          <Select>
-					          	{
-					          		dataUnitMenusuration.map((item) => (
-											<Option key={item?.code} value={item?.id_unit}>
-												{item?.unit} - ({item?.abreviation})
-						          			</Option>
-					          			)
-					          		)
-					          	}
-  							  </Select>
-					        </Form.Item>
-					      </Col>
-					      <Col span={4}>
-							<Form.Item label="Status" name="is_active" valuePropName="checked">
-					          <Switch />
-					        </Form.Item>
-					      </Col>
-					      <Col span={24}>
-							<Form.Item label="Observação" name="description">
-					        	<TextArea rows={4} className="input-radius"/>
-					        </Form.Item>
-					      </Col>
-					      
-					     
-					      <Col span={24}>
-					      	<Button onClick={() => form.submit()} shape="round" className="button ac">
-						       Salvar
-						    </Button>
-							<Button shape="round" className="button-cancel ac">
-						       Cancelar
-						    </Button>
-					      </Col>
-					    </Row>
-			      	</Form>
-            </Drawer>
-
+		      	<Drawer
+		          	title="Editar tamanho"
+		          	width={720}
+		          	onClose={() => setExpandEditRow(!expandEditRow)} 
+		          	visible={expandEditRow}
+		          	bodyStyle={{ paddingBottom: 80 }}>
+		          		<Form layout="vertical" form={form} onFinish={updateSize}>   			  
+					        <Row gutter={[16, 16]}>
+						      <Col span={6}>
+								<Form.Item label="Valor" name="size_value">
+						          <Input className="input-radius"/>
+						        </Form.Item>
+						      </Col>
+						      <Col span={6}>
+								<Form.Item label="Unidade" name="unit">
+						          <Select>
+						          	{
+						          		dataUnitMenusuration.map((item) => (
+												<Option key={item?.code} value={item?.id_unit}>
+													{item?.unit} - ({item?.abreviation})
+							          			</Option>
+						          			)
+						          		)
+						          	}
+	  							  </Select>
+						        </Form.Item>
+						      </Col>
+						      <Col span={4}>
+								<Form.Item label="Status" name="is_active" valuePropName="checked">
+						          <Switch />
+						        </Form.Item>
+						      </Col>
+						      <Col span={24}>
+								<Form.Item label="Observação" name="description">
+						        	<TextArea rows={4} className="input-radius"/>
+						        </Form.Item>
+						      </Col>
+						      
+						     
+						      <Col span={24}>
+						      	<Button onClick={() => form.submit()} shape="round" className="button ac">
+							       Editar
+							    </Button>
+								<Button onClick={() => setExpandEditRow(!expandEditRow)} shape="round" className="button-cancel ac">
+							       Cancelar
+							    </Button>
+						      </Col>
+						    </Row>
+				      	</Form>
+	            </Drawer>
+			</Spin>
   		</div>
   	);
 }

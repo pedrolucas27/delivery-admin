@@ -10,7 +10,8 @@ import {
 	Select,
 	Switch,
 	Row, 
-	Col
+	Col,
+	message
 } from 'antd';
 import {
   PlusOutlined
@@ -71,9 +72,16 @@ function AddProduct() {
 					fk_id_size: values?.size
 				}
 			);
-			form.resetFields();
+
+			if(response?.status === 200){
+				message.success(response?.data?.message);
+				form.resetFields();
+			}else{
+				message.error(response?.data?.message);
+			}
+
 		}else{
-			console.log("INFORME OS CAMPOS PEDIDOS, POR FAVOR!");
+			message.error("Informe os campos pedidos, por favor !");
 		}
 		
 	}
@@ -82,7 +90,7 @@ function AddProduct() {
 	return (
 		<div>
 			<Layout>
-				<MenuSite open={expand} menuItem={['sub1-1']} subMenu={['sub1']}/>
+				<MenuSite open={expand} />
 		        <Layout className="site-layout">
 		          <HeaderSite title={'Cadastro de produto'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 		          <Content className="container-main">
@@ -150,7 +158,7 @@ function AddProduct() {
 
 					      <Col span={6}>
 					      	<Form.Item label="Preço" name="price_product">
-					      	  <Input addonBefore="R$" />
+					      	  <Input className="input-radius" />
 					        </Form.Item>
 					      </Col>
 
@@ -164,7 +172,7 @@ function AddProduct() {
 					      	<Button onClick={() => form.submit()} shape="round" className="button ac">
 						       Salvar
 						    </Button>
-							<Button shape="round" className="button-cancel ac">
+							<Button onClick={() => {form.resetFields()}} shape="round" className="button-cancel ac">
 						       Cancelar
 						    </Button>
 					      </Col>

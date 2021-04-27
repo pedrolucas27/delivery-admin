@@ -18,7 +18,7 @@ import FooterSite from "../../components/Footer";
 
 const { Content } = Layout;
 
-function Products() {
+function Pdv() {
 	const [expand, setExpand] = useState(false);
 
 	return (
@@ -26,7 +26,7 @@ function Products() {
 			<Layout>
 				<MenuSite open={expand} />
 		        <Layout className="site-layout">
-		          <HeaderSite title={'Listagem de produtos'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
+		          <HeaderSite title={'Ponto de venda'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 		          <Content className="container-main">
 		            
 
@@ -38,4 +38,4 @@ function Products() {
   	);
 }
 
-export default Products;
+export default Pdv;

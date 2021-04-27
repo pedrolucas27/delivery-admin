@@ -9,10 +9,10 @@ import {
 	Switch,
 	Row, 
 	Col,
+	message,
+	Spin
 } from 'antd';
-import {
-  PlusOutlined
-} from '@ant-design/icons';
+
 import 'antd/dist/antd.css';
 import '../../global.css';
 
@@ -27,9 +27,11 @@ const BASE_URL = "http://localhost:4020/";
 function AddCategory() {
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
+	const [loading, setLoading] = useState(false);
 	
 
 	const onSaveCategory = async (values) => {
+		setLoading(true);
 		if(values?.name_category){
 			const response = await axios.post(BASE_URL+"category",
 				{
@@ -37,53 +39,63 @@ function AddCategory() {
 					is_active: values?.is_active !== undefined ? values?.is_active:true
 				}
 			);
-			form.resetFields();
+
+			setLoading(false);			
+			if(response?.status === 200){
+				message.success(response?.data?.message);
+				form.resetFields();
+			}else{
+				message.error(response?.data?.message);
+			}
+			
 		}else{
-			console.log("INFORME OS CAMPOS PEDIDOS, POR FAVOR!");
+			setLoading(false);
+			message.error("Informe o nome da categoria, por favor !");
 		}
 		
 	}
 
+
 	return (
 		<div>
-			<Layout>
-				<MenuSite open={expand} menuItem={['sub1-2']} subMenu={['sub1']}/>
-		        <Layout className="site-layout">
-		          <HeaderSite title={'Cadastro de categoria'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
-		          <Content className="container-main">
+			<Spin size="large" spinning={loading}>
+				<Layout>
+					<MenuSite open={expand} />
+			        <Layout className="site-layout">
+			          <HeaderSite title={'Cadastro de categoria'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
+			          <Content className="container-main">
 
-			      	<Form layout="vertical" form={form} onFinish={onSaveCategory}>   			  
-				        <Row gutter={[16, 16]}>
+				      	<Form layout="vertical" form={form} onFinish={onSaveCategory}>   			  
+					        <Row gutter={[16, 16]}>
 
-					      <Col span={20}>
-							<Form.Item label="Nome" name="name_category">
-					          <Input className="input-radius"/>
-					        </Form.Item>
-					      </Col>
+						      <Col span={20}>
+								<Form.Item label="Nome" name="name_category">
+						          <Input className="input-radius"/>
+						        </Form.Item>
+						      </Col>
 
-					      <Col span={4}>
-							<Form.Item label="Status" name="is_active">
-					          <Switch defaultChecked />
-					        </Form.Item>
-					      </Col>
-					      
+						      <Col span={4}>
+								<Form.Item label="Status" name="is_active">
+						          <Switch defaultChecked />
+						        </Form.Item>
+						      </Col>
+						      
 
-					      <Col span={24}>
-					      	<Button onClick={() => form.submit()} shape="round" className="button ac">
-						       Salvar
-						    </Button>
-							<Button shape="round" className="button-cancel ac">
-						       Cancelar
-						    </Button>
-					      </Col>
-					    </Row>
-			      	</Form>
-
-
-		          </Content>
-		          <FooterSite />
-		        </Layout>
-	      	</Layout>
+						      <Col span={24}>
+						      	<Button onClick={() => form.submit()} shape="round" className="button ac">
+							       Salvar
+							    </Button>
+								<Button onClick={() => {form.resetFields()}} shape="round" className="button-cancel ac">
+							       Cancelar
+							    </Button>
+						      </Col>
+						    </Row>
+				      	</Form>
+			          </Content>
+			          <FooterSite />
+			        </Layout>
+		      	</Layout>
+		    </Spin>
   		</div>
   	);
 }
