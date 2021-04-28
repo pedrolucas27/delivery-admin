@@ -6,16 +6,13 @@ import {
 	Form, 
 	Input, 
 	Button, 
-	Radio,
 	Select,
 	Switch,
 	Row, 
 	Col,
-	message
+	message,
+	Spin
 } from 'antd';
-import {
-  PlusOutlined
-} from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import './addProduct.css';
 import '../../global.css';
@@ -33,19 +30,19 @@ const BASE_URL = "http://localhost:4020/";
 function AddProduct() {
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
-
 	const [dataFlavor, setDataFlavor] = useState([]);
 	const [dataSize, setDataSize] = useState([]);
 	const [dataCategory, setDataCategory] = useState([]);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		axios.get(BASE_URL+"flavors").then((response) => {
+		axios.get(BASE_URL+"flavor").then((response) => {
 			setDataFlavor(response?.data);
 		}).catch((error) => {
 			console.log("BUGOU: "+ error);
 		});
 
-		axios.get(BASE_URL+"sizes").then((response) => {
+		axios.get(BASE_URL+"size").then((response) => {
 			setDataSize(response?.data);						
 		}).catch((error) => {
 			console.log("BUGOU: "+ error);
@@ -60,6 +57,7 @@ function AddProduct() {
 
 
 	const onSaveProduct = async (values) => {
+		setLoading(true);
 		if(values?.name_product && values?.price_product && values?.flavor && values?.category && values?.size){
 			const response = await axios.post(BASE_URL+"product",
 				{
@@ -72,7 +70,8 @@ function AddProduct() {
 					fk_id_size: values?.size
 				}
 			);
-
+			
+			setLoading(false);
 			if(response?.status === 200){
 				message.success(response?.data?.message);
 				form.resetFields();
@@ -81,6 +80,7 @@ function AddProduct() {
 			}
 
 		}else{
+			setLoading(false);
 			message.error("Informe os campos pedidos, por favor !");
 		}
 		
@@ -89,102 +89,103 @@ function AddProduct() {
 
 	return (
 		<div>
-			<Layout>
-				<MenuSite open={expand} />
-		        <Layout className="site-layout">
-		          <HeaderSite title={'Cadastro de produto'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
-		          <Content className="container-main">
-		            
+			<Spin size="large" spinning={loading}>
+				<Layout>
+					<MenuSite open={expand} />
+			        <Layout className="site-layout">
+			          <HeaderSite title={'Cadastro de produto'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
+			          <Content className="container-main">
+			            
 
-			      	<Form layout="vertical" form={form} onFinish={onSaveProduct}>   			  
-				        <Row gutter={[16, 16]}>
+				      	<Form layout="vertical" form={form} onFinish={onSaveProduct}>   			  
+					        <Row gutter={[16, 16]}>
 
-					      <Col span={20}>
-							<Form.Item label="Nome" name="name_product">
-					          <Input  className="input-radius"/>
-					        </Form.Item>
-					      </Col>
+						      <Col span={20}>
+								<Form.Item label="Nome" name="name_product">
+						          <Input  className="input-radius"/>
+						        </Form.Item>
+						      </Col>
 
-					      <Col span={4}>
-							<Form.Item label="Status" name="is_active">
-					          <Switch defaultChecked />
-					        </Form.Item>
-					      </Col>
+						      <Col span={4}>
+								<Form.Item label="Status" name="is_active">
+						          <Switch defaultChecked />
+						        </Form.Item>
+						      </Col>
 
-					      <Col span={6}>
-							<Form.Item label="Categoria" name="category">
-					          <Select>
-					          	{
-					          		dataCategory.map((item) => (
-										<Option key={item?.code} value={item?.id_category}>
-											{item?.name_category}
-						          		</Option>
-					          			)
-					          		)
-					          	}
-  							  </Select>
-					        </Form.Item>
-					      </Col>
-					      
-					      <Col span={6}>
-							<Form.Item label="Sabor" name="flavor">
-					          <Select>
-					          	{
-					          		dataFlavor.map((item) => (
-										<Option key={item?.code} value={item?.id}>
-											{item?.name_flavor}
-						          		</Option>
-					          			)
-					          		)
-					          	}
-  							  </Select>
-					        </Form.Item>
-					      </Col>
+						      <Col span={6}>
+								<Form.Item label="Categoria" name="category">
+						          <Select>
+						          	{
+						          		dataCategory.map((item) => (
+											<Option key={item?.code} value={item?.id_category}>
+												{item?.name_category}
+							          		</Option>
+						          			)
+						          		)
+						          	}
+	  							  </Select>
+						        </Form.Item>
+						      </Col>
+						      
+						      <Col span={6}>
+								<Form.Item label="Sabor" name="flavor">
+						          <Select>
+						          	{
+						          		dataFlavor.map((item) => (
+											<Option key={item?.code} value={item?.id}>
+												{item?.name_flavor}
+							          		</Option>
+						          			)
+						          		)
+						          	}
+	  							  </Select>
+						        </Form.Item>
+						      </Col>
 
-					      <Col span={6}>
-							<Form.Item label="Tamanho" name="size">
-					          <Select>
-					          	{
-					          		dataSize.map((item) => (
-										<Option key={item?.code} value={item?.id_size}>
-											{item?.size} ({item?.unit} - {item?.abreviation})
-						          		</Option>
-					          			)
-					          		)
-					          	}
-  							  </Select>
-					        </Form.Item>
-					      </Col>
+						      <Col span={6}>
+								<Form.Item label="Tamanho" name="size">
+						          <Select>
+						          	{
+						          		dataSize.map((item) => (
+											<Option key={item?.code} value={item?.id_size}>
+												{item?.size} ({item?.unit} - {item?.abreviation})
+							          		</Option>
+						          			)
+						          		)
+						          	}
+	  							  </Select>
+						        </Form.Item>
+						      </Col>
 
-					      <Col span={6}>
-					      	<Form.Item label="Preço" name="price_product">
-					      	  <Input className="input-radius" />
-					        </Form.Item>
-					      </Col>
+						      <Col span={6}>
+						      	<Form.Item label="Preço" name="price_product">
+						      	  <Input className="input-radius" />
+						        </Form.Item>
+						      </Col>
 
-					      <Col span={24}>
-					      	<Form.Item label="Descrição" name="description">
-					      	  <TextArea rows={4} className="input-radius"/>
-					        </Form.Item>
-					      </Col>
+						      <Col span={24}>
+						      	<Form.Item label="Descrição" name="description">
+						      	  <TextArea rows={4} className="input-radius"/>
+						        </Form.Item>
+						      </Col>
 
-					      <Col span={24}>
-					      	<Button onClick={() => form.submit()} shape="round" className="button ac">
-						       Salvar
-						    </Button>
-							<Button onClick={() => {form.resetFields()}} shape="round" className="button-cancel ac">
-						       Cancelar
-						    </Button>
-					      </Col>
+						      <Col span={24}>
+						      	<Button onClick={() => form.submit()} shape="round" className="button ac">
+							       Salvar
+							    </Button>
+								<Button onClick={() => {form.resetFields()}} shape="round" className="button-cancel ac">
+							       Cancelar
+							    </Button>
+						      </Col>
 
-					    </Row>
-			      	</Form>
+						    </Row>
+				      	</Form>
 
-
-		          </Content>
-		          <FooterSite />
-		        </Layout>
-	      	</Layout>
+			          </Content>
+			          <FooterSite />
+			        </Layout>
+		      	</Layout>
+		    </Spin>
   		</div>
   	);
 }

@@ -40,18 +40,17 @@ function Flavors() {
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		axios.get(BASE_URL+"flavors").then((response) => {
+		axios.get(BASE_URL+"flavor").then((response) => {
 			let array = [];
 			response?.data.forEach((flavor) => {
 				array.push({
 					key: flavor?.id,
 					code: flavor?.code,
 					name: flavor?.name_flavor,
-					description: flavor?.description,
+					description: flavor?.description || "-",
 					status: flavor?.is_active 
 				})
 			})
-			console.log(array);
 		  	setData(array);
 		}).catch((error) => {
 			console.log("BUGOU: "+ error);
@@ -96,7 +95,7 @@ function Flavors() {
 
 
     const getFlavors = async () => {
-    	await axios.get(BASE_URL+"flavors").then((response) => {
+    	await axios.get(BASE_URL+"flavor").then((response) => {
 			let array = [];
 			response?.data.forEach((flavor) => {
 				array.push({
@@ -107,7 +106,6 @@ function Flavors() {
 					status: flavor?.is_active 
 				})
 			})
-			console.log(array);
 		  	setData(array);
 		}).catch((error) => {
 			console.log("BUGOU: "+ error);

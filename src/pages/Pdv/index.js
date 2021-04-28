@@ -29,7 +29,7 @@ function Pdv() {
 		          <HeaderSite title={'Ponto de venda'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 		          <Content className="container-main">
 		            
-
+		          	
 		          </Content>
 		          <FooterSite />
 		        </Layout>
