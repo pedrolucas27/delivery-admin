@@ -66,7 +66,7 @@ function AddCategory() {
 			          <Content className="container-main">
 
 				      	<Form layout="vertical" form={form} onFinish={onSaveCategory}>   			  
-					        <Row gutter={[16, 16]}>
+					        <Row gutter={[8, 0]}>
 
 						      <Col span={20}>
 								<Form.Item label="Nome" name="name_category">

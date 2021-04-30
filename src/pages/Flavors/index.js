@@ -13,6 +13,7 @@ import {
 	Tooltip,
 	Switch,
 	Spin,
+	Select,
 	message
 } from 'antd';
 import {
@@ -28,6 +29,7 @@ import FooterSite from "../../components/Footer";
 
 const { Content } = Layout;
 const { TextArea } = Input;
+const { Option } = Select;
 
 const BASE_URL = "http://localhost:4020/";
 
@@ -38,8 +40,16 @@ function Flavors() {
 	const [idUpdate, setIdUpdate] = useState(null);
 	const [form] = Form.useForm();
 	const [loading, setLoading] = useState(false);
+	const [dataCategory, setDataCategory] = useState([]);
 
 	useEffect(() => {
+
+		axios.get(BASE_URL+"category").then((response) => {
+			setDataCategory(response?.data);						
+		}).catch((error) => {
+			console.log("BUGOU: "+ error);
+		});
+
 		axios.get(BASE_URL+"flavor").then((response) => {
 			let array = [];
 			response?.data.forEach((flavor) => {
@@ -48,6 +58,7 @@ function Flavors() {
 					code: flavor?.code,
 					name: flavor?.name_flavor,
 					description: flavor?.description || "-",
+					category: flavor?.id_category,
 					status: flavor?.is_active 
 				})
 			})
@@ -55,6 +66,7 @@ function Flavors() {
 		}).catch((error) => {
 			console.log("BUGOU: "+ error);
 		});
+
 	}, []);
 
 
@@ -62,6 +74,18 @@ function Flavors() {
 	  { title: 'Código', dataIndex: 'code', key: 'code' },
 	  { title: 'Nome', dataIndex: 'name', key: 'name' },
 	  { title: 'Descrição', dataIndex: 'description', key: 'description' },
+	  { 
+	  	title: 'Categoria pertencente', 
+	  	dataIndex: 'category', 
+	  	key: 'category',
+	  	render: (__, record) => {
+	  		return(
+	  			<div>
+	  				{ dataCategory?.filter((item) => item?.id_category === record?.category)[0].name_category || "-" }
+	  			</div>
+	  		);
+	  	}  
+	  },
 	  { 
 	  	title: 'Status', 
 	  	dataIndex: 'status', 
@@ -102,7 +126,8 @@ function Flavors() {
 					key: flavor?.id,
 					code: flavor?.code,
 					name: flavor?.name_flavor,
-					description: flavor?.description,
+					description: flavor?.description || "-",
+					category: flavor?.id_category,
 					status: flavor?.is_active 
 				})
 			})
@@ -135,13 +160,14 @@ function Flavors() {
     const updateFlavor = async (values) => {
     	setLoading(true);
 
-		if(values?.name_flavor){
+		if(values?.name_flavor && values?.category){
 			const response = await axios.put(BASE_URL+"flavor", 
 				{  
 				  id: idUpdate, 
 				  name_flavor: values?.name_flavor, 
 				  description: values?.description, 
-				  is_active: values?.is_active
+				  is_active: values?.is_active,
+				  id_category: values?.category
 				} 
 			);
 
@@ -169,7 +195,8 @@ function Flavors() {
     	form.setFieldsValue({
     		name_flavor: line?.name,
     		description: line?.description,
-    		is_active: line?.status
+    		is_active: line?.status,
+    		category: line?.category
     	});
 
     	setExpandEditRow(!expandEditRow);
@@ -202,9 +229,23 @@ function Flavors() {
 		          	bodyStyle={{ paddingBottom: 80 }}>
 		          		<Form layout="vertical" form={form} onFinish={updateFlavor}>   			  
 					        <Row gutter={[16, 16]}>
-						      <Col span={20}>
+						      <Col span={14}>
 								<Form.Item label="Nome" name="name_flavor">
 						          <Input className="input-radius"/>
+						        </Form.Item>
+						      </Col>
+						      <Col span={6}>
+								<Form.Item label="Categoria" name="category">
+						         	<Select>
+							          	{
+							          		dataCategory.map((item) => (
+												<Option key={item?.code} value={item?.id_category}>
+													{item?.name_category}
+								          		</Option>
+							          			)
+							          		)
+							          	}
+	  							  	</Select>
 						        </Form.Item>
 						      </Col>
 						      <Col span={4}>

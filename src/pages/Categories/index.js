@@ -11,7 +11,6 @@ import {
 	Drawer,
 	Input,
 	Switch,
-	Select, 
 	Form,
 	message,
 	Spin
@@ -28,7 +27,6 @@ import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 
 const { Content } = Layout;
-const { TextArea } = Input;
 
 const BASE_URL = "http://localhost:4020/";
 

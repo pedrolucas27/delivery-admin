@@ -79,7 +79,7 @@ function AddAdditional() {
 			          <Content className="container-main">
 
 				      	<Form layout="vertical" form={form} onFinish={onSaveAdditional}>   			  
-					        <Row gutter={[16, 16]}>
+					        <Row gutter={[8, 0]}>
 
 						      <Col span={6}>
 								<Form.Item label="Nome" name="name_additional">

@@ -91,7 +91,7 @@ function AddSize() {
 			          <Content className="container-main">
 			            
 				      	<Form layout="vertical" form={form} onFinish={onSaveSize}>   			  
-					        <Row gutter={[16, 16]}>
+					        <Row gutter={[8, 0]}>
 						      <Col span={6}>
 								<Form.Item label="Valor" name="size_value">
 						          <Input className="input-radius"/>

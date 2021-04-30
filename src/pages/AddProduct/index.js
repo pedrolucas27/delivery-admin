@@ -98,7 +98,7 @@ function AddProduct() {
 			            
 
 				      	<Form layout="vertical" form={form} onFinish={onSaveProduct}>   			  
-					        <Row gutter={[16, 16]}>
+					        <Row gutter={[8, 0]}>
 
 						      <Col span={20}>
 								<Form.Item label="Nome" name="name_product">
