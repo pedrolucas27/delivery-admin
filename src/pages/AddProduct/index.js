@@ -71,7 +71,6 @@ function AddProduct() {
 				}
 			);
 			
-			
 			setLoading(false);
 			if(response?.status === 200){
 				message.success(response?.data?.message);
