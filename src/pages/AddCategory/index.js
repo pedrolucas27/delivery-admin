@@ -9,9 +9,14 @@ import {
 	Switch,
 	Row, 
 	Col,
+	Upload,
 	message,
 	Spin
 } from 'antd';
+
+import {
+  PlusOutlined
+} from '@ant-design/icons';
 
 import 'antd/dist/antd.css';
 import '../../global.css';
@@ -24,11 +29,22 @@ const { Content } = Layout;
 
 const BASE_URL = "http://localhost:4020/";
 
+function getBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
+
 function AddCategory() {
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
-	
+
+	const [fileList, setFileList] = useState([]);
+	const [imageProduct, setImageProduct] = useState(null);
 
 	const onSaveCategory = async (values) => {
 		setLoading(true);
@@ -36,7 +52,8 @@ function AddCategory() {
 			const response = await axios.post(BASE_URL+"category",
 				{
 					name_category: values?.name_category, 
-					is_active: values?.is_active !== undefined ? values?.is_active:true
+					is_active: values?.is_active !== undefined ? values?.is_active:true,
+					base64image: imageProduct
 				}
 			);
 
@@ -54,6 +71,25 @@ function AddCategory() {
 		}
 		
 	}
+
+	const handleChangeImage = async (file) => {
+		setFileList(file.fileList);
+
+		if(file.fileList.length !== 0){
+			const image = await getBase64(file.fileList[0].originFileObj);
+			setImageProduct(image);
+		}else{
+			setFileList([]);
+			setImageProduct(null);
+		}
+	}
+
+	const uploadButton = (
+      <div className="div-icon-upload">
+        <PlusOutlined />
+        <div style={{ marginTop: 8 }}>Upload</div>
+      </div>
+    );
 
 
 	return (
@@ -79,13 +115,31 @@ function AddCategory() {
 						          <Switch defaultChecked />
 						        </Form.Item>
 						      </Col>
+
+						      <Col span={24}>
+							    <Upload
+								    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+								    listType="picture-card"
+								    onChange={handleChangeImage}
+	        					>
+	          						{fileList.length >= 8 ? null : uploadButton}
+	        					</Upload>
+						      </Col>
 						      
 
 						      <Col span={24}>
 						      	<Button onClick={() => form.submit()} shape="round" className="button ac">
 							       Salvar
 							    </Button>
-								<Button onClick={() => {form.resetFields()}} shape="round" className="button-cancel ac">
+								<Button 
+									onClick={() => {
+										form.resetFields();
+										setFileList([]);
+										setImageProduct(null);
+									}} 
+									shape="round" 
+									className="button-cancel ac"
+								>
 							       Cancelar
 							    </Button>
 						      </Col>

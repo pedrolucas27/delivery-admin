@@ -19,7 +19,7 @@ import {
 import {
   DeleteOutlined,
   EditOutlined
-} from '@ant-design/icons'
+} from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
 
@@ -42,7 +42,7 @@ function Products() {
 	const [dataCategory, setDataCategory] = useState([]);
 	const [dataFlavor, setDataFlavor] = useState([]);
 	const [dataSize, setDataSize] = useState([]);
-
+	const [dataUnitMensuration, setDataUnitMensuration] = useState([]);
 	const [dataProduct, setDataProduct] = useState([]);
 
 	useEffect(() => {
@@ -59,13 +59,13 @@ function Products() {
 			console.log("BUGOU: "+ error);
 		});
 
-		axios.get(BASE_URL+"size").then((response) => {
-		  	setDataSize(response?.data);
+		axios.get(BASE_URL+"unitMensuration").then((response) => {
+			setDataUnitMensuration(response?.data);						
 		}).catch((error) => {
 			console.log("BUGOU: "+ error);
 		});
 
-		axios.get(BASE_URL+"product/pizza").then((response) => {
+		axios.get(BASE_URL+"product").then((response) => {
 			let array = [];
 			response?.data?.forEach((product) => {
 				array.push({
@@ -81,7 +81,7 @@ function Products() {
 					flavor: product?.name_flavor,
 					id_size: product?.id_size,
 					id_unit_fk: product?.id_unit_fk,
-					size: product?.size 
+					size: product?.size_product + " (" + product?.unit + " - " + product?.abreviation + ")"
 				})
 			})
 		  	setDataProduct(array);
@@ -133,7 +133,7 @@ function Products() {
 
 
     const getProducts = async () => {
-		await axios.get(BASE_URL+"product/pizza").then((response) => {
+		await axios.get(BASE_URL+"product").then((response) => {
 			let array = [];
 			response?.data?.forEach((product) => {
 				array.push({
@@ -149,7 +149,7 @@ function Products() {
 					flavor: product?.name_flavor,
 					id_size: product?.id_size,
 					id_unit_fk: product?.id_unit_fk,
-					size: product?.size 
+					size: product?.size_product + " (" + product?.unit + " - " + product?.abreviation + ")"
 				})
 			})
 		  	setDataProduct(array);

@@ -11,11 +11,19 @@ import {
 	Row, 
 	Col,
 	message,
+	Upload,
 	Spin
 } from 'antd';
+
+import {
+  PlusOutlined
+} from '@ant-design/icons';
+
 import 'antd/dist/antd.css';
 import './addProduct.css';
 import '../../global.css';
+
+import { maskMoney } from "../../helpers.js";
 
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
@@ -27,13 +35,24 @@ const { Content } = Layout;
 
 const BASE_URL = "http://localhost:4020/";
 
+function getBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
+
 function AddProduct() {
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [dataFlavor, setDataFlavor] = useState([]);
-	const [dataSize, setDataSize] = useState([]);
+	const [dataUnitMensuration, setDataUnitMensuration] = useState([]);
 	const [dataCategory, setDataCategory] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const [fileList, setFileList] = useState([]);
+	const [imageProduct, setImageProduct] = useState(null);
 
 	useEffect(() => {
 		axios.get(BASE_URL+"flavor").then((response) => {
@@ -42,8 +61,8 @@ function AddProduct() {
 			console.log("BUGOU: "+ error);
 		});
 
-		axios.get(BASE_URL+"size").then((response) => {
-			setDataSize(response?.data);						
+		axios.get(BASE_URL+"unitMensuration").then((response) => {
+			setDataUnitMensuration(response?.data);						
 		}).catch((error) => {
 			console.log("BUGOU: "+ error);
 		});
@@ -58,16 +77,19 @@ function AddProduct() {
 
 	const onSaveProduct = async (values) => {
 		setLoading(true);
-		if(values?.name_product && values?.price_product && values?.flavor && values?.category && values?.size){
+
+		if(values?.name_product && values?.price_product && values?.flavor && values?.category){
 			const response = await axios.post(BASE_URL+"product",
 				{
 					name_product: values?.name_product,
 					description: values?.description || null,
 					price: parseFloat(values?.price_product),
 					is_active: values?.is_active !== undefined ? values?.is_active:true,
+					base64image: imageProduct,
+					size_product: parseInt(values?.size || 1),
 					fk_id_flavor: values?.flavor,
 					fk_id_category: values?.category,
-					fk_id_size: values?.size
+					fk_id_unit: values?.unitMensuration || null
 				}
 			);
 			
@@ -87,6 +109,35 @@ function AddProduct() {
 	}
 
 
+	const handleChangeImage = async (file) => {
+		setFileList(file.fileList);
+
+		if(file.fileList.length !== 0){
+			const image = await getBase64(file.fileList[0].originFileObj);
+			setImageProduct(image);
+		}else{
+			setFileList([]);
+			setImageProduct(null);
+		}
+	}
+
+	const handleChangePrice = (input) => {
+		console.log(input.target.value);
+		const price = maskMoney(input.target.value);
+		console.log("PREÇO:"+price);
+
+		//form.setFieldsValue({ price_product: price });
+
+	}
+
+
+	const uploadButton = (
+      <div className="div-icon-upload">
+        <PlusOutlined />
+        <div style={{ marginTop: 8 }}>Upload</div>
+      </div>
+    );
+
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
@@ -96,7 +147,6 @@ function AddProduct() {
 			          <HeaderSite title={'Cadastro de produto'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 			          <Content className="container-main">
 			            
-
 				      	<Form layout="vertical" form={form} onFinish={onSaveProduct}>   			  
 					        <Row gutter={[8, 0]}>
 
@@ -142,13 +192,19 @@ function AddProduct() {
 						        </Form.Item>
 						      </Col>
 
-						      <Col span={6}>
-								<Form.Item label="Tamanho" name="size">
+						      <Col span={3}>
+						      	<Form.Item label="Tamanho" name="size">
+						      	  <Input className="input-radius" />
+						        </Form.Item>
+						      </Col>
+
+						      <Col span={5}>
+								<Form.Item label="Unidade de Medida" name="unitMensuration">
 						          <Select>
 						          	{
-						          		dataSize.map((item) => (
-											<Option key={item?.code} value={item?.id_size}>
-												{item?.size} ({item?.unit} - {item?.abreviation})
+						          		dataUnitMensuration.map((item) => (
+											<Option key={item?.code} value={item?.id_unit}>
+												{item?.unit} - {item?.abreviation}
 							          		</Option>
 						          			)
 						          		)
@@ -157,9 +213,9 @@ function AddProduct() {
 						        </Form.Item>
 						      </Col>
 
-						      <Col span={6}>
+						      <Col span={4}>
 						      	<Form.Item label="Preço" name="price_product">
-						      	  <Input className="input-radius" />
+						      	  <Input className="input-radius" onKeyPress={handleChangePrice} />
 						        </Form.Item>
 						      </Col>
 
@@ -167,6 +223,17 @@ function AddProduct() {
 						      	<Form.Item label="Descrição" name="description">
 						      	  <TextArea rows={4} className="input-radius"/>
 						        </Form.Item>
+						      </Col>
+
+						      <Col span={24}>
+							      	<Upload
+								        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+								        listType="picture-card"
+								        fileList={fileList}
+								        onChange={handleChangeImage}
+	        						>
+	          							{fileList.length >= 8 ? null : uploadButton}
+	        						</Upload>
 						      </Col>
 
 						      <Col span={24}>

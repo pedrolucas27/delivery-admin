@@ -28,6 +28,12 @@
 	border-color: #D62828;
 }
 
+.button-finish, .button-finish:hover, .button-finish:focus, .button-finish:active{
+    color: #fff;
+    background-color: #00a000;
+    border-color: #00a000;
+}
+
 .ac{
 	margin: 5px;
 	float: right;
@@ -129,6 +135,27 @@
     background-color: #214185;
 }
 
+.ant-tabs-card.ant-tabs-large > .ant-tabs-nav .ant-tabs-tab {
+    padding: 10px 16px 6px;
+}
+
+.ant-upload {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 14px;
+    font-variant: tabular-nums;
+    line-height: 1.5715;
+    list-style: none;
+    -webkit-font-feature-settings: 'tnum';
+    font-feature-settings: 'tnum', "tnum";
+    outline: 0;
+    background-color: #808080;
+    border-radius: 10px;
+}
+
 .steps-content{
     min-height: 400px;
     margin-top: 16px;
@@ -148,15 +175,60 @@
 .container-icon-card{
     width: 100%;
     text-align: center;
+    margin: 0;
 }
 
 .card-pdv-2{
     width: 100%;
     border-radius: 20px;
-    height: 180px;
+    height: 200px;
     margin-top: 5px;
 }
 
 .check-card-pdv{
     background-color: #e6f7ff;
+}
+
+.text-money{
+    font-size: 1.3em;
+    color: #00a000;
+    display: block;
+    margin: 0
+}
+
+.button-detail{
+    float: right;
+    color: #214185;
+}
+
+.modal-radius{
+    border-radius: 20px;
+}
+
+.p-modal-detail{
+    font-size: 1.1em;
+    margin: 2px;
+}
+
+.span-modal-detail{
+    font-weight: bold;
+    margin: 2px;
+}
+
+.line-divider{
+    margin: 5;
+    width: 100%;
+}
+
+.card-pdv-order{
+    width: 100%;
+    min-height: 200px;
+    border-radius: 20px;
+}
+
+.line-bottom-card{
+    height: 50px;
+    bottom: 0;
+    width: 100%;
+    position: absolute;
 }
