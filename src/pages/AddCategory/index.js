@@ -27,7 +27,7 @@ import FooterSite from "../../components/Footer";
 
 const { Content } = Layout;
 
-const BASE_URL = "http://localhost:4020/";
+const BASE_URL = "http://localhost:8080/";
 
 function getBase64(file) {
   return new Promise((resolve, reject) => {
@@ -44,43 +44,56 @@ function AddCategory() {
 	const [loading, setLoading] = useState(false);
 
 	const [fileList, setFileList] = useState([]);
-	const [imageProduct, setImageProduct] = useState(null);
+	const [imageCategory, setImageCategory] = useState(null);
 
 	const onSaveCategory = async (values) => {
-		setLoading(true);
-		if(values?.name_category){
-			const response = await axios.post(BASE_URL+"category",
-				{
-					name_category: values?.name_category, 
-					is_active: values?.is_active !== undefined ? values?.is_active:true,
-					base64image: imageProduct
-				}
-			);
-
-			setLoading(false);			
-			if(response?.status === 200){
-				message.success(response?.data?.message);
-				form.resetFields();
-			}else{
-				message.error(response?.data?.message);
-			}
-			
-		}else{
-			setLoading(false);
-			message.error("Informe o nome da categoria, por favor !");
-		}
 		
+
+		try{
+				setLoading(true);
+				if(values.name_category){
+						const response = await axios.post(BASE_URL+"category",
+							{
+								name_category: values.name_category, 
+								is_active: values.is_active !== undefined ? values.is_active:true,
+								base64image: imageCategory
+							}
+						);
+
+						setLoading(false);			
+						if(response.status === 200){
+							message.success(response.data.message);
+							setFileList([]);
+							setImageCategory(null);
+							form.resetFields();
+						}else{
+							message.error(response.data.message);
+						}
+			
+				}else{
+					setLoading(false);
+					message.error("Informe o nome da categoria, por favor !");
+				}
+		}catch(error){
+				setLoading(false);
+				message.error("Erro de comunicação com o servidor, tente novamente !");
+		}
+
 	}
 
 	const handleChangeImage = async (file) => {
 		setFileList(file.fileList);
 
 		if(file.fileList.length !== 0){
-			const image = await getBase64(file.fileList[0].originFileObj);
-			setImageProduct(image);
+			if(imageCategory !== null){
+					const image = await getBase64(file.fileList[0].originFileObj);
+					setImageCategory(image);
+			}else{
+					message.error("Escolha no máximoo uma imagem.");
+			}
 		}else{
 			setFileList([]);
-			setImageProduct(null);
+			setImageCategory(null);
 		}
 	}
 
@@ -96,8 +109,8 @@ function AddCategory() {
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} />
-			        <Layout className="site-layout">
+						<MenuSite open={expand} current={'addCategory'} openCurrent={'register'}/>
+			      <Layout className="site-layout">
 			          <HeaderSite title={'Cadastro de categoria'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 			          <Content className="container-main">
 
@@ -111,19 +124,21 @@ function AddCategory() {
 						      </Col>
 
 						      <Col span={4}>
-								<Form.Item label="Status" name="is_active">
+										<Form.Item label="Status" name="is_active">
 						          <Switch defaultChecked />
 						        </Form.Item>
 						      </Col>
 
 						      <Col span={24}>
-							    <Upload
-								    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-								    listType="picture-card"
-								    onChange={handleChangeImage}
-	        					>
-	          						{fileList.length >= 8 ? null : uploadButton}
-	        					</Upload>
+						      	<Form.Item label="" name="image">
+									    <Upload
+										    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+										    listType="picture-card"
+										    onChange={handleChangeImage}
+			        					>
+			          						{fileList.length >= 8 ? null : uploadButton}
+			        					</Upload>
+		        					</Form.Item>
 						      </Col>
 						      
 
@@ -135,7 +150,7 @@ function AddCategory() {
 									onClick={() => {
 										form.resetFields();
 										setFileList([]);
-										setImageProduct(null);
+										setImageCategory(null);
 									}} 
 									shape="round" 
 									className="button-cancel ac"

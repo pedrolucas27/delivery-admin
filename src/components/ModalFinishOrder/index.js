@@ -1,4 +1,4 @@
-import React, { useState, useForm } from "react";
+import React from "react";
 import { 
 	Button, 
 	Row, 
@@ -31,7 +31,7 @@ function ModalFinishOrder(props){
 			<Modal 
 				title="Adicionar informações do pedido" 
 				visible={props.visibleModalFinishOrder}
-				style={{ top: 20 }}
+				style={{ top: 10 }}
 				footer={[
             		<Button 
             			shape="round" 

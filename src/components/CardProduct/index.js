@@ -18,11 +18,11 @@ function CardProduct(props){
 		<div>
 			<Card
 				hoverable 
-				className={props?.check ? "card-pdv-2 check-card-pdv" : "card-pdv-2"}
+				className={props.check ? "card-pdv-2 check-card-pdv" : "card-pdv-2"}
 				onClick={() => props.onChangeProduct()}
 			>
 			   	<Title level={5}>
-					{props?.name}
+					{props.name}
 			   	</Title>
 			   	<p style={{ margin: 2 }}>
 			   		<span>Tamanho/Volume:</span> {props.size}
@@ -31,9 +31,9 @@ function CardProduct(props){
 					<Col span={24}>
 						<div className="container-icon-card">
 							<p className="text-money">
-								R$ 1,50
+								R$ {props.price}
 							</p>
-							{props?.check && (	
+							{props.check && (	
 								<CheckCircleOutlined className="icon-table" />
 							)}
 						</div>

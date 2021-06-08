@@ -15,16 +15,16 @@ function CardCategory(props){
 		<div>
 			<Card
 				hoverable 
-				className={props?.check ? "card-pdv check-card-pdv" : "card-pdv"}
+				className={props.check ? "card-pdv check-card-pdv" : "card-pdv"}
 				onClick={() => props.onChangeCategory()}
 			>
 				<Title level={3}>
-					{props?.name}
+					{props.name}
 				</Title>
 				<p>
-					{props?.check ? "Categoria escolhida!":"Clique para escolher."}
+					{props.check ? "Categoria escolhida!":"Clique para escolher."}
 				</p>
-				{props?.check && (
+				{props.check && (
 					<div>
 						<CheckCircleOutlined className="icon-table" />
 					</div>

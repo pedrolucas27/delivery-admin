@@ -17,17 +17,17 @@ function CardFlavor(props){
 		<div>
 			<Card
 				hoverable 
-				className={props?.check ? "card-pdv-2 check-card-pdv" : "card-pdv-2"}
+				className={props.check ? "card-pdv-2 check-card-pdv" : "card-pdv-2"}
 				onClick={() => props.onChangeFlavor()}
 			>
 			   	<Title level={3}>
-					{props?.name}
+					{props.name}
 			   	</Title>
 			   	<p style={{ margin: 2 }}>
-			   		{props?.description ? props?.description:"Não possui descrição."}
+			   		{props.description ? props.description:"Não possui descrição."}
 			   	</p>
 
-			   	{props?.check && (
+			   	{props.check && (
 			   		<Row>
 			    		<Col span={24}>
 			    			<div className="container-icon-card">

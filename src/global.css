@@ -113,7 +113,7 @@
 .icon-table{
     font-size: 1.2em;
     color: #000;
-    margin: 5px;
+    margin: 7px;
     cursor: pointer;
 }
 
@@ -169,6 +169,13 @@
     border-radius: 20px;
     height: 150px;
     text-align: center;
+    margin-top: 5px;
+}
+
+.card-delivery{
+    width: 100%;
+    border-radius: 20px;
+    height: 80px;
     margin-top: 5px;
 }
 
@@ -231,4 +238,72 @@
     bottom: 0;
     width: 100%;
     position: absolute;
+}
+
+
+
+.container-main-home{
+    width: 95%;
+    margin: auto;
+}
+
+.stretch {
+    align-content: stretch;
+}
+
+.container {
+    flex-direction: row;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+@media only screen and (max-width:1200px) {
+    .container-main-home{
+        width: 100%;
+        margin: auto;
+    }
+
+}
+
+
+@media only screen and (max-width:1000px) {
+    .container-main-home{
+        width: 80%;
+        margin: auto;
+    }
+}
+
+@media only screen and (max-width:900px) {
+    .container-menu-product{
+        width: 95%;
+        padding: 10px;
+    }
+}
+
+@media only screen and (max-width:800px) {
+    .container-main-home{
+        width: 100%;
+        margin: auto;
+    }
+}
+
+
+@media only screen and (max-width:600px) {
+    .container-main-home{
+        width: 100%;
+        margin: auto;
+    }
+
+    .container-menu-product{
+        width: 100%;
+        padding: 10px;
+    }
+
+    .icon-menu-header{
+        display: none;
+    }
+
+    .title-company{
+        margin-left: 0px;
+    }
 }

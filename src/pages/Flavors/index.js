@@ -31,7 +31,7 @@ const { Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
 
-const BASE_URL = "http://localhost:4020/";
+const BASE_URL = "http://localhost:8080/";
 
 function Flavors() {
 	const [expand, setExpand] = useState(false);
@@ -43,29 +43,32 @@ function Flavors() {
 	const [dataCategory, setDataCategory] = useState([]);
 
 	useEffect(() => {
+		try{
+				axios.get(BASE_URL+"category").then((response) => {
+					setDataCategory(response.data);						
+				}).catch((error) => {
+					console.log("BUGOU: "+ error);
+				});
 
-		axios.get(BASE_URL+"category").then((response) => {
-			setDataCategory(response?.data);						
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
-
-		axios.get(BASE_URL+"flavor").then((response) => {
-			let array = [];
-			response?.data.forEach((flavor) => {
-				array.push({
-					key: flavor?.id,
-					code: flavor?.code,
-					name: flavor?.name_flavor,
-					description: flavor?.description || "-",
-					category: flavor?.id_category,
-					status: flavor?.is_active 
-				})
-			})
-		  	setData(array);
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
+				axios.get(BASE_URL+"flavor").then((response) => {
+					let array = [];
+					response.data.forEach((flavor) => {
+						array.push({
+							key: flavor.id,
+							code: flavor.code,
+							name: flavor.name_flavor,
+							description: flavor.description || "-",
+							category: flavor.id_category,
+							status: flavor.is_active 
+						})
+					})
+				  	setData(array);
+				}).catch((error) => {
+					console.log("BUGOU: "+ error);
+				});
+		}catch(error){
+			message.error("Erro de comunicação com o servidor.");
+		}
 
 	}, []);
 
@@ -81,7 +84,7 @@ function Flavors() {
 	  	render: (__, record) => {
 	  		return(
 	  			<div>
-	  				{ dataCategory?.filter((item) => item?.id_category === record?.category)[0].name_category || "-" }
+	  				{ typeof(dataCategory.filter((item) => item.id_category === record.category)[0].name_category) || "-" }
 	  			</div>
 	  		);
 	  	}  
@@ -93,12 +96,12 @@ function Flavors() {
 	  	render: (__, record) => {
 	  		return(
 	  			<div>
-	  				{ record?.status ? "Ativo" : "Inativo" }
+	  				{ record.status ? "Ativo" : "Inativo" }
 	  			</div>
 	  		);
 	  	} 
 	  },
-  	  {
+  	{
 	    title: 'Ações',
 	    dataIndex: '',
 	    key: 'x',
@@ -106,10 +109,10 @@ function Flavors() {
 	    	return(
 	    		<div>
 	    			<Tooltip placement="top" title='Deletar sabor'>
-	    				<DeleteOutlined className="icon-table" onClick={() => deleteFlavor(record?.key)}/>
+	    				<DeleteOutlined className="icon-table" onClick={() => deleteFlavor(record.key)}/>
 	    			</Tooltip>
 	    			<Tooltip placement="top" title='Editar sabor'>
-	    				<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record?.key)}/>
+	    				<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)}/>
 	    			</Tooltip>
 	    		</div>
 	    	)
@@ -119,84 +122,96 @@ function Flavors() {
 
 
     const getFlavors = async () => {
-    	await axios.get(BASE_URL+"flavor").then((response) => {
-			let array = [];
-			response?.data.forEach((flavor) => {
-				array.push({
-					key: flavor?.id,
-					code: flavor?.code,
-					name: flavor?.name_flavor,
-					description: flavor?.description || "-",
-					category: flavor?.id_category,
-					status: flavor?.is_active 
-				})
-			})
-		  	setData(array);
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
+    	try{
+		    	await axios.get(BASE_URL+"flavor").then((response) => {
+						let array = [];
+						response.data.forEach((flavor) => {
+							array.push({
+								key: flavor.id,
+								code: flavor.code,
+								name: flavor.name_flavor,
+								description: flavor.description || "-",
+								category: flavor.id_category,
+								status: flavor.is_active 
+							})
+						})
+				  	setData(array);
+					}).catch((error) => {
+						message.error("Erro de comunicação com o servidor.");
+					});
+			}catch(error){
+				message.error("Erro de comunicação com o servidor.");
+			}
     }
 
 
 
     const deleteFlavor = async (id) => {
-    	setLoading(true);
-
-		await axios.delete(BASE_URL+"flavor/"+id).then(response => {
-      		if(response?.status === 200){
-				getFlavors();
-				setLoading(false);
-				message.success(response?.data?.message);
-			}else{
-				setLoading(false);
-				message.error(response?.data?.message);
-			}
-    	}).catch(error => {
-    		setLoading(false);
-    		message.error(error);
-    	});
+    	try{
+	    		setLoading(true);
+					await axios.delete(BASE_URL+"flavor/"+id).then(response => {
+	      		if(response.status === 200){
+							getFlavors();
+							setLoading(false);
+							message.success(response.data.message);
+						}else{
+							setLoading(false);
+							message.error(response.data.message);
+						}
+		    	}).catch(error => {
+		    		setLoading(false);
+		    		message.error("Erro de comunicação com o servidor.");
+		    	});
+	    }catch(error){
+		    	setLoading(false);
+		    	message.error("Erro de comunicação com o servidor, tente novamente!");
+	    }
     }
 
     const updateFlavor = async (values) => {
-    	setLoading(true);
+    	try{
+    		setLoading(true);
+				if(values.name_flavor && values.category){
+					const response = await axios.put(BASE_URL+"flavor", 
+						{  
+						  id: idUpdate, 
+						  name_flavor: values.name_flavor, 
+						  description: values.description, 
+						  is_active: values.is_active,
+						  id_category: values.category
+						} 
+					);
 
-		if(values?.name_flavor && values?.category){
-			const response = await axios.put(BASE_URL+"flavor", 
-				{  
-				  id: idUpdate, 
-				  name_flavor: values?.name_flavor, 
-				  description: values?.description, 
-				  is_active: values?.is_active,
-				  id_category: values?.category
-				} 
-			);
+					if(response.status === 200){
+						getFlavors();
+						setLoading(false);
+						message.success(response.data.message);
+						setExpandEditRow(!expandEditRow);
+					}else{
+						setLoading(false);
+						message.error(response.data.message);
+					}
 
-			if(response?.status === 200){
-				getFlavors();
-				setLoading(false);
-				message.success(response?.data?.message);
-				setExpandEditRow(!expandEditRow);
-			}else{
-				setLoading(false);
-				message.error(response?.data?.message);
-			}
-
-		}else{
-			setLoading(false);
-			message.error("Informe o nome do sabor, por favor !");
-		}
+				}else{
+					setLoading(false);
+					message.error("Informe o nome do sabor, por favor !");
+				}
+			}catch(error){
+		    	setLoading(false);
+		    	message.error("Erro de comunicação com o servidor, tente novamente!");
+	    }
 
     }
 
     const setFildsDrawer = (id) => {
-    	const line = data?.filter((item) => item?.key === id)[0];
+    	const line = data.filter((item) => item.key === id)[0];
     	setIdUpdate(id);
 
     	form.setFieldsValue({
-    		name_flavor: line?.name,
-    		description: line?.description,
-    		is_active: line?.status,
-    		category: line?.category
+    		name_flavor: line.name,
+    		description: line.description,
+    		is_active: line.status,
+    		category: line.category
     	});
 
     	setExpandEditRow(!expandEditRow);
@@ -207,15 +222,15 @@ function Flavors() {
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} />
+					<MenuSite open={expand} current={'flavors'} openCurrent={'list'} />
 			        <Layout className="site-layout">
 			          <HeaderSite title={'Listagem de sabores'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 			          <Content className="container-main">
 			            <Table
 			              size="middle"
-						  columns={columns}
-						  dataSource={data}
-						/>
+									  columns={columns}
+									  dataSource={data}
+									/>
 			          </Content>
 			          <FooterSite />
 			        </Layout>
@@ -239,8 +254,8 @@ function Flavors() {
 						         	<Select>
 							          	{
 							          		dataCategory.map((item) => (
-												<Option key={item?.code} value={item?.id_category}>
-													{item?.name_category}
+												<Option key={item.code} value={item.id_category}>
+													{item.name_category}
 								          		</Option>
 							          			)
 							          		)

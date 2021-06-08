@@ -17,6 +17,7 @@ import {
 import 'antd/dist/antd.css';
 import '../../global.css';
 
+import { maskMoney } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
@@ -25,7 +26,7 @@ const { Content } = Layout;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const BASE_URL = "http://localhost:4020/";
+const BASE_URL = "http://localhost:8080/";
 
 function AddAdditional() {
 	const [form] = Form.useForm();
@@ -34,46 +35,65 @@ function AddAdditional() {
 	const [dataCategory, setDataCategory] = useState([]);
 
 	useEffect(() => {
-		axios.get(BASE_URL+"category").then((response) => {
-			setDataCategory(response?.data);						
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
+		try{
+			form.setFieldsValue({ price: maskMoney(0) });
+
+			axios.get(BASE_URL+"category").then((response) => {
+				setDataCategory(response.data);						
+			}).catch((error) => {
+				console.log("BUGOU: "+ error);
+			});
+		}catch(error){
+			message.error("Erro de comunicação com o servidor.");
+		}
+		
 	}, []);
 
 	const onSaveAdditional = async (values) => {
-		setLoading(true);
-		if(values?.name_additional && values?.category && values?.price){
-			const response = await axios.post(BASE_URL+"additional",
-				{
-					name: values?.name_additional,
-					description: values?.description || null,
-					is_default: values?.is_default !== undefined ? values?.is_default:true,
-					price: parseFloat(values?.price),
-					is_active: values?.is_active !== undefined ? values?.is_active:true,
-					id_category: values?.category
+
+		try{
+			setLoading(true);
+			if(values.name_additional && values.category && values.price){
+				const response = await axios.post(BASE_URL+"additional",
+					{
+						name: values.name_additional,
+						description: values.description || null,
+						is_default: values.is_default !== undefined ? values.is_default:true,
+						price: Number(values.price.replace(",",".")),
+						is_active: values.is_active !== undefined ? values.is_active:true,
+						id_category: values.category
+					}
+				);
+
+				setLoading(false);
+				if(response.status === 200){
+					message.success(response.data.message);
+					form.resetFields();
+				}else{
+					message.error(response.data.message);
 				}
-			);
 
-			setLoading(false);
-			if(response?.status === 200){
-				message.success(response?.data?.message);
-				form.resetFields();
 			}else{
-				message.error(response?.data?.message);
+				setLoading(false);
+				message.error("Informe os campos pedidos, por favor !");
 			}
-
-		}else{
+		}catch(error){
 			setLoading(false);
-			message.error("Informe os campos pedidos, por favor !");
+			message.error("Erro de comunicação com o servidor, tente novamente !");
 		}
+		
+	}
+
+	const handleChangePrice = async () => {
+		const field = form.getFieldValue("price");
+		form.setFieldsValue({ price: await maskMoney(field) });
 	}
 
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} />
+					<MenuSite open={expand} current={'addAdditional'} openCurrent={'register'}/>
 			        <Layout className="site-layout">
 			          <HeaderSite title={'Cadastro de adicional'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 			          <Content className="container-main">
@@ -92,8 +112,8 @@ function AddAdditional() {
 						          <Select>
 							          	{
 							          		dataCategory.map((item) => (
-												<Option key={item?.code} value={item?.id_category}>
-													{item?.name_category}
+												<Option key={item.code} value={item.id_category}>
+													{item.name_category}
 								          		</Option>
 							          			)
 							          		)
@@ -103,8 +123,8 @@ function AddAdditional() {
 						      </Col>
 
 						      <Col span={5}>
-								<Form.Item label="Preço (R$)" name="price">
-						          <Input className="input-radius" />
+								<Form.Item label="Preço" name="price">
+						          <Input className="input-radius" onKeyUp={handleChangePrice}/>
 						        </Form.Item>
 						      </Col>
 

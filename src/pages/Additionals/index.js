@@ -23,6 +23,7 @@ import {
 import 'antd/dist/antd.css';
 import '../../global.css';
 
+import { maskMoney, changeCommaForPoint } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
@@ -31,7 +32,7 @@ const { Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
 
-const BASE_URL = "http://localhost:4020/";
+const BASE_URL = "http://localhost:8080/";
 
 function Additionals() {
 	const [expand, setExpand] = useState(false);
@@ -43,45 +44,49 @@ function Additionals() {
 	const [dataCategory, setDataCategory] = useState([]);
 	
 	useEffect(() => {
-		axios.get(BASE_URL+"additional").then((response) => {
-			let array = [];
-			response?.data.forEach((additional) => {
-				array.push({
-					key: additional?.id,
-					code: additional?.code,
-					name: additional?.name,
-					description: additional?.description || "-",
-					category: additional?.id_category,
-					value: additional?.price,
-					is_default: additional?.is_default,
-					status: additional?.is_active				
-				})
-			})
-		  	setData(array);
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
-		
-		axios.get(BASE_URL+"category").then((response) => {
-			setDataCategory(response?.data);						
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
+		try{
+				axios.get(BASE_URL+"additional").then((response) => {
+					let array = [];
+					response.data.forEach((additional) => {
+						array.push({
+							key: additional.id,
+							code: additional.code,
+							name: additional.name,
+							description: additional.description || "-",
+							category: additional.id_category,
+							value: additional.price,
+							is_default: additional.is_default,
+							status: additional.is_active				
+						})
+					})
+				  	setData(array);
+				}).catch((error) => {
+					console.log("BUGOU: "+ error);
+				});
+				
+				axios.get(BASE_URL+"category").then((response) => {
+					setDataCategory(response.data);						
+				}).catch((error) => {
+					console.log("BUGOU: "+ error);
+				});
+
+		}catch(error){
+			message.error("Erro de comunicação com o servidor.");
+		}
 	}, []);
 
 	const columns = [
 	  { title: 'Código', dataIndex: 'code', key: 'code' },
 	  { title: 'Nome', dataIndex: 'name', key: 'name' },
 	  { title: 'Descrição', dataIndex: 'description', key: 'description' },
-	  { title: 'Valor (R$)', dataIndex: 'value', key: 'value' },
 	  { 
-	  	title: 'É um adicional padrão ?', 
-	  	dataIndex: 'is_default', 
-	  	key: 'is_default',
+	  	title: 'Valor (R$)', 
+	  	dataIndex: 'value', 
+	  	key: 'value',
 	  	render: (__, record) => {
 	  		return(
 	  			<div>
-	  				{ record?.is_default ? "Sim" : "Não" }
+	  				{changeCommaForPoint(record.value)}
 	  			</div>
 	  		);
 	  	} 
@@ -93,7 +98,7 @@ function Additionals() {
 	  	render: (__, record) => {
 	  		return(
 	  			<div>
-	  				{ record?.status ? "Ativo" : "Inativo" }
+	  				{ record.status ? "Ativo" : "Inativo" }
 	  			</div>
 	  		);
 	  	} 
@@ -106,10 +111,10 @@ function Additionals() {
 	    	return(
 	    		<div>
 	    			<Tooltip placement="top" title='Deletar adicional'>
-	    				<DeleteOutlined className="icon-table" onClick={() => deleteAdditional(record?.key)}/>
+	    				<DeleteOutlined className="icon-table" onClick={() => deleteAdditional(record.key)}/>
 	    			</Tooltip>
 	    			<Tooltip placement="top" title='Editar adicional'>
-	    				<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record?.key)}/>
+	    				<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)}/>
 	    			</Tooltip>
 	    		</div>
 	    	)
@@ -119,109 +124,125 @@ function Additionals() {
 
 
     const getAdditionals = async () => {
-    	await axios.get(BASE_URL+"additional").then((response) => {
-			let array = [];
-			response?.data.forEach((additional) => {
-				array.push({
-					key: additional?.id,
-					code: additional?.code,
-					name: additional?.name,
-					description: additional?.description || "-",
-					value: additional?.price,
-					is_default: additional?.is_default,
-					status: additional?.is_active				
-				})
-			})
-		  	setData(array);
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
+    	try{
+    			await axios.get(BASE_URL+"additional").then((response) => {
+						let array = [];
+						response.data.forEach((additional) => {
+							array.push({
+								key: additional.id,
+								code: additional.code,
+								name: additional.name,
+								description: additional.description || "-",
+								value: additional.price,
+								is_default: additional.is_default,
+								status: additional.is_active				
+							})
+						})
+				  	setData(array);
+					}).catch((error) => {
+						console.log("BUGOU: "+ error);
+					});
+    	}catch(error){
+    		message.error("Erro de comunicação com o servidor.");
+    	}
+
     }
 
     const deleteAdditional = async (id) => {
-    	setLoading(true);
-    	
-		await axios.delete(BASE_URL+"additional/"+id).then(response => {
-      		if(response?.status === 200){
-				getAdditionals();
-				setLoading(false);
-				message.success(response?.data?.message);
-			}else{
-				setLoading(false);
-				message.error(response?.data?.message);
-			}
-    	}).catch(error => {
-    		setLoading(false);
-    		message.error(error);
-    	});
+    	try{
+    		setLoading(true);
+				await axios.delete(BASE_URL+"additional/"+id).then(response => {
+      		if(response.status === 200){
+						getAdditionals();
+						setLoading(false);
+						message.success(response.data.message);
+					}else{
+						setLoading(false);
+						message.error(response.data.message);
+					}
+	    	}).catch(error => {
+	    		setLoading(false);
+	    		message.error("Erro de comunicação com o servidor.");
+	    	});
+	    }catch(error){
+	    	setLoading(false);
+	    	message.error("Erro de comunicação com o servidor, tente novamente!");
+	    }
     }
 
 
     const updateAdditional = async (values) => {
-    	setLoading(true);
-    	if(values?.name_additional && values?.category && values?.price){
-			const response = await axios.put(BASE_URL+"additional", 
-				{
-					id: idUpdate,  
-				  	name: values?.name_additional,
-					description: values?.description || null,
-					is_default: values?.is_default !== undefined ? values?.is_default:true,
-					price: parseFloat(values?.price),
-					is_active: values?.is_active !== undefined ? values?.is_active:true,
-					id_category: values?.category
-				} 
-			);
-			
-			if(response?.status === 200){
-				getAdditionals();
-				setLoading(false);
-				message.success(response?.data?.message);
-				setExpandEditRow(!expandEditRow);
-			}else{
-				setLoading(false);
-				message.error(response?.data?.message);
-			}
+    	try{
+		    	setLoading(true);
+		    	if(values.name_additional && values.category && values.price){
+							const response = await axios.put(BASE_URL+"additional", 
+								{
+									id: idUpdate,  
+								  name: values.name_additional,
+									description: values.description || null,
+									is_default: values.is_default !== undefined ? values.is_default:true,
+									price: Number(values.price.replace(",",".")),
+									is_active: values.is_active !== undefined ? values.is_active:true,
+									id_category: values.category
+								} 
+							);
+							
+							if(response.status === 200){
+								getAdditionals();
+								setLoading(false);
+								message.success(response.data.message);
+								setExpandEditRow(!expandEditRow);
+							}else{
+								setLoading(false);
+								message.error(response.data.message);
+							}
 
-		}else{
-			setLoading(false);
-			message.error("Informe os campos pedidos, por favor !");
-		}
+					}else{
+						setLoading(false);
+						message.error("Informe os campos pedidos, por favor !");
+					}
+			}catch(error){
+		    	setLoading(false);
+		    	message.error("Erro de comunicação com o servidor, tente novamente!");
+	    }
 
     }
 
 
     const setFildsDrawer = (id) => {
-    	const line = data?.filter((item) => item?.key === id)[0];
+    	const line = data.filter((item) => item.key === id)[0];
     	setIdUpdate(id);
 
     	form.setFieldsValue({
-    		name_additional: line?.name,
-    		category: line?.category,
-    		price: line?.value,
-    		is_default: line?.is_default,
-    		is_active: line?.status,
-    		description: line?.description
+    		name_additional: line.name,
+    		category: line.category,
+    		price: line.value,
+    		is_default: line.is_default,
+    		is_active: line.status,
+    		description: line.description
     	});
 
     	setExpandEditRow(!expandEditRow);
     }
 
-
-
+    const handleChangePrice = async () => {
+			const field = form.getFieldValue("price");
+			form.setFieldsValue({ price: await maskMoney(field) });
+		}
 
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} />
+							<MenuSite open={expand} current={'additionals'} openCurrent={'list'} />
 			        <Layout className="site-layout">
 			          <HeaderSite title={'Listagem de adicionais'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 			          <Content className="container-main">
 			            <Table
 			              size="middle"
-						  columns={columns}
-						  dataSource={data}
-						/>
+									  columns={columns}
+									  dataSource={data}
+									/>
 			          </Content>
 			          <FooterSite />
 			        </Layout>
@@ -248,8 +269,8 @@ function Additionals() {
 						          <Select>
 						          {
 					          		dataCategory.map((item) => (
-										<Option key={item?.code} value={item?.id_category}>
-											{item?.name_category}
+										<Option key={item.code} value={item.id_category}>
+											{item.name_category}
 						          		</Option>
 					          			)
 					          		)
@@ -260,7 +281,7 @@ function Additionals() {
 
 						      <Col span={5}>
 								<Form.Item label="Preço" name="price">
-						          <Input className="input-radius"/>
+						          <Input className="input-radius" onKeyUp={handleChangePrice}/>
 						        </Form.Item>
 						      </Col>
 
@@ -293,7 +314,7 @@ function Additionals() {
 						      </Col>
 						    </Row>
 				      	</Form>
-	            </Drawer>
+	          </Drawer>
 			</Spin>
   		</div>
   	);

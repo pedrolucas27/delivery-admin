@@ -22,6 +22,7 @@ import {
 import 'antd/dist/antd.css';
 import '../../global.css';
 
+import { maskMoney, changeCommaForPoint } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
@@ -30,7 +31,7 @@ const { Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
 
-const BASE_URL = "http://localhost:4020/";
+const BASE_URL = "http://localhost:8080/";
 
 function AddPromotion() {
 	const [form] = Form.useForm();
@@ -45,41 +46,91 @@ function AddPromotion() {
 	const [idCategoryProductPromotion, setIdCategoryProductPromotion] = useState(null);
 
 	useEffect(() => {
-		axios.get(BASE_URL+"category").then((response) => {
-			setDataCategory(response?.data);						
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
+		try{
+				form.setFieldsValue({ price_promotion: maskMoney(0) });
+
+				axios.get(BASE_URL+"category").then((response) => {
+					setDataCategory(response.data);						
+				}).catch((error) => {
+					console.log("BUGOU: "+ error);
+				});
+		}catch(error){
+				message.error("Erro de comunicação com o servidor.");
+		}
 	}, []);
 
 
 	const getFlavorsByCategory = async (idCategory) => {
-		setLoading(true);
-		setIdCategoryProductPromotion(idCategory);
-		await axios.get(BASE_URL+"flavor/byCategory/"+idCategory).then((response) => {
-			setDataFlavor(response?.data);					
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
-		setLoading(false);
+		try{
+				setLoading(true);
+				setIdCategoryProductPromotion(idCategory);
+				await axios.get(BASE_URL+"flavor/byCategory/"+idCategory).then((response) => {
+					setDataFlavor(response.data);					
+				}).catch((error) => {
+					console.log("BUGOU: "+ error);
+				});
+				setLoading(false);
+		}catch(error){
+			setLoading(false);
+			message.error("Erro de comunicação com o servidor.");
+		}	
 	}
 
 	const getProductsByCategoryAndFlavor = async (idFlavor) => {
-		setLoading(true);
-		await axios.get(BASE_URL+"product/others/"+idCategoryProductPromotion+"/"+idFlavor).then((response) => {
-			setDataProductsFilter(response?.data);								
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
-		setLoading(false);
+		try{
+				setLoading(true);
+				await axios.get(BASE_URL+"product/others/"+idCategoryProductPromotion+"/"+idFlavor).then((response) => {
+					setLoading(false);
+					setDataProductsFilter(response.data);								
+				}).catch((error) => {
+					setLoading(false);
+					message.error("Erro de comunicação com o servidor.");
+				});
+		}catch(error){
+				setLoading(false);
+				message.error("Erro de comunicação com o servidor.");
+		}
 	}
 
 	const columns = [
-	  { title: 'Nome do produto', dataIndex: 'name_product', key: 'name_product' },
-	  { title: 'Preço original (R$)', dataIndex: 'price_product', key: 'price_product' },
-	  { title: 'Preço promocional (R$)', dataIndex: 'price_promotion', key: 'price_promotion' },
-	  { title: 'Desconto (R$)', dataIndex: 'discount', key: 'discount' },
-  	  {
+	  { title: 'Produto', dataIndex: 'name_product', key: 'name_product' },
+	  { 
+	  	title: 'Preço original (R$)', 
+	  	dataIndex: 'price_product', 
+	  	key: 'price_product',
+	  	render: (__, record) => {
+	    	return(
+	    		<div>
+	    			{changeCommaForPoint(record.price_product)}
+	    		</div>
+	    	)
+	    },  
+	  },
+	  { 
+	  	title: 'Preço promocional (R$)', 
+	  	dataIndex: 'price_promotion', 
+	  	key: 'price_promotion',
+	  	render: (__, record) => {
+	    	return(
+	    		<div>
+	    			{changeCommaForPoint(record.price_promotion)}
+	    		</div>
+	    	)
+	    },  
+	  },
+	  { 
+	  	title: 'Desconto (R$)', 
+	  	dataIndex: 'discount', 
+	  	key: 'discount',
+	  	render: (__, record) => {
+	    	return(
+	    		<div>
+	    			{changeCommaForPoint(record.discount)}
+	    		</div>
+	    	)
+	    }, 
+	  },
+  	{
 	    title: 'Ações',
 	    dataIndex: '',
 	    key: 'x',
@@ -87,17 +138,17 @@ function AddPromotion() {
 	    	return(
 	    		<div>
 	    			<Tooltip placement="top" title='Deletar promoção'>
-	    				<DeleteOutlined className="icon-table" onClick={() => deleteLineTable(record?.key)}/>
+	    				<DeleteOutlined className="icon-table" onClick={() => deleteLineTable(record.key)}/>
 	    			</Tooltip>
 	    		</div>
 	    	)
 	    },
-  	  },
-    ];
+  	},
+   ];
 
 
     const deleteLineTable = (key) => {
-    	const newDataTable = dataTable?.filter((item) => item?.key !== key);
+    	const newDataTable = dataTable.filter((item) => item.key !== key);
     	setDataTable(newDataTable);
     }
 
@@ -110,23 +161,23 @@ function AddPromotion() {
     	if(idProduct && pricePromotion){
 
     		//verificando se o produto selecionado já está na promoção.
-    		const flag = dataTable?.filter((item) => item?.key === idProduct).length !== 0 ? true : false;
+    		const flag = dataTable.filter((item) => item.key === idProduct).length !== 0 ? true : false;
     		
     		if(!flag){
-				const product = dataProductsFilter?.filter((item) => item?.id_product === idProduct)[0];
+					const product = dataProductsFilter.filter((item) => item.id_product === idProduct)[0];
 	    		let line = {
 		    		key: idProduct,
-		    		name_product: product?.name_product,
-		    		price_product: product?.price,
-		    		price_promotion: parseFloat(pricePromotion),
-		    		discount: (product?.price) - parseFloat(pricePromotion),
+		    		name_product: product.name_product,
+		    		price_product: product.price,
+		    		price_promotion: Number(pricePromotion.replace(",",".")),
+		    		discount: (product.price) - Number(pricePromotion.replace(",",".")),
 	    		}
 	    		setDataTable([...dataTable, line]);
 	    		form.setFieldsValue({
 	    			category: null,
 	    			flavor: null,
 		    		name_product: null,
-		    		price_promotion: null
+		    		price_promotion: maskMoney(0)
     			});
 
     		}else{
@@ -143,59 +194,66 @@ function AddPromotion() {
 
 
     const onSavePromotion = async (values) => {
-    	setLoading(true);
+    	try{
+		    	setLoading(true);
 
-    	//array de produtos inseridos na promoção
-    	let array = [];
-    	dataTable?.map((item) => {
-    		array.push({
-    			id_product: item?.key,
-    			price_promotion: item?.price_promotion,
-    			is_active: true
-    		})
-    	})
+		    	//array de produtos inseridos na promoção
+		    	let array = [];
+		    	dataTable.forEach((item) => {
+		    		array.push({
+		    			id_product: item.key,
+		    			price_promotion: item.price_promotion,
+		    			is_active: true
+		    		})
+		    	})
 
-    	if(values?.name_promotion){
-			if(array.length !== 0){
-				const response = await axios.post(BASE_URL+"promotion",
-					{
-						name_promotion: values?.name_promotion, 
-						is_active: values?.is_active !== undefined ? values?.is_active:true, 
-						description: values?.description || null,
-						products: array
+	    		if(values.name_promotion){
+						if(array.length !== 0){
+							const response = await axios.post(BASE_URL+"promotion",
+								{
+									name_promotion: values.name_promotion, 
+									is_active: values.is_active !== undefined ? values.is_active:true, 
+									description: values.description || null,
+									products: array
+								}
+							);
+
+							setLoading(false);
+							if(response.status === 200){
+								message.success(response.data.message);
+								form.resetFields();
+								setDataTable([]);
+							}else{
+								message.error(response.data.message);
+							}
+
+						}else{
+							message.error("Insira produtos na sua promoção !");
+						}
+				
+					}else{
+						setLoading(false);
+						message.error("Informe o nome da promoção, por favor !");
 					}
-				);
-
-				console.log(response);
-
-				setLoading(false);
-				if(response?.status === 200){
-					message.success(response?.data?.message);
-					form.resetFields();
-					setDataTable([]);
-				}else{
-					message.error(response?.data?.message);
-				}
-
-			}else{
-				message.error("Insira produtos na sua promoção !");
+			}catch(error){
+					setLoading(false);
+					message.error("Erro de comunicação com o servidor, tente novamente !");
 			}
-			
-		}else{
-			setLoading(false);
-			message.error("Informe o nome da promoção, por favor !");
-		}
 
-    	setLoading(false);
     }
 	
+
+	const handleChangePrice = async () => {
+		const field = form.getFieldValue("price_promotion");
+		form.setFieldsValue({ price_promotion: await maskMoney(field) });
+	}
 
 
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} />
+							<MenuSite open={expand} current={'addPromotion'} openCurrent={'register'} />
 			        <Layout className="site-layout">
 			          <HeaderSite title={'Cadastro de promoção'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 			          <Content className="container-main">
@@ -226,8 +284,8 @@ function AddPromotion() {
 							          	<Select onChange={getFlavorsByCategory}>
 								          	{
 								          		dataCategory.map((item) => (
-													<Option key={item?.id_category} value={item?.id_category}>
-														{item?.name_category}
+													<Option key={item.id_category} value={item.id_category}>
+														{item.name_category}
 									          		</Option>
 								          			)
 								          		)
@@ -241,8 +299,8 @@ function AddPromotion() {
 								        <Select onChange={getProductsByCategoryAndFlavor}>
 								          	{
 								          		dataFlavor.map((item) => (
-													<Option key={item?.id} value={item?.id}>
-														{item?.name_flavor}
+													<Option key={item.id} value={item.id}>
+														{item.name_flavor}
 									          		</Option>
 								          			)
 								          		)
@@ -256,8 +314,8 @@ function AddPromotion() {
 							          	<Select>
 											{
 								          		dataProductsFilter.map((item) => (
-													<Option key={item?.id_product} value={item?.id_product}>
-														{item?.name_product}
+													<Option key={item.id_product} value={item.id_product}>
+														{item.name_product}
 									          		</Option>
 								          			)
 								          		)
@@ -268,7 +326,7 @@ function AddPromotion() {
 
 							    <Col span={4}>
 									<Form.Item label="Preço promocional" name="price_promotion">
-							          	<Input className="input-radius" />
+							          	<Input className="input-radius" onKeyUp={handleChangePrice}/>
 							        </Form.Item>
 							    </Col>
 
@@ -284,9 +342,9 @@ function AddPromotion() {
 
 							    <Col span={24}>
 							      	<Table
-						              size="middle"
-									  columns={columns}
-									  dataSource={dataTable}
+						            size="middle"
+											  columns={columns}
+											  dataSource={dataTable}
 									/>
 							    </Col>
 						      

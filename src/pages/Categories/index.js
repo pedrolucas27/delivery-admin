@@ -28,7 +28,7 @@ import FooterSite from "../../components/Footer";
 
 const { Content } = Layout;
 
-const BASE_URL = "http://localhost:4020/";
+const BASE_URL = "http://localhost:8080/";
 
 function Categories() {
 	const [expand, setExpand] = useState(false);
@@ -39,20 +39,24 @@ function Categories() {
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		axios.get(BASE_URL+"category").then((response) => {
-			let array = [];
-			response?.data.forEach((category) => {
-				array.push({
-					key: category?.id_category,
-					code: category?.code,
-					name: category?.name_category,
-					status: category?.is_active 
-				})
-			})
-			setDataCategory(array);						
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
+		try{
+				axios.get(BASE_URL+"category").then((response) => {
+					let array = [];
+					response.data.forEach((category) => {
+						array.push({
+							key: category.id_category,
+							code: category.code,
+							name: category.name_category,
+							status: category.is_active 
+						})
+					})
+					setDataCategory(array);						
+				}).catch((error) => {
+					console.log("BUGOU: "+ error);
+				});
+		}catch(error){
+				message.error("Erro de comunicação com o servidor.");
+		}
 	}, []);
 
 	const columns = [
@@ -65,7 +69,7 @@ function Categories() {
 	  	render: (__, record) => {
 	  		return(
 	  			<div>
-	  				{ record?.status ? "Ativo" : "Inativo" }
+	  				{ record.status ? "Ativo" : "Inativo" }
 	  			</div>
 	  		);
 	  	} 
@@ -78,10 +82,10 @@ function Categories() {
 	    	return(
 	    		<div>
 	    			<Tooltip placement="top" title='Deletar categoria'>
-	    				<DeleteOutlined className="icon-table" onClick={() => deleteCategory(record?.key)}/>
+	    				<DeleteOutlined className="icon-table" onClick={() => deleteCategory(record.key)}/>
 	    			</Tooltip>
 	    			<Tooltip placement="top" title='Editar categoria'>
-	    				<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record?.key)}/>
+	    				<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)}/>
 	    			</Tooltip>
 	    		</div>
 	    	)
@@ -91,77 +95,92 @@ function Categories() {
 
 
     const getCategories = async () => {
-    	await axios.get(BASE_URL+"category").then((response) => {
-			let array = [];
-			response?.data.forEach((category) => {
-				array.push({
-					key: category?.id_category,
-					code: category?.code,
-					name: category?.name_category,
-					status: category?.is_active 
-				})
-			})
-			setDataCategory(array);						
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
+    	try{
+    		await axios.get(BASE_URL+"category").then((response) => {
+					let array = [];
+					response.data.forEach((category) => {
+						array.push({
+							key: category.id_category,
+							code: category.code,
+							name: category.name_category,
+							status: category.is_active 
+						})
+					})
+					setDataCategory(array);						
+				}).catch((error) => {
+					message.error("Erro de comunicação com o servidor.");
+				});
+    	}catch(error){
+    		message.error("Erro de comunicação com o servidor.");
+    	}
     }
 
 
 
     const deleteCategory = async (id) => {
-    	setLoading(true);
-
-    	await axios.delete(BASE_URL+"category/"+id).then(response => {
-      		if(response?.status === 200){
-				getCategories();
-				setLoading(false);
-				message.success(response?.data?.message);
-			}else{
-				setLoading(false);
-				message.error(response?.data?.message);
-			}
-    	}).catch(error => {
+    	try{
+    		setLoading(true);
+    		await axios.delete(BASE_URL+"category/"+id).then(response => {
+      		if(response.status === 200){
+						getCategories();
+						setLoading(false);
+						message.success(response.data.message);
+					}else{
+						setLoading(false);
+						message.error(response.data.message);
+					}
+	    	}).catch(error => {
+	    		setLoading(false);
+		    	message.error("Erro de comunicação com o servidor.");
+	    	});
+    	}catch(error){
     		setLoading(false);
-    		message.error(error);
-    	});
+		    message.error("Erro de comunicação com o servidor, tente novamente!");
+    	}
+    	
 
     }
 
     const updateCategory = async (values) => {
-    	setLoading(true);
-    	if(values?.name_category){
-			const response = await axios.put(BASE_URL+"category",
-				{
-					id: idUpdate,
-					name_category: values?.name_category, 
-					is_active: values?.is_active !== undefined ? values?.is_active:true
-				}
-			);
-			
-	    	if(response?.status === 200){
-				getCategories();
-				setLoading(false);
-				message.success(response?.data?.message);
-				setExpandEditRow(!expandEditRow);
-			}else{
-				setLoading(false);
-				message.error(response?.data?.message);
-			}
+	    	try{
+	    			setLoading(true);
+    				if(values.name_category){
+								const response = await axios.put(BASE_URL+"category",
+									{
+										id: idUpdate,
+										name_category: values.name_category, 
+										is_active: values.is_active !== undefined ? values.is_active:true
+									}
+								);
+				
+		    				if(response.status === 200){
+									getCategories();
+									setLoading(false);
+									message.success(response.data.message);
+									setExpandEditRow(!expandEditRow);
+								}else{
+									setLoading(false);
+									message.error(response.data.message);
+								}
 
-		}else{
-			setLoading(false);
-			message.error("Informe o nome da categoria, por favor !");
-		}
+						}else{
+							setLoading(false);
+							message.error("Informe o nome da categoria, por favor !");
+						}
+	    	}catch(error){
+	    		setLoading(false);
+		    	message.error("Erro de comunicação com o servidor, tente novamente!");
+	    	}
+    	
     }
 
     const setFildsDrawer = (id) => {
-    	const line = dataCategory?.filter((item) => item?.key === id)[0];
+    	const line = dataCategory.filter((item) => item.key === id)[0];
     	setIdUpdate(id);
 
     	form.setFieldsValue({
-    		name_category: line?.name,
-    		is_active: line?.status
+    		name_category: line.name,
+    		is_active: line.status
     	});
 
     	setExpandEditRow(!expandEditRow);
@@ -172,15 +191,15 @@ function Categories() {
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} />
+							<MenuSite open={expand} current={'categories'} openCurrent={'list'} />
 			        <Layout className="site-layout">
 			          <HeaderSite title={'Listagem de categorias'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 			          <Content className="container-main">
 			            <Table
 			              size="middle"
-						  columns={columns}
-						  dataSource={dataCategory}
-						/>
+									  columns={columns}
+									  dataSource={dataCategory}
+									/>
 			          </Content>
 			          <FooterSite />
 			        </Layout>
@@ -192,34 +211,35 @@ function Categories() {
 		          	onClose={() => setExpandEditRow(!expandEditRow)} 
 		          	visible={expandEditRow}
 		          	bodyStyle={{ paddingBottom: 80 }}>
+
 		          		<Form layout="vertical" form={form} onFinish={updateCategory}>   			  
-					        <Row gutter={[16, 16]}>
+					        	<Row gutter={[16, 16]}>
 
-						      <Col span={20}>
-								<Form.Item label="Nome" name="name_category">
-						          <Input className="input-radius"/>
-						        </Form.Item>
-						      </Col>
+								      <Col span={20}>
+												<Form.Item label="Nome" name="name_category">
+								          <Input className="input-radius"/>
+								        </Form.Item>
+								      </Col>
 
-						      <Col span={4}>
-								<Form.Item label="Status" name="is_active" valuePropName="checked">
-						          <Switch />
-						        </Form.Item>
-						      </Col>
+								      <Col span={4}>
+												<Form.Item label="Status" name="is_active" valuePropName="checked">
+								          <Switch />
+								        </Form.Item>
+								      </Col>
 						      
-
-						      <Col span={24}>
-						      	<Button onClick={() => form.submit()} shape="round" className="button ac">
-							       Editar
-							    </Button>
-								<Button onClick={() => setExpandEditRow(!expandEditRow)} shape="round" className="button-cancel ac">
-							       Cancelar
-							    </Button>
-						      </Col>
-						    </Row>
+								      <Col span={24}>
+									      <Button onClick={() => form.submit()} shape="round" className="button ac">
+										       Editar
+										    </Button>
+												<Button onClick={() => setExpandEditRow(!expandEditRow)} shape="round" className="button-cancel ac">
+										       Cancelar
+										    </Button>
+								      </Col>
+						    		</Row>
 				      	</Form>
-	            </Drawer>
-			</Spin>
+
+	          </Drawer>
+				</Spin>
   		</div>
   	);
 }

@@ -3,8 +3,6 @@ import {
 	Button, 
 	Row, 
 	Col,
-	message,
-	Input,
 	Divider,
 	Typography,
 	Modal
@@ -16,7 +14,6 @@ import {
 import 'antd/dist/antd.css';
 import '../../global.css';
 
-const { TextArea } = Input;
 const { Title } = Typography;
 
 function ModalAddProductCart(props){
@@ -48,10 +45,10 @@ function ModalAddProductCart(props){
 				<Row>
 					<Col span={24}>
 						<Title level={3} style={{ margin: 2 }}>
-							{props?.product?.name}
+							{props.product.name}
 						</Title>
 						<p style={{ margin: 2 }}>
-			   				<span>Tamanho/Volume:</span> {props?.product?.size}
+			   				<span>Tamanho/Volume:</span> {props.product.size}
 			   			</p>
 			   			<Divider className="line-divider"/> 
 					</Col>
@@ -60,7 +57,7 @@ function ModalAddProductCart(props){
 							<Col span={12}>
 								<div className="container-icon-card">
 									<Title level={3} style={{ color: '#00a000' }}>
-										R$ {quantity * props?.product?.price}
+										R$ {quantity * props.product.price}
 									</Title>
 								</div>
 							</Col>
@@ -96,9 +93,6 @@ function ModalAddProductCart(props){
 							</Col>
 						</Row>
 						<Divider className="line-divider"/>
-					</Col>
-					<Col span={24}>
-						<TextArea rows={3} className="input-radius" />
 					</Col>
 				</Row>
         

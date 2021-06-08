@@ -24,7 +24,7 @@ const { TextArea } = Input;
 const { Content } = Layout;
 const { Option } = Select;
 
-const BASE_URL = "http://localhost:4020/";
+const BASE_URL = "http://localhost:8080/";
 
 function AddFlavor() {
 	const [form] = Form.useForm();
@@ -33,37 +33,46 @@ function AddFlavor() {
 	const [dataCategory, setDataCategory] = useState([]);
 
 	useEffect(() => {
-		axios.get(BASE_URL+"category").then((response) => {
-			setDataCategory(response?.data);						
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
+		try{
+			axios.get(BASE_URL+"category").then((response) => {
+				setDataCategory(response.data);						
+			}).catch((error) => {
+				console.log("BUGOU: "+ error);
+			});
+		}catch(error){
+			message.error("Erro de comunicação com o servidor.");
+		}
 	}, []);
 	
 	const onSaveFlavor = async (values) => {
-		setLoading(true);
 
-		if(values?.name_flavor && values?.category){
-			const response = await axios.post(BASE_URL+"flavor",
-				{
-					name_flavor: values?.name_flavor,
-					description: values?.description, 
-					is_active: values?.is_active !== undefined ? values?.is_active:true,
-					id_category: values?.category
-				}
-			);
+		try{
+			setLoading(true);
+			if(values.name_flavor && values.category){
+				const response = await axios.post(BASE_URL+"flavor",
+					{
+						name_flavor: values.name_flavor,
+						description: values.description, 
+						is_active: values.is_active !== undefined ? values.is_active:true,
+						id_category: values.category
+					}
+				);
 			
-			setLoading(false);
-			if(response?.status === 200){
-				message.success(response?.data?.message);
-				form.resetFields();
-			}else{
-				message.error(response?.data?.message);
-			}
+				setLoading(false);
+				if(response.status === 200){
+					message.success(response.data.message);
+					form.resetFields();
+				}else{
+					message.error(response.data.message);
+				}
 
-		}else{
+			}else{
+				setLoading(false);
+				message.error("Informe o nome do sabor, por favor !");
+			}
+		}catch(error){
 			setLoading(false);
-			message.error("Informe o nome do sabor, por favor !");
+			message.error("Erro de comunicação com o servidor, tente novamente !");
 		}
 
 	}
@@ -73,7 +82,7 @@ function AddFlavor() {
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} />
+					<MenuSite open={expand} current={'addFlavor'} openCurrent={'register'} />
 			        <Layout className="site-layout">
 			          <HeaderSite title={'Cadastro de sabor'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 			          <Content className="container-main">
@@ -91,8 +100,8 @@ function AddFlavor() {
 						         	<Select>
 							          	{
 							          		dataCategory.map((item) => (
-												<Option key={item?.code} value={item?.id_category}>
-													{item?.name_category}
+												<Option key={item.code} value={item.id_category}>
+													{item.name_category}
 								          		</Option>
 							          			)
 							          		)

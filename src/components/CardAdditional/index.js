@@ -7,7 +7,6 @@ import {
 	Col
 } from 'antd';
 import {
-  	CheckCircleOutlined,
   	MinusOutlined,
   	PlusOutlined
 } from '@ant-design/icons';
@@ -23,7 +22,7 @@ function CardAdditional(props){
 				className="card-pdv"
 			>
 				<Title level={5}>
-					{props?.name}
+					{props.name}
 				</Title>
 				<Row>
 					<Col span={24}>
@@ -40,7 +39,7 @@ function CardAdditional(props){
 							shape="circle" 
 							className="button-cancel" 
 							icon={<MinusOutlined />}
-							disabled={props?.quantity === 0 ? true:false} 
+							disabled={props.quantity === 0 ? true:false} 
 							onClick={() => props.minusQuantityAdditional()} 
 						/>
 					</Col>

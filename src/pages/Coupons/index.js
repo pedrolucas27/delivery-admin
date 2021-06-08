@@ -22,6 +22,7 @@ import {
 import 'antd/dist/antd.css';
 import '../../global.css';
 
+import { maskMoney, changeCommaForPoint } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
@@ -29,7 +30,7 @@ import FooterSite from "../../components/Footer";
 const { Content } = Layout;
 const { TextArea } = Input;
 
-const BASE_URL = "http://localhost:4020/";
+const BASE_URL = "http://localhost:8080/";
 
 function Coupons() {
 	const [expand, setExpand] = useState(false);
@@ -40,22 +41,26 @@ function Coupons() {
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		axios.get(BASE_URL+"coupom").then((response) => {
-			let array = [];
-			response?.data.forEach((coupom) => {
-				array.push({
-					key: coupom?.id_coupom,
-					code: coupom?.code,
-					name: coupom?.name_coupom,
-					description: coupom?.description || "-",
-					value_discount: parseFloat(coupom?.value_discount),
-					status: coupom?.is_active				
-				})
-			})
-		  	setDataCoupons(array);
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
+		try{
+				axios.get(BASE_URL+"coupom").then((response) => {
+					let array = [];
+					response.data.forEach((coupom) => {
+						array.push({
+							key: coupom.id_coupom,
+							code: coupom.code,
+							name: coupom.name_coupom,
+							description: coupom.description || "-",
+							value_discount: coupom.value_discount,
+							status: coupom.is_active				
+						})
+					})
+				  setDataCoupons(array);
+				}).catch((error) => {
+					message.error("Erro de comunicação com o servidor.");
+				});
+		}catch(error){
+			message.error("Erro de comunicação com o servidor.");
+		}
 		
 	}, []);
 
@@ -65,7 +70,18 @@ function Coupons() {
 	  { title: 'Código', dataIndex: 'code', key: 'code' },
 	  { title: 'Nome', dataIndex: 'name', key: 'name' },
 	  { title: 'Descrição', dataIndex: 'description', key: 'description' },
-	  { title: 'Valor do desconto (R$)', dataIndex: 'value_discount', key: 'value_discount' },
+	  { 
+	  	title: 'Desconto (R$)', 
+	  	dataIndex: 'value_discount', 
+	  	key: 'value_discount',
+	  	render: (__, record) => {
+	  		return(
+	  			<div>
+	  				{changeCommaForPoint(record.value_discount)}
+	  			</div>
+	  		);
+	  	} 
+	  },
 	  { 
 	  	title: 'Status', 
 	  	dataIndex: 'status', 
@@ -73,7 +89,7 @@ function Coupons() {
 	  	render: (__, record) => {
 	  		return(
 	  			<div>
-	  				{ record?.status ? "Ativo" : "Inativo" }
+	  				{ record.status ? "Ativo" : "Inativo" }
 	  			</div>
 	  		);
 	  	} 
@@ -85,11 +101,11 @@ function Coupons() {
 	    render: (__, record) => {
 	    	return(
 	    		<div>
-	    			<Tooltip placement="top" title='Deletar cupom' onClick={() => deleteCoupom(record?.key)}>
+	    			<Tooltip placement="top" title='Deletar cupom' onClick={() => deleteCoupom(record.key)}>
 	    				<DeleteOutlined className="icon-table" />
 	    			</Tooltip>
 	    			<Tooltip placement="top" title='Editar cupom'>
-	    				<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record?.key)} />
+	    				<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)} />
 	    			</Tooltip>
 	    		</div>
 	    	)
@@ -99,102 +115,120 @@ function Coupons() {
 
 
     const getCoupons = async () => {
-    	axios.get(BASE_URL+"coupom").then((response) => {
-			let array = [];
-			response?.data.forEach((coupom) => {
-				array.push({
-					key: coupom?.id_coupom,
-					code: coupom?.code,
-					name: coupom?.name_coupom,
-					description: coupom?.description || "-",
-					value_discount: parseFloat(coupom?.value_discount),
-					status: coupom?.is_active				
-				})
-			})
-		  	setDataCoupons(array);
-		}).catch((error) => {
-			console.log("BUGOU: "+ error);
-		});
+    	try{
+		    	axios.get(BASE_URL+"coupom").then((response) => {
+						let array = [];
+						response.data.forEach((coupom) => {
+							array.push({
+								key: coupom.id_coupom,
+								code: coupom.code,
+								name: coupom.name_coupom,
+								description: coupom.description || "-",
+								value_discount: parseFloat(coupom.value_discount),
+								status: coupom.is_active				
+							})
+						})
+				  	setDataCoupons(array);
+					}).catch((error) => {
+							message.error("Erro de comunicação com o servidor.");
+					});
+			}catch(error){
+				message.error("Erro de comunicação com o servidor.");
+			}
     }
 
 
     const deleteCoupom = async (id) => {
-    	setLoading(true);
-    	
-		await axios.delete(BASE_URL+"coupom/"+id).then(response => {
-      		if(response?.status === 200){
-				getCoupons();
-				setLoading(false);
-				message.success(response?.data?.message);
-			}else{
-				setLoading(false);
-				message.error(response?.data?.message);
-			}
-    	}).catch(error => {
-    		setLoading(false);
-    		message.error(error);
-    	});
+    	try{
+    		setLoading(true);
+				await axios.delete(BASE_URL+"coupom/"+id).then(response => {
+      		if(response.status === 200){
+						getCoupons();
+						setLoading(false);
+						message.success(response.data.message);
+					}else{
+						setLoading(false);
+						message.error(response.data.message);
+					}
+	    	}).catch(error => {
+	    		setLoading(false);
+	    		message.error("Erro de comunicação com o servidor.");
+	    	});
+	    }catch(error){
+	    	setLoading(false);
+	    	message.error("Erro de comunicação com o servidor, tente novamente!");
+	    }
     }
 
     const updateCoupom = async (values) => {
     	setLoading(true);
-    	if(values?.name_coupom && values?.price){
-			const response = await axios.put(BASE_URL+"coupom", 
-				{
-					id_coupom: idUpdate,  
-				  	name_coupom: values?.name_coupom,
-				  	description: values?.description,
-				  	value_discount: parseFloat(values?.price),
-				  	is_active: values?.is_active !== undefined ? values?.is_active:true,
-				} 
-			);
-			
-			if(response?.status === 200){
-				getCoupons();
-				setLoading(false);
-				message.success(response?.data?.message);
-				setExpandEditRow(!expandEditRow);
-			}else{
-				setLoading(false);
-				message.error(response?.data?.message);
-			}
+    	try{
+		    	if(values.name_coupom && values.price){
+							const response = await axios.put(BASE_URL+"coupom", 
+								{
+									id_coupom: idUpdate,  
+								  	name_coupom: values.name_coupom,
+								  	description: values.description,
+								  	value_discount: Number(values.price.replace(",",".")),
+								  	is_active: values.is_active !== undefined ? values.is_active:true,
+								} 
+							);
+							
+							if(response.status === 200){
+								getCoupons();
+								setLoading(false);
+								message.success(response.data.message);
+								setExpandEditRow(!expandEditRow);
+							}else{
+								setLoading(false);
+								message.error(response.data.message);
+							}
 
-		}else{
-			setLoading(false);
-			message.error("Informe os campos pedidos, por favor !");
-		}
+					}else{
+						setLoading(false);
+						message.error("Informe os campos pedidos, por favor !");
+					}
+			}catch(error){
+		    	setLoading(false);
+		    	message.error("Erro de comunicação com o servidor, tente novamente!");
+	    }
 
     }
 
 
 
     const setFildsDrawer = (id) => {
-    	const line = dataCoupons?.filter((item) => item?.key === id)[0];
+    	const line = dataCoupons.filter((item) => item.key === id)[0];
     	setIdUpdate(id);
 
     	form.setFieldsValue({
-    		name_coupom: line?.name,
-    		price: line?.value_discount,
-    		is_active: line?.status,
-    		description: line?.description
+    		name_coupom: line.name,
+    		price: line.value_discount,
+    		is_active: line.status,
+    		description: line.description
     	});
 
     	setExpandEditRow(!expandEditRow);
     }
 
+    const handleChangePrice = async () => {
+			const field = form.getFieldValue("price");
+			form.setFieldsValue({ price: await maskMoney(field) });
+		}
+
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} />
+							<MenuSite open={expand} current={'coupons'} openCurrent={'list'} />
 			        <Layout className="site-layout">
 			          <HeaderSite title={'Listagem de cupons'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 			          <Content className="container-main">
 			            <Table
 			              size="middle"
-						  columns={columns}
-						  dataSource={dataCoupons}
-						/>
+									  columns={columns}
+									  dataSource={dataCoupons}
+									/>
 			          </Content>
 			          <FooterSite />
 			        </Layout>
@@ -218,7 +252,7 @@ function Coupons() {
 
 						      <Col span={4}>
 								<Form.Item label="Valor (R$)" name="price">
-						          <Input className="input-radius" />
+						          <Input className="input-radius" onKeyUp={handleChangePrice}/>
 						        </Form.Item>
 						      </Col>
 

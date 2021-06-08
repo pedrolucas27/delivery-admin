@@ -16,6 +16,7 @@ import {
 import 'antd/dist/antd.css';
 import '../../global.css';
 
+import { maskMoney } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
@@ -23,7 +24,7 @@ import FooterSite from "../../components/Footer";
 const { Content } = Layout;
 const { TextArea } = Input;
 
-const BASE_URL = "http://localhost:4020/";
+const BASE_URL = "http://localhost:8080/";
 
 function AddCoupom() {
 	const [form] = Form.useForm();
@@ -32,37 +33,48 @@ function AddCoupom() {
 
 
 	const onSaveCoupom = async (values) => {
-		console.log(values);
-		setLoading(true);
-		if(values?.name_coupom && values?.price){
-			const response = await axios.post(BASE_URL+"coupom",
-				{
-					name_coupom: values?.name_coupom,
-					description: values?.description || null,
-					value_discount: parseFloat(values?.price),
-					is_active: values?.is_active !== undefined ? values?.is_active:true,
+
+		try{
+			setLoading(true);
+			if(values.name_coupom && values.price){
+				const response = await axios.post(BASE_URL+"coupom",
+					{
+						name_coupom: values.name_coupom,
+						description: values.description || null,
+						value_discount: Number(values.price.replace(",",".")),
+						is_active: values.is_active !== undefined ? values.is_active:true,
+					}
+				);
+
+				setLoading(false);
+				if(response.status === 200){
+					message.success(response.data.message);
+					form.resetFields();
+				}else{
+					message.error(response.data.message);
 				}
-			);
-
-			setLoading(false);
-			if(response?.status === 200){
-				message.success(response?.data?.message);
-				form.resetFields();
 			}else{
-				message.error(response?.data?.message);
+				setLoading(false);
+				message.error("Informe os campos pedidos, por favor !");
 			}
-
-		}else{
+		}catch(error){
 			setLoading(false);
-			message.error("Informe os campos pedidos, por favor !");
+			message.error("Erro de comunicação com o servidor, tente novamente !");
 		}
+		
+	}
+
+
+	const handleChangePrice = async () => {
+		const field = form.getFieldValue("price");
+		form.setFieldsValue({ price: await maskMoney(field) });
 	}
 
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} />
+					<MenuSite open={expand} current={'addCoupom'} openCurrent={'register'}/>
 			        <Layout className="site-layout">
 			          <HeaderSite title={'Cadastro de cupom'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 			          <Content className="container-main">
@@ -78,7 +90,7 @@ function AddCoupom() {
 
 						      <Col span={4}>
 								<Form.Item label="Valor (R$)" name="price">
-						          <Input className="input-radius" />
+						          <Input className="input-radius" onKeyUp={handleChangePrice}/>
 						        </Form.Item>
 						      </Col>
 

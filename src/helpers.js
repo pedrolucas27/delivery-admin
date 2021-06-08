@@ -1,16 +1,20 @@
 
 export function maskMoney(value){
-	let money = "";
-	if(value){
-		money = money.replace(/\D/g, "");
-		money = money.replace(/(\d)(\d{2})$/, "$1,$2");
-		money = money.replace(/(?=(\d{3})+(\D))\B/g, ".");
-	}
-	return money;
+	var v = String(value).replace(/\D/g,'');
+	v = (v/100).toFixed(2) + '';
+	v = v.replace(".", ",");
+	v = v.replace(/(\d)(\d{3})(\d{3}),/g, "$1.$2.$3,");
+	v = v.replace(/(\d)(\d{3}),/g, "$1.$2,");
+	return v;
+}
+
+export function changeCommaForPoint(value){
+	var v = value.toFixed(2);
+	v = String(v).replace(".", ",");
+	return v;
 }
 
 export function maskNumer(value){
-	let number = "";
-
-	return number;
+	var v = String(value).replace(/\D/g,'');
+	return v;
 }
