@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-import { 
+import {
 	Layout,
-	Form, 
-	Input, 
-	Button, 
+	Form,
+	Input,
+	Button,
 	Switch,
-	Row, 
+	Row,
 	Col,
 	message,
 	Spin
@@ -31,29 +31,29 @@ function AddFormPayment() {
 
 
 	const onSaveFormPayment = async (values) => {
-		try{
+		try {
 			setLoading(true);
-			if(values.name_form_payment){
-				const response = await axios.post(BASE_URL+"form_payment",
+			if (values.name_form_payment) {
+				const response = await axios.post(BASE_URL + "form_payment",
 					{
 						name_form_payment: values.name_form_payment,
-						is_active: values.is_active !== undefined ? values.is_active:true,
+						is_active: values.is_active !== undefined ? values.is_active : true,
 					}
 				);
 
 				setLoading(false);
-				if(response.status === 200){
+				if (response.status === 200) {
 					message.success(response.data.message);
 					form.resetFields();
-				}else{
+				} else {
 					message.error(response.data.message);
 				}
 
-			}else{
+			} else {
 				setLoading(false);
 				message.error("Informe o nome da forma de pagamento, por favor !");
-			} 
-		}catch(error){
+			}
+		} catch (error) {
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor, tente novamente !");
 		}
@@ -66,45 +66,45 @@ function AddFormPayment() {
 			<Spin size="large" spinning={loading}>
 				<Layout>
 					<MenuSite open={expand} current={'addFormPayment'} openCurrent={'register'} />
-			        <Layout className="site-layout">
-			          <HeaderSite title={'Cadastro de forma de pagamento'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
-			          <Content className="container-main">
+					<Layout className="site-layout">
+						<HeaderSite title={'Cadastro de forma de pagamento'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
+						<Content className="container-main">
 
-				      	<Form layout="vertical" form={form} onFinish={onSaveFormPayment}>   			  
-					        <Row gutter={[8, 0]}>
+							<Form layout="vertical" form={form} onFinish={onSaveFormPayment}>
+								<Row gutter={[8, 0]}>
 
-						      <Col span={20}>
-								<Form.Item label="Nome" name="name_form_payment">
-						          <Input className="input-radius" />
-						        </Form.Item>
-						      </Col>
+									<Col span={20}>
+										<Form.Item label="Nome" name="name_form_payment">
+											<Input className="input-radius" />
+										</Form.Item>
+									</Col>
 
-						      <Col span={4}>
-								<Form.Item label="Status" name="is_active">
-						          <Switch defaultChecked />
-						        </Form.Item>
-						      </Col>				      
+									<Col span={4}>
+										<Form.Item label="Status" name="is_active">
+											<Switch defaultChecked />
+										</Form.Item>
+									</Col>
 
-						      <Col span={24}>
-						      	<Button onClick={() => form.submit()} shape="round" className="button ac">
-							       Salvar
-							    </Button>
-								<Button onClick={() => {form.resetFields()}} shape="round" className="button-cancel ac">
-							       Cancelar
-							    </Button>
-						      </Col>
+									<Col span={24}>
+										<Button onClick={() => form.submit()} shape="round" className="button ac">
+											Salvar
+							    		</Button>
+										<Button onClick={() => { form.resetFields() }} shape="round" className="button-cancel ac">
+											Cancelar
+							    		</Button>
+									</Col>
 
-						    </Row>
-				      	</Form>
+								</Row>
+							</Form>
 
 
-			          </Content>
-			          <FooterSite />
-			        </Layout>
-		      	</Layout>
-		    </Spin>
-  		</div>
-  	);
+						</Content>
+						<FooterSite />
+					</Layout>
+				</Layout>
+			</Spin>
+		</div>
+	);
 }
 
 export default AddFormPayment;

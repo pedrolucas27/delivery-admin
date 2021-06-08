@@ -1,46 +1,46 @@
 import React, { useState } from "react";
-import { 
-	Button, 
-	Row, 
+import {
+	Button,
+	Row,
 	Col,
 	Divider,
 	Typography,
 	Modal
 } from 'antd';
 import {
-  	PlusOutlined,
-  	MinusOutlined
+	PlusOutlined,
+	MinusOutlined
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
 
 const { Title } = Typography;
 
-function ModalAddProductCart(props){
+function ModalAddProductCart(props) {
 	const [quantity, setQuantity] = useState(1);
 
-	return(
+	return (
 		<div>
-			<Modal 
-				title="Adicionar no carrinho" 
+			<Modal
+				title="Adicionar no carrinho"
 				visible={props.isVisibleAddCart}
 				footer={[
-					<Button 
-						shape="round" 
-						className="button-cancel" 
+					<Button
+						shape="round"
+						className="button-cancel"
 						onClick={() => props.onCancelProductChange()}
 					>
 						Cancelar
 					</Button>,
-            		<Button 
-            			shape="round" 
-            			className="button"
-            			onClick={() => props.onAddOrder(quantity)}
-            		>
+					<Button
+						shape="round"
+						className="button"
+						onClick={() => props.onAddOrder(quantity)}
+					>
 						Adicionar e seguir
 					</Button>
-					
-          		]} 
+
+				]}
 			>
 				<Row>
 					<Col span={24}>
@@ -48,9 +48,9 @@ function ModalAddProductCart(props){
 							{props.product.name}
 						</Title>
 						<p style={{ margin: 2 }}>
-			   				<span>Tamanho/Volume:</span> {props.product.size}
-			   			</p>
-			   			<Divider className="line-divider"/> 
+							<span>Tamanho/Volume:</span> {props.product.size}
+						</p>
+						<Divider className="line-divider" />
 					</Col>
 					<Col span={24}>
 						<Row>
@@ -64,12 +64,12 @@ function ModalAddProductCart(props){
 							<Col span={12}>
 								<Row justify="center">
 									<Col span={4}>
-										<Button 
-											shape="circle" 
-											className="button-cancel" 
+										<Button
+											shape="circle"
+											className="button-cancel"
 											icon={<MinusOutlined />}
 											onClick={() => setQuantity(quantity - 1)}
-											disabled={quantity === 1 ? true:false} 
+											disabled={quantity === 1 ? true : false}
 										/>
 									</Col>
 									<Col span={4}>
@@ -80,23 +80,23 @@ function ModalAddProductCart(props){
 										</div>
 									</Col>
 									<Col span={4}>
-										<Button 
-											shape="circle" 
-											className="button" 
-											style={{ float: "right" }} 
+										<Button
+											shape="circle"
+											className="button"
+											style={{ float: "right" }}
 											icon={<PlusOutlined />}
-											onClick={() => setQuantity(quantity + 1)} 
+											onClick={() => setQuantity(quantity + 1)}
 										/>
 									</Col>
 								</Row>
-								
+
 							</Col>
 						</Row>
-						<Divider className="line-divider"/>
+						<Divider className="line-divider" />
 					</Col>
 				</Row>
-        
-      		</Modal>
+
+			</Modal>
 		</div>
 	);
 }

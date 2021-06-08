@@ -1,5 +1,5 @@
 import React from "react";
-import { 
+import {
 	Card,
 	Row,
 	Col,
@@ -7,33 +7,33 @@ import {
 	Button
 } from 'antd';
 import {
-  	CheckCircleOutlined
+	CheckCircleOutlined
 } from '@ant-design/icons';
 import '../../global.css';
 
 const { Title } = Typography;
 
-function CardProduct(props){
-	return(
+function CardProduct(props) {
+	return (
 		<div>
 			<Card
-				hoverable 
+				hoverable
 				className={props.check ? "card-pdv-2 check-card-pdv" : "card-pdv-2"}
 				onClick={() => props.onChangeProduct()}
 			>
-			   	<Title level={5}>
+				<Title level={5}>
 					{props.name}
-			   	</Title>
-			   	<p style={{ margin: 2 }}>
-			   		<span>Tamanho/Volume:</span> {props.size}
-			   	</p>												    	
+				</Title>
+				<p style={{ margin: 2 }}>
+					<span>Tamanho/Volume:</span> {props.size}
+				</p>
 				<Row>
 					<Col span={24}>
 						<div className="container-icon-card">
 							<p className="text-money">
 								R$ {props.price}
 							</p>
-							{props.check && (	
+							{props.check && (
 								<CheckCircleOutlined className="icon-table" />
 							)}
 						</div>
@@ -41,16 +41,16 @@ function CardProduct(props){
 				</Row>
 				<Row>
 					<Col span={24}>
-						<Button 
-							type="link" 
+						<Button
+							type="link"
 							className="button-detail"
 							onClick={() => props.showModalDetail()}
 						>
-          					Ver detalhes
+							Ver detalhes
         				</Button>
 					</Col>
 				</Row>
-																    	
+
 			</Card>
 		</div>
 	);

@@ -1,5 +1,5 @@
 import React from "react";
-import { 
+import {
 	Card,
 	Typography,
 	Row,
@@ -7,18 +7,18 @@ import {
 	Col
 } from 'antd';
 import {
-  	MinusOutlined,
-  	PlusOutlined
+	MinusOutlined,
+	PlusOutlined
 } from '@ant-design/icons';
 import '../../global.css';
 
 const { Title } = Typography;
 
-function CardAdditional(props){
-	return(
+function CardAdditional(props) {
+	return (
 		<div>
 			<Card
-				hoverable 
+				hoverable
 				className="card-pdv"
 			>
 				<Title level={5}>
@@ -35,12 +35,12 @@ function CardAdditional(props){
 				</Row>
 				<Row justify="center">
 					<Col span={4}>
-						<Button 
-							shape="circle" 
-							className="button-cancel" 
+						<Button
+							shape="circle"
+							className="button-cancel"
 							icon={<MinusOutlined />}
-							disabled={props.quantity === 0 ? true:false} 
-							onClick={() => props.minusQuantityAdditional()} 
+							disabled={props.quantity === 0 ? true : false}
+							onClick={() => props.minusQuantityAdditional()}
 						/>
 					</Col>
 					<Col span={4}>
@@ -51,15 +51,15 @@ function CardAdditional(props){
 						</div>
 					</Col>
 					<Col span={4}>
-						<Button 
-							shape="circle" 
-							className="button" 
-							style={{ float: "right" }} 
+						<Button
+							shape="circle"
+							className="button"
+							style={{ float: "right" }}
 							icon={<PlusOutlined />}
-							onClick={() => props.plusQuantityAdditional()}  
+							onClick={() => props.plusQuantityAdditional()}
 						/>
 					</Col>
-				</Row>											    	
+				</Row>
 			</Card>
 		</div>
 	);

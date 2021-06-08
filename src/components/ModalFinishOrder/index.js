@@ -1,7 +1,7 @@
 import React from "react";
-import { 
-	Button, 
-	Row, 
+import {
+	Button,
+	Row,
 	Col,
 	message,
 	Input,
@@ -18,7 +18,7 @@ import '../../global.css';
 const { TextArea } = Input;
 const { Title } = Typography;
 
-function ModalFinishOrder(props){
+function ModalFinishOrder(props) {
 	const [form] = Form.useForm();
 
 	const insertDataClientOrder = (values) => {
@@ -26,27 +26,27 @@ function ModalFinishOrder(props){
 		props.insertDataOrder(values);
 	}
 
-	return(
+	return (
 		<div>
-			<Modal 
-				title="Adicionar informações do pedido" 
+			<Modal
+				title="Adicionar informações do pedido"
 				visible={props.visibleModalFinishOrder}
 				style={{ top: 10 }}
 				footer={[
-            		<Button 
-            			shape="round" 
-            			className="button"
-            			onClick={() => form.submit()}
-            		>
+					<Button
+						shape="round"
+						className="button"
+						onClick={() => form.submit()}
+					>
 						Finalizar
 					</Button>,
-					<Button 
-						shape="round" 
-						className="button-cancel" 
+					<Button
+						shape="round"
+						className="button-cancel"
 					>
 						Cancelar
 					</Button>
-          		]} 
+				]}
 			>
 
 				<Row>
@@ -54,94 +54,91 @@ function ModalFinishOrder(props){
 						<Title level={5}>
 							Dados do cliente
 						</Title>
-			   			<Divider className="line-divider"/> 
+						<Divider className="line-divider" />
 					</Col>
 					<Col span={24}>
-						<Form layout="vertical" form={form} onFinish={insertDataClientOrder}>   			  
-					        <Row gutter={[6, 0]}>
+						<Form layout="vertical" form={form} onFinish={insertDataClientOrder}>
+							<Row gutter={[6, 0]}>
 
-						      <Col span={16}>
-								<Form.Item 
-									label="Nome" 
-									name="name_client"
-									rules={[
-							          {
-							            required: true,
-							            message: 'Insira o nome.',
-							          }
-        							]}
-								>
-						          <Input className="input-radius" />
-						        </Form.Item>
-						      </Col>
+								<Col span={16}>
+									<Form.Item
+										label="Nome"
+										name="name_client"
+										rules={[
+											{
+												required: true,
+												message: 'Insira o nome.',
+											}
+										]}
+									>
+										<Input className="input-radius" />
+									</Form.Item>
+								</Col>
 
-						      <Col span={8}>
-								<Form.Item 
-									label="Telefone celular" 
-									name="phone_cell"
-									rules={[
-							          {
-							            required: true,
-							            message: 'Insira o telefone.',
-							          }
-        							]}
-								>
-						          <Input className="input-radius" />
-						        </Form.Item>
-						      </Col>
+								<Col span={8}>
+									<Form.Item
+										label="Telefone celular"
+										name="phone_cell"
+										rules={[
+											{
+												required: true,
+												message: 'Insira o telefone.',
+											}
+										]}
+									>
+										<Input className="input-radius" />
+									</Form.Item>
+								</Col>
 
-						      <Col span={24}>
-								<Form.Item 
-									label="Logradouro" 
-									name="address"
-									rules={[
-							          {
-							            required: true,
-							            message: 'Insira o endereço.',
-							          }
-        							]}
-								>
-						          <Input className="input-radius" />
-						        </Form.Item>
-						      </Col>
+								<Col span={24}>
+									<Form.Item
+										label="Logradouro"
+										name="address"
+										rules={[
+											{
+												required: true,
+												message: 'Insira o endereço.',
+											}
+										]}
+									>
+										<Input className="input-radius" />
+									</Form.Item>
+								</Col>
 
-						      <Col span={24}>
-								<Title level={5}>
-									Pagamento
+								<Col span={24}>
+									<Title level={5}>
+										Pagamento
 								</Title>
-					   			<Divider className="line-divider"/> 
-							  </Col>
+									<Divider className="line-divider" />
+								</Col>
 
-							  <Col span={12}>
-								<Form.Item 
-									label="Forma de pagamento" 
-									name="form_payment"
-									
-								>
-						          <Select />
-						        </Form.Item>
-						      </Col>
+								<Col span={12}>
+									<Form.Item
+										label="Forma de pagamento"
+										name="form_payment"
 
-						      <Col span={12}>
-								<Form.Item label="Cupom" name="coupom">
-						          <Input className="input-radius" />
-						        </Form.Item>
-						      </Col>
+									>
+										<Select />
+									</Form.Item>
+								</Col>
 
-						      <Col span={24}>
-								<Form.Item label="Observação" name="observation">
-						          <TextArea rows={3} className="input-radius" />
-						        </Form.Item>
-						      </Col>
+								<Col span={12}>
+									<Form.Item label="Cupom" name="coupom">
+										<Input className="input-radius" />
+									</Form.Item>
+								</Col>
 
-						    </Row>
+								<Col span={24}>
+									<Form.Item label="Observação" name="observation">
+										<TextArea rows={3} className="input-radius" />
+									</Form.Item>
+								</Col>
+
+							</Row>
 						</Form>
 					</Col>
-										
 				</Row>
-				
-        
-      		</Modal>
+			</Modal>
 		</div>
 	);
 }

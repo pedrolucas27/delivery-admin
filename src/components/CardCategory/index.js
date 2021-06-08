@@ -1,20 +1,20 @@
 import React from "react";
-import { 
+import {
 	Card,
 	Typography
 } from 'antd';
 import {
-  	CheckCircleOutlined
+	CheckCircleOutlined
 } from '@ant-design/icons';
 import '../../global.css';
 
 const { Title } = Typography;
 
-function CardCategory(props){
-	return(
+function CardCategory(props) {
+	return (
 		<div>
 			<Card
-				hoverable 
+				hoverable
 				className={props.check ? "card-pdv check-card-pdv" : "card-pdv"}
 				onClick={() => props.onChangeCategory()}
 			>
@@ -22,14 +22,14 @@ function CardCategory(props){
 					{props.name}
 				</Title>
 				<p>
-					{props.check ? "Categoria escolhida!":"Clique para escolher."}
+					{props.check ? "Categoria escolhida!" : "Clique para escolher."}
 				</p>
 				{props.check && (
 					<div>
 						<CheckCircleOutlined className="icon-table" />
 					</div>
 				)}
-																    	
+
 			</Card>
 		</div>
 	);

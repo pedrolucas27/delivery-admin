@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-import { 
+import {
 	Layout,
-	Button, 
-	Row, 
+	Button,
+	Row,
 	Col,
 	Table,
 	Tooltip,
@@ -16,8 +16,8 @@ import {
 	Spin
 } from 'antd';
 import {
-  DeleteOutlined,
-  EditOutlined
+	DeleteOutlined,
+	EditOutlined
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
@@ -39,209 +39,209 @@ function Categories() {
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		try{
-				axios.get(BASE_URL+"category").then((response) => {
-					let array = [];
-					response.data.forEach((category) => {
-						array.push({
-							key: category.id_category,
-							code: category.code,
-							name: category.name_category,
-							status: category.is_active 
-						})
+		try {
+			axios.get(BASE_URL + "category").then((response) => {
+				let array = [];
+				response.data.forEach((category) => {
+					array.push({
+						key: category.id_category,
+						code: category.code,
+						name: category.name_category,
+						status: category.is_active
 					})
-					setDataCategory(array);						
-				}).catch((error) => {
-					console.log("BUGOU: "+ error);
-				});
-		}catch(error){
-				message.error("Erro de comunicação com o servidor.");
+				})
+				setDataCategory(array);
+			}).catch((error) => {
+				console.log("BUGOU: " + error);
+			});
+		} catch (error) {
+			message.error("Erro de comunicação com o servidor.");
 		}
 	}, []);
 
 	const columns = [
-	  { title: 'Código', dataIndex: 'code', key: 'code' },
-	  { title: 'Nome', dataIndex: 'name', key: 'name' },
-	  { 
-	  	title: 'Status', 
-	  	dataIndex: 'status', 
-	  	key: 'status',
-	  	render: (__, record) => {
-	  		return(
-	  			<div>
-	  				{ record.status ? "Ativo" : "Inativo" }
-	  			</div>
-	  		);
-	  	} 
-	  },
-  	  {
-	    title: 'Ações',
-	    dataIndex: '',
-	    key: 'x',
-	    render: (__, record) => {
-	    	return(
-	    		<div>
-	    			<Tooltip placement="top" title='Deletar categoria'>
-	    				<DeleteOutlined className="icon-table" onClick={() => deleteCategory(record.key)}/>
-	    			</Tooltip>
-	    			<Tooltip placement="top" title='Editar categoria'>
-	    				<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)}/>
-	    			</Tooltip>
-	    		</div>
-	    	)
-	    },
-  	  },
-    ];
+		{ title: 'Código', dataIndex: 'code', key: 'code' },
+		{ title: 'Nome', dataIndex: 'name', key: 'name' },
+		{
+			title: 'Status',
+			dataIndex: 'status',
+			key: 'status',
+			render: (__, record) => {
+				return (
+					<div>
+						{ record.status ? "Ativo" : "Inativo"}
+					</div>
+				);
+			}
+		},
+		{
+			title: 'Ações',
+			dataIndex: '',
+			key: 'x',
+			render: (__, record) => {
+				return (
+					<div>
+						<Tooltip placement="top" title='Deletar categoria'>
+							<DeleteOutlined className="icon-table" onClick={() => deleteCategory(record.key)} />
+						</Tooltip>
+						<Tooltip placement="top" title='Editar categoria'>
+							<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)} />
+						</Tooltip>
+					</div>
+				)
+			},
+		},
+	];
 
 
-    const getCategories = async () => {
-    	try{
-    		await axios.get(BASE_URL+"category").then((response) => {
-					let array = [];
-					response.data.forEach((category) => {
-						array.push({
-							key: category.id_category,
-							code: category.code,
-							name: category.name_category,
-							status: category.is_active 
-						})
+	const getCategories = async () => {
+		try {
+			await axios.get(BASE_URL + "category").then((response) => {
+				let array = [];
+				response.data.forEach((category) => {
+					array.push({
+						key: category.id_category,
+						code: category.code,
+						name: category.name_category,
+						status: category.is_active
 					})
-					setDataCategory(array);						
-				}).catch((error) => {
-					message.error("Erro de comunicação com o servidor.");
-				});
-    	}catch(error){
-    		message.error("Erro de comunicação com o servidor.");
-    	}
-    }
+				})
+				setDataCategory(array);
+			}).catch((error) => {
+				message.error("Erro de comunicação com o servidor.");
+			});
+		} catch (error) {
+			message.error("Erro de comunicação com o servidor.");
+		}
+	}
 
 
 
-    const deleteCategory = async (id) => {
-    	try{
-    		setLoading(true);
-    		await axios.delete(BASE_URL+"category/"+id).then(response => {
-      		if(response.status === 200){
-						getCategories();
-						setLoading(false);
-						message.success(response.data.message);
-					}else{
-						setLoading(false);
-						message.error(response.data.message);
+	const deleteCategory = async (id) => {
+		try {
+			setLoading(true);
+			await axios.delete(BASE_URL + "category/" + id).then(response => {
+				if (response.status === 200) {
+					getCategories();
+					setLoading(false);
+					message.success(response.data.message);
+				} else {
+					setLoading(false);
+					message.error(response.data.message);
+				}
+			}).catch(error => {
+				setLoading(false);
+				message.error("Erro de comunicação com o servidor.");
+			});
+		} catch (error) {
+			setLoading(false);
+			message.error("Erro de comunicação com o servidor, tente novamente!");
+		}
+
+
+	}
+
+	const updateCategory = async (values) => {
+		try {
+			setLoading(true);
+			if (values.name_category) {
+				const response = await axios.put(BASE_URL + "category",
+					{
+						id: idUpdate,
+						name_category: values.name_category,
+						is_active: values.is_active !== undefined ? values.is_active : true
 					}
-	    	}).catch(error => {
-	    		setLoading(false);
-		    	message.error("Erro de comunicação com o servidor.");
-	    	});
-    	}catch(error){
-    		setLoading(false);
-		    message.error("Erro de comunicação com o servidor, tente novamente!");
-    	}
-    	
+				);
 
-    }
+				if (response.status === 200) {
+					getCategories();
+					setLoading(false);
+					message.success(response.data.message);
+					setExpandEditRow(!expandEditRow);
+				} else {
+					setLoading(false);
+					message.error(response.data.message);
+				}
 
-    const updateCategory = async (values) => {
-	    	try{
-	    			setLoading(true);
-    				if(values.name_category){
-								const response = await axios.put(BASE_URL+"category",
-									{
-										id: idUpdate,
-										name_category: values.name_category, 
-										is_active: values.is_active !== undefined ? values.is_active:true
-									}
-								);
-				
-		    				if(response.status === 200){
-									getCategories();
-									setLoading(false);
-									message.success(response.data.message);
-									setExpandEditRow(!expandEditRow);
-								}else{
-									setLoading(false);
-									message.error(response.data.message);
-								}
+			} else {
+				setLoading(false);
+				message.error("Informe o nome da categoria, por favor !");
+			}
+		} catch (error) {
+			setLoading(false);
+			message.error("Erro de comunicação com o servidor, tente novamente!");
+		}
 
-						}else{
-							setLoading(false);
-							message.error("Informe o nome da categoria, por favor !");
-						}
-	    	}catch(error){
-	    		setLoading(false);
-		    	message.error("Erro de comunicação com o servidor, tente novamente!");
-	    	}
-    	
-    }
+	}
 
-    const setFildsDrawer = (id) => {
-    	const line = dataCategory.filter((item) => item.key === id)[0];
-    	setIdUpdate(id);
+	const setFildsDrawer = (id) => {
+		const line = dataCategory.filter((item) => item.key === id)[0];
+		setIdUpdate(id);
 
-    	form.setFieldsValue({
-    		name_category: line.name,
-    		is_active: line.status
-    	});
+		form.setFieldsValue({
+			name_category: line.name,
+			is_active: line.status
+		});
 
-    	setExpandEditRow(!expandEditRow);
-    }
-    
+		setExpandEditRow(!expandEditRow);
+	}
+
 
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-							<MenuSite open={expand} current={'categories'} openCurrent={'list'} />
-			        <Layout className="site-layout">
-			          <HeaderSite title={'Listagem de categorias'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
-			          <Content className="container-main">
-			            <Table
-			              size="middle"
-									  columns={columns}
-									  dataSource={dataCategory}
-									/>
-			          </Content>
-			          <FooterSite />
-			        </Layout>
-		      	</Layout>
+					<MenuSite open={expand} current={'categories'} openCurrent={'list'} />
+					<Layout className="site-layout">
+						<HeaderSite title={'Listagem de categorias'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
+						<Content className="container-main">
+							<Table
+								size="middle"
+								columns={columns}
+								dataSource={dataCategory}
+							/>
+						</Content>
+						<FooterSite />
+					</Layout>
+				</Layout>
 
-		      	<Drawer
-		          	title="Editar categoria"
-		          	width={720}
-		          	onClose={() => setExpandEditRow(!expandEditRow)} 
-		          	visible={expandEditRow}
-		          	bodyStyle={{ paddingBottom: 80 }}>
+				<Drawer
+					title="Editar categoria"
+					width={720}
+					onClose={() => setExpandEditRow(!expandEditRow)}
+					visible={expandEditRow}
+					bodyStyle={{ paddingBottom: 80 }}>
 
-		          		<Form layout="vertical" form={form} onFinish={updateCategory}>   			  
-					        	<Row gutter={[16, 16]}>
+					<Form layout="vertical" form={form} onFinish={updateCategory}>
+						<Row gutter={[16, 16]}>
 
-								      <Col span={20}>
-												<Form.Item label="Nome" name="name_category">
-								          <Input className="input-radius"/>
-								        </Form.Item>
-								      </Col>
+							<Col span={20}>
+								<Form.Item label="Nome" name="name_category">
+									<Input className="input-radius" />
+								</Form.Item>
+							</Col>
 
-								      <Col span={4}>
-												<Form.Item label="Status" name="is_active" valuePropName="checked">
-								          <Switch />
-								        </Form.Item>
-								      </Col>
-						      
-								      <Col span={24}>
-									      <Button onClick={() => form.submit()} shape="round" className="button ac">
-										       Editar
-										    </Button>
-												<Button onClick={() => setExpandEditRow(!expandEditRow)} shape="round" className="button-cancel ac">
-										       Cancelar
-										    </Button>
-								      </Col>
-						    		</Row>
-				      	</Form>
+							<Col span={4}>
+								<Form.Item label="Status" name="is_active" valuePropName="checked">
+									<Switch />
+								</Form.Item>
+							</Col>
 
-	          </Drawer>
-				</Spin>
-  		</div>
-  	);
+							<Col span={24}>
+								<Button onClick={() => form.submit()} shape="round" className="button ac">
+									Editar
+								</Button>
+								<Button onClick={() => setExpandEditRow(!expandEditRow)} shape="round" className="button-cancel ac">
+									Cancelar
+							    </Button>
+							</Col>
+						</Row>
+					</Form>
+
+				</Drawer>
+			</Spin>
+		</div>
+	);
 }
 
 export default Categories;

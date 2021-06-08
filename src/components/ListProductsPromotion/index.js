@@ -1,6 +1,6 @@
 import React from "react";
 
-import { 
+import {
 	List,
 	Typography
 } from 'antd';
@@ -9,24 +9,24 @@ import { changeCommaForPoint } from "../../helpers.js";
 
 const { Title } = Typography;
 
-function ListProductsPromotion(props){
-	return(
+function ListProductsPromotion(props) {
+	return (
 		<div>
-			<List 
+			<List
 				header={<div>Produtos que estão nesta promoção</div>}
-      			bordered
-      			dataSource={props.dataProducts}
-			    renderItem={item => (
-			        <List.Item key={item.id_product}>
-			        	<div>
-			        		<Title level={5}>{item.name_product}</Title>
-			        		<p>
-			        			<span style={{ fontWeight: "bold" }}>Preço promocional: </span>
-			        			{changeCommaForPoint(item.price_pp)}
-			        		</p>
-			        	</div>
-			        </List.Item>
-			    )}
+				bordered
+				dataSource={props.dataProducts}
+				renderItem={item => (
+					<List.Item key={item.id_product}>
+						<div>
+							<Title level={5}>{item.name_product}</Title>
+							<p>
+								<span style={{ fontWeight: "bold" }}>Preço promocional: </span>
+								{changeCommaForPoint(item.price_pp)}
+							</p>
+						</div>
+					</List.Item>
+				)}
 			/>
 		</div>
 	);
