@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-
+import API from "../../api.js";
 import {
 	Layout,
 	Button,
@@ -21,15 +20,10 @@ import {
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
-
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
-
 const { Content } = Layout;
-
-const BASE_URL = "http://localhost:8080/";
-
 function FormsPayments() {
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
@@ -37,9 +31,8 @@ function FormsPayments() {
 	const [dataFormPayment, setDataFormPayment] = useState([]);
 	const [idUpdate, setIdUpdate] = useState(null);
 	const [loading, setLoading] = useState(false);
-
 	useEffect(() => {
-		axios.get(BASE_URL + "form_payment").then((response) => {
+		API.get("form_payment").then((response) => {
 			let array = [];
 			response.data.forEach((formPayment) => {
 				array.push({
@@ -51,10 +44,9 @@ function FormsPayments() {
 			})
 			setDataFormPayment(array);
 		}).catch((error) => {
-			console.log("BUGOU: " + error);
+			message.error("Erro de comunicação com o servidor.");
 		});
 	}, []);
-
 
 	const columns = [
 		{ title: 'Código', dataIndex: 'code', key: 'code' },
@@ -90,11 +82,9 @@ function FormsPayments() {
 		},
 	];
 
-
 	const deleteFormPayment = async (id) => {
 		setLoading(true);
-
-		await axios.delete(BASE_URL + "form_payment/" + id).then(response => {
+		await API.delete("form_payment/" + id).then(response => {
 			if (response.status === 200) {
 				getFormsPayments();
 				setLoading(false);
@@ -105,14 +95,12 @@ function FormsPayments() {
 			}
 		}).catch(error => {
 			setLoading(false);
-			message.error(error);
+			message.error("Erro de comunicação com o servidor.");
 		});
-
 	}
 
-
 	const getFormsPayments = async () => {
-		await axios.get(BASE_URL + "form_payment").then((response) => {
+		await API.get("form_payment").then((response) => {
 			let array = [];
 			response.data.forEach((formPayment) => {
 				array.push({
@@ -124,23 +112,20 @@ function FormsPayments() {
 			})
 			setDataFormPayment(array);
 		}).catch((error) => {
-			console.log("BUGOU: " + error);
+			message.error("Erro de comunicação com o servidor.");
 		});
 	}
-
-
 
 	const onUpdateFormPayment = async (values) => {
 		setLoading(true);
 		if (values.name_form_payment) {
-			const response = await axios.put(BASE_URL + "form_payment",
+			const response = await API.put("form_payment",
 				{
 					id: idUpdate,
 					name_form_payment: values.name_form_payment,
 					is_active: values.is_active !== undefined ? values.is_active : true,
 				}
 			);
-
 			setLoading(false);
 			if (response.status === 200) {
 				getFormsPayments();
@@ -150,29 +135,21 @@ function FormsPayments() {
 			} else {
 				message.error(response.data.message);
 			}
-
 		} else {
 			setLoading(false);
 			message.error("Informe o nome da forma de pagamento, por favor !");
 		}
-
 	}
-
 
 	const setFildsDrawer = (id) => {
 		const line = dataFormPayment.filter((item) => item.key === id)[0];
 		setIdUpdate(id);
-
 		form.setFieldsValue({
 			name_form_payment: line.name,
 			is_active: line.status
 		});
-
 		setExpandEditRow(!expandEditRow);
 	}
-
-
-
 
 	return (
 		<div>
@@ -191,7 +168,6 @@ function FormsPayments() {
 						<FooterSite />
 					</Layout>
 				</Layout>
-
 				<Drawer
 					title="Editar forma de pagamento"
 					width={720}
@@ -200,19 +176,16 @@ function FormsPayments() {
 					bodyStyle={{ paddingBottom: 80 }}>
 					<Form layout="vertical" form={form} onFinish={onUpdateFormPayment}>
 						<Row gutter={[8, 0]}>
-
 							<Col span={20}>
 								<Form.Item label="Nome" name="name_form_payment">
 									<Input className="input-radius" />
 								</Form.Item>
 							</Col>
-
 							<Col span={4}>
 								<Form.Item label="Status" name="is_active" valuePropName="checked">
 									<Switch />
 								</Form.Item>
 							</Col>
-
 							<Col span={24}>
 								<Button onClick={() => form.submit()} shape="round" className="button ac">
 									Salvar
@@ -221,7 +194,6 @@ function FormsPayments() {
 									Cancelar
 							    </Button>
 							</Col>
-
 						</Row>
 					</Form>
 				</Drawer>
@@ -229,5 +201,4 @@ function FormsPayments() {
 		</div>
 	);
 }
-
 export default FormsPayments;

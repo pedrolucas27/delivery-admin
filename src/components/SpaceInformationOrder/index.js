@@ -7,13 +7,9 @@ import {
 } from 'antd';
 import '../../global.css';
 import { changeCommaForPoint } from "../../helpers.js";
-
-
 const { Title } = Typography;
-
 function SpaceInformationOrder(props) {
 	const [dataClient, setDataClient] = useState([]);
-
 	useEffect(() => {
 		setDataClient(String(props.addressClient).split(";"));
 	}, []);
@@ -52,9 +48,7 @@ function SpaceInformationOrder(props) {
 					}
 				</Col>
 			</Row>
-
 		</div>
 	);
 }
-
 export default SpaceInformationOrder;

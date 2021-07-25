@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-
+import API from "../../api.js";
 import {
 	Layout,
 	Button,
@@ -22,18 +21,13 @@ import {
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
-
 import { maskMoney, changeCommaForPoint } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
-
 const { Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
-
-const BASE_URL = "http://localhost:8080/";
-
 function Additionals() {
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
@@ -42,10 +36,9 @@ function Additionals() {
 	const [data, setData] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [dataCategory, setDataCategory] = useState([]);
-
 	useEffect(() => {
 		try {
-			axios.get(BASE_URL + "additional").then((response) => {
+			API.get("additional").then((response) => {
 				let array = [];
 				response.data.forEach((additional) => {
 					array.push({
@@ -55,21 +48,18 @@ function Additionals() {
 						description: additional.description || "-",
 						category: additional.id_category,
 						value: additional.price,
-						is_default: additional.is_default,
 						status: additional.is_active
 					})
 				})
 				setData(array);
 			}).catch((error) => {
-				console.log("BUGOU: " + error);
+				message.error("Erro de comunicação com o servidor.");
 			});
-
-			axios.get(BASE_URL + "category").then((response) => {
+			API.get("category").then((response) => {
 				setDataCategory(response.data);
 			}).catch((error) => {
-				console.log("BUGOU: " + error);
+				message.error("Erro de comunicação com o servidor.");
 			});
-
 		} catch (error) {
 			message.error("Erro de comunicação com o servidor.");
 		}
@@ -122,10 +112,9 @@ function Additionals() {
 		},
 	];
 
-
 	const getAdditionals = async () => {
 		try {
-			await axios.get(BASE_URL + "additional").then((response) => {
+			await API.get("additional").then((response) => {
 				let array = [];
 				response.data.forEach((additional) => {
 					array.push({
@@ -134,24 +123,22 @@ function Additionals() {
 						name: additional.name,
 						description: additional.description || "-",
 						value: additional.price,
-						is_default: additional.is_default,
 						status: additional.is_active
 					})
 				})
 				setData(array);
 			}).catch((error) => {
-				console.log("BUGOU: " + error);
+				message.error("Erro de comunicação com o servidor.");
 			});
 		} catch (error) {
 			message.error("Erro de comunicação com o servidor.");
 		}
-
 	}
 
 	const deleteAdditional = async (id) => {
+		setLoading(true);
 		try {
-			setLoading(true);
-			await axios.delete(BASE_URL + "additional/" + id).then(response => {
+			await API.delete("additional/" + id).then(response => {
 				if (response.status === 200) {
 					getAdditionals();
 					setLoading(false);
@@ -170,23 +157,20 @@ function Additionals() {
 		}
 	}
 
-
 	const updateAdditional = async (values) => {
 		try {
 			setLoading(true);
 			if (values.name_additional && values.category && values.price) {
-				const response = await axios.put(BASE_URL + "additional",
+				const response = await API.put("additional",
 					{
 						id: idUpdate,
 						name: values.name_additional,
 						description: values.description || null,
-						is_default: values.is_default !== undefined ? values.is_default : true,
 						price: Number(values.price.replace(",", ".")),
 						is_active: values.is_active !== undefined ? values.is_active : true,
 						id_category: values.category
 					}
 				);
-
 				if (response.status === 200) {
 					getAdditionals();
 					setLoading(false);
@@ -196,7 +180,6 @@ function Additionals() {
 					setLoading(false);
 					message.error(response.data.message);
 				}
-
 			} else {
 				setLoading(false);
 				message.error("Informe os campos pedidos, por favor !");
@@ -205,9 +188,7 @@ function Additionals() {
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor, tente novamente!");
 		}
-
 	}
-
 
 	const setFildsDrawer = (id) => {
 		const line = data.filter((item) => item.key === id)[0];
@@ -217,7 +198,6 @@ function Additionals() {
 			name_additional: line.name,
 			category: line.category,
 			price: line.value,
-			is_default: line.is_default,
 			is_active: line.status,
 			description: line.description
 		});
@@ -247,24 +227,20 @@ function Additionals() {
 						<FooterSite />
 					</Layout>
 				</Layout>
-
 				<Drawer
 					title="Editar adicional"
 					width={720}
 					onClose={() => setExpandEditRow(!expandEditRow)}
 					visible={expandEditRow}
 					bodyStyle={{ paddingBottom: 80 }}>
-
 					<Form layout="vertical" form={form} onFinish={updateAdditional}>
 						<Row gutter={[16, 16]}>
-
-							<Col span={6}>
+							<Col span={8}>
 								<Form.Item label="Nome" name="name_additional">
 									<Input className="input-radius" />
 								</Form.Item>
 							</Col>
-
-							<Col span={5}>
+							<Col span={6}>
 								<Form.Item label="Categoria" name="category">
 									<Select>
 										{
@@ -278,32 +254,21 @@ function Additionals() {
 									</Select>
 								</Form.Item>
 							</Col>
-
 							<Col span={5}>
 								<Form.Item label="Preço" name="price">
 									<Input className="input-radius" onKeyUp={handleChangePrice} />
 								</Form.Item>
 							</Col>
-
-							<Col span={4}>
-								<Form.Item label="Adiconal padrão" name="is_default" valuePropName="checked">
-									<Switch />
-								</Form.Item>
-							</Col>
-
-							<Col span={4}>
+							<Col span={5}>
 								<Form.Item label="Status" name="is_active" valuePropName="checked">
 									<Switch />
 								</Form.Item>
 							</Col>
-
 							<Col span={24}>
 								<Form.Item label="Descrição" name="description">
 									<TextArea rows={4} className="input-radius" />
 								</Form.Item>
 							</Col>
-
-
 							<Col span={24}>
 								<Button onClick={() => form.submit()} shape="round" className="button ac">
 									Editar
@@ -319,5 +284,4 @@ function Additionals() {
 		</div>
 	);
 }
-
 export default Additionals;

@@ -1,14 +1,11 @@
 import React from "react";
-
 import {
 	List,
 	Typography
 } from 'antd';
 import 'antd/dist/antd.css';
 import { changeCommaForPoint } from "../../helpers.js";
-
 const { Title } = Typography;
-
 function ListProductsPromotion(props) {
 	return (
 		<div>
@@ -31,5 +28,4 @@ function ListProductsPromotion(props) {
 		</div>
 	);
 }
-
 export default ListProductsPromotion;

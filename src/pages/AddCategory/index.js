@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
-
+import API from "../../api.js";
 import {
 	Layout,
 	Form,
@@ -13,21 +12,15 @@ import {
 	message,
 	Spin
 } from 'antd';
-
 import {
 	PlusOutlined
 } from '@ant-design/icons';
-
 import 'antd/dist/antd.css';
 import '../../global.css';
-
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
-
 const { Content } = Layout;
-
-const BASE_URL = "http://localhost:8080/";
 
 function getBase64(file) {
 	return new Promise((resolve, reject) => {
@@ -42,17 +35,13 @@ function AddCategory() {
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
-
-	const [fileList, setFileList] = useState([]);
 	const [imageCategory, setImageCategory] = useState(null);
 
 	const onSaveCategory = async (values) => {
-
-
 		try {
 			setLoading(true);
 			if (values.name_category) {
-				const response = await axios.post(BASE_URL + "category",
+				const response = await API.post("category",
 					{
 						name_category: values.name_category,
 						is_active: values.is_active !== undefined ? values.is_active : true,
@@ -63,7 +52,6 @@ function AddCategory() {
 				setLoading(false);
 				if (response.status === 200) {
 					message.success(response.data.message);
-					setFileList([]);
 					setImageCategory(null);
 					form.resetFields();
 				} else {
@@ -82,19 +70,8 @@ function AddCategory() {
 	}
 
 	const handleChangeImage = async (file) => {
-		setFileList(file.fileList);
-
-		if (file.fileList.length !== 0) {
-			if (imageCategory !== null) {
-				const image = await getBase64(file.fileList[0].originFileObj);
-				setImageCategory(image);
-			} else {
-				message.error("Escolha no máximoo uma imagem.");
-			}
-		} else {
-			setFileList([]);
-			setImageCategory(null);
-		}
+		const image = await getBase64(file.fileList[0].originFileObj);
+		setImageCategory(image);
 	}
 
 	const uploadButton = (
@@ -134,13 +111,13 @@ function AddCategory() {
 											<Upload
 												action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
 												listType="picture-card"
+												showUploadList={false}
 												onChange={handleChangeImage}
 											>
-												{fileList.length >= 8 ? null : uploadButton}
+												{imageCategory ? <img src={imageCategory} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
 											</Upload>
 										</Form.Item>
 									</Col>
-
 
 									<Col span={24}>
 										<Button onClick={() => form.submit()} shape="round" className="button ac">
@@ -149,7 +126,6 @@ function AddCategory() {
 										<Button
 											onClick={() => {
 												form.resetFields();
-												setFileList([]);
 												setImageCategory(null);
 											}}
 											shape="round"

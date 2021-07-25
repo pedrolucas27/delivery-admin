@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-
+import API from "../../api.js";
 import {
 	Layout,
 	Button,
@@ -21,15 +20,10 @@ import {
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
-
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
-
 const { Content } = Layout;
-
-const BASE_URL = "http://localhost:8080/";
-
 function Categories() {
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
@@ -37,10 +31,9 @@ function Categories() {
 	const [dataCategory, setDataCategory] = useState([]);
 	const [idUpdate, setIdUpdate] = useState(null);
 	const [loading, setLoading] = useState(false);
-
 	useEffect(() => {
 		try {
-			axios.get(BASE_URL + "category").then((response) => {
+			API.get("category").then((response) => {
 				let array = [];
 				response.data.forEach((category) => {
 					array.push({
@@ -93,10 +86,9 @@ function Categories() {
 		},
 	];
 
-
 	const getCategories = async () => {
 		try {
-			await axios.get(BASE_URL + "category").then((response) => {
+			await API.get("category").then((response) => {
 				let array = [];
 				response.data.forEach((category) => {
 					array.push({
@@ -115,12 +107,10 @@ function Categories() {
 		}
 	}
 
-
-
 	const deleteCategory = async (id) => {
 		try {
 			setLoading(true);
-			await axios.delete(BASE_URL + "category/" + id).then(response => {
+			await API.delete("category/" + id).then(response => {
 				if (response.status === 200) {
 					getCategories();
 					setLoading(false);
@@ -137,22 +127,19 @@ function Categories() {
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor, tente novamente!");
 		}
-
-
 	}
 
 	const updateCategory = async (values) => {
 		try {
 			setLoading(true);
 			if (values.name_category) {
-				const response = await axios.put(BASE_URL + "category",
+				const response = await API.put("category",
 					{
 						id: idUpdate,
 						name_category: values.name_category,
 						is_active: values.is_active !== undefined ? values.is_active : true
 					}
 				);
-
 				if (response.status === 200) {
 					getCategories();
 					setLoading(false);
@@ -162,7 +149,6 @@ function Categories() {
 					setLoading(false);
 					message.error(response.data.message);
 				}
-
 			} else {
 				setLoading(false);
 				message.error("Informe o nome da categoria, por favor !");
@@ -171,21 +157,17 @@ function Categories() {
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor, tente novamente!");
 		}
-
 	}
 
 	const setFildsDrawer = (id) => {
 		const line = dataCategory.filter((item) => item.key === id)[0];
 		setIdUpdate(id);
-
 		form.setFieldsValue({
 			name_category: line.name,
 			is_active: line.status
 		});
-
 		setExpandEditRow(!expandEditRow);
 	}
-
 
 	return (
 		<div>
@@ -204,29 +186,24 @@ function Categories() {
 						<FooterSite />
 					</Layout>
 				</Layout>
-
 				<Drawer
 					title="Editar categoria"
 					width={720}
 					onClose={() => setExpandEditRow(!expandEditRow)}
 					visible={expandEditRow}
 					bodyStyle={{ paddingBottom: 80 }}>
-
 					<Form layout="vertical" form={form} onFinish={updateCategory}>
 						<Row gutter={[16, 16]}>
-
 							<Col span={20}>
 								<Form.Item label="Nome" name="name_category">
 									<Input className="input-radius" />
 								</Form.Item>
 							</Col>
-
 							<Col span={4}>
 								<Form.Item label="Status" name="is_active" valuePropName="checked">
 									<Switch />
 								</Form.Item>
 							</Col>
-
 							<Col span={24}>
 								<Button onClick={() => form.submit()} shape="round" className="button ac">
 									Editar
@@ -237,11 +214,9 @@ function Categories() {
 							</Col>
 						</Row>
 					</Form>
-
 				</Drawer>
 			</Spin>
 		</div>
 	);
 }
-
 export default Categories;

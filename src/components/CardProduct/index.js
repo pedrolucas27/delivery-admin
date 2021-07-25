@@ -4,21 +4,20 @@ import {
 	Row,
 	Col,
 	Typography,
-	Button
 } from 'antd';
 import {
 	CheckCircleOutlined
 } from '@ant-design/icons';
 import '../../global.css';
-
+import { changeCommaForPoint } from "../../helpers.js";
 const { Title } = Typography;
-
 function CardProduct(props) {
 	return (
 		<div>
 			<Card
 				hoverable
 				className={props.check ? "card-pdv-2 check-card-pdv" : "card-pdv-2"}
+				style={{ height: '175px' }}
 				onClick={() => props.onChangeProduct()}
 			>
 				<Title level={5}>
@@ -31,7 +30,7 @@ function CardProduct(props) {
 					<Col span={24}>
 						<div className="container-icon-card">
 							<p className="text-money">
-								R$ {props.price}
+								R$ {changeCommaForPoint(props.price)}
 							</p>
 							{props.check && (
 								<CheckCircleOutlined className="icon-table" />
@@ -39,21 +38,8 @@ function CardProduct(props) {
 						</div>
 					</Col>
 				</Row>
-				<Row>
-					<Col span={24}>
-						<Button
-							type="link"
-							className="button-detail"
-							onClick={() => props.showModalDetail()}
-						>
-							Ver detalhes
-        				</Button>
-					</Col>
-				</Row>
-
 			</Card>
 		</div>
 	);
 }
-
 export default CardProduct;

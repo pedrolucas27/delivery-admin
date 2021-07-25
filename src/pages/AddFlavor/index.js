@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-
+import API from "../../api.js";
 import {
 	Layout,
 	Form,
@@ -15,29 +14,23 @@ import {
 } from 'antd';
 import 'antd/dist/antd.css';
 import '../../global.css';
-
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
-
 const { TextArea } = Input;
 const { Content } = Layout;
 const { Option } = Select;
-
-const BASE_URL = "http://localhost:8080/";
-
 function AddFlavor() {
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [dataCategory, setDataCategory] = useState([]);
-
 	useEffect(() => {
 		try {
-			axios.get(BASE_URL + "category").then((response) => {
+			API.get("category").then((response) => {
 				setDataCategory(response.data);
 			}).catch((error) => {
-				console.log("BUGOU: " + error);
+				message.error("Erro de comunicação com o servidor.");
 			});
 		} catch (error) {
 			message.error("Erro de comunicação com o servidor.");
@@ -45,11 +38,10 @@ function AddFlavor() {
 	}, []);
 
 	const onSaveFlavor = async (values) => {
-
 		try {
 			setLoading(true);
 			if (values.name_flavor && values.category) {
-				const response = await axios.post(BASE_URL + "flavor",
+				const response = await API.post("flavor",
 					{
 						name_flavor: values.name_flavor,
 						description: values.description,
@@ -57,7 +49,6 @@ function AddFlavor() {
 						id_category: values.category
 					}
 				);
-
 				setLoading(false);
 				if (response.status === 200) {
 					message.success(response.data.message);
@@ -65,7 +56,6 @@ function AddFlavor() {
 				} else {
 					message.error(response.data.message);
 				}
-
 			} else {
 				setLoading(false);
 				message.error("Informe o nome do sabor, por favor !");
@@ -74,7 +64,6 @@ function AddFlavor() {
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor, tente novamente !");
 		}
-
 	}
 
 
@@ -86,8 +75,6 @@ function AddFlavor() {
 					<Layout className="site-layout">
 						<HeaderSite title={'Cadastro de sabor'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
-
-
 							<Form layout="vertical" form={form} onFinish={onSaveFlavor}>
 								<Row gutter={[8, 0]}>
 									<Col span={14}>
@@ -114,13 +101,11 @@ function AddFlavor() {
 											<Switch defaultChecked />
 										</Form.Item>
 									</Col>
-
 									<Col span={24}>
 										<Form.Item label="Descrição" name="description">
 											<TextArea rows={4} className="input-radius" />
 										</Form.Item>
 									</Col>
-
 									<Col span={24}>
 										<Button onClick={() => form.submit()} shape="round" className="button ac">
 											Salvar
@@ -131,8 +116,6 @@ function AddFlavor() {
 									</Col>
 								</Row>
 							</Form>
-
-
 						</Content>
 						<FooterSite />
 					</Layout>
@@ -141,5 +124,4 @@ function AddFlavor() {
 		</div>
 	);
 }
-
 export default AddFlavor;

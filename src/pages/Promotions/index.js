@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../../api.js";
 import { maskMoney, changeCommaForPoint } from "../../helpers.js";
-
 import {
 	Row,
 	Col,
@@ -17,28 +16,20 @@ import {
 	Switch,
 	Drawer
 } from 'antd';
-
 import 'antd/dist/antd.css';
 import '../../global.css';
-
 import {
 	DeleteOutlined,
 	EditOutlined,
 	PlusOutlined
 } from '@ant-design/icons';
-
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 import ListProductsPromotion from "../../components/ListProductsPromotion";
-
 const { Content } = Layout;
 const { Option } = Select;
 const { TextArea } = Input;
-
-
-const BASE_URL = "http://localhost:8080/";
-
 function Promotions() {
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
@@ -51,10 +42,9 @@ function Promotions() {
 	const [idUpdate, setIdUpdate] = useState(null);
 	const [form] = Form.useForm();
 	const [idCategoryProductPromotion, setIdCategoryProductPromotion] = useState(null);
-
 	useEffect(() => {
 		try {
-			axios.get(BASE_URL + "promotion").then((response) => {
+			API.get("promotion").then((response) => {
 				let array = [];
 				response.data.forEach((promotion) => {
 					array.push({
@@ -70,15 +60,12 @@ function Promotions() {
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
 			});
-
 			form.setFieldsValue({ price_promotion: maskMoney(0) });
-			axios.get(BASE_URL + "category").then((response) => {
+			API.get("category").then((response) => {
 				setDataCategory(response.data);
 			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor 1.");
+				message.error("Erro de comunicação com o servidor.");
 			});
-
-
 		} catch (error) {
 			message.error("Erro de comunicação com o servidor.");
 		}
@@ -88,10 +75,10 @@ function Promotions() {
 		try {
 			setLoading(true);
 			setIdCategoryProductPromotion(idCategory);
-			await axios.get(BASE_URL + "flavor/byCategory/" + idCategory).then((response) => {
+			await API.get("flavor/byCategory/" + idCategory).then((response) => {
 				setDataFlavor(response.data);
 			}).catch((error) => {
-				console.log("BUGOU: " + error);
+				message.error("Erro de comunicação com o servidor.");
 			});
 			setLoading(false);
 		} catch (error) {
@@ -103,7 +90,7 @@ function Promotions() {
 	const getProductsByCategoryAndFlavor = async (idFlavor) => {
 		try {
 			setLoading(true);
-			await axios.get(BASE_URL + "product/others/" + idCategoryProductPromotion + "/" + idFlavor).then((response) => {
+			await API.get("product/others/" + idCategoryProductPromotion + "/" + idFlavor).then((response) => {
 				setLoading(false);
 				setDataProductsFilter(response.data);
 			}).catch((error) => {
@@ -115,7 +102,6 @@ function Promotions() {
 			message.error("Erro de comunicação com o servidor.");
 		}
 	}
-
 
 	const columns = [
 		{ title: 'Código', dataIndex: 'code', key: 'code' },
@@ -151,7 +137,6 @@ function Promotions() {
 			},
 		},
 	];
-
 
 	const columnsTable2 = [
 		{ title: 'Produto', dataIndex: 'name_product', key: 'name_product' },
@@ -207,18 +192,15 @@ function Promotions() {
 		},
 	];
 
-
 	const deleteLineTable = async (key) => {
-
 		try {
 			let isNewProduct = dataTable.filter((item) => item.key === key)[0].is_new_product;
 			if (!isNewProduct) {
 				setLoading(true);
-				await axios.delete(BASE_URL + "product-promotion/" + key).then((response) => {
+				await API.delete("product-promotion/" + key).then((response) => {
 					if (response.status === 200) {
 						setLoading(false);
 						message.success(response.data.message);
-
 						const newDataTable = dataTable.filter((item) => item.key !== key);
 						setDataTable(newDataTable);
 					} else {
@@ -237,13 +219,11 @@ function Promotions() {
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor, tente novamente!");
 		}
-
-
 	}
 
 	const getPromotions = async () => {
 		try {
-			axios.get(BASE_URL + "promotion").then((response) => {
+			API.get("promotion").then((response) => {
 				let array = [];
 				response.data.forEach((promotion) => {
 					array.push({
@@ -267,7 +247,7 @@ function Promotions() {
 	const deletePromotion = async (id) => {
 		try {
 			setLoading(true);
-			await axios.delete(BASE_URL + "promotion/" + id).then(response => {
+			await API.delete("promotion/" + id).then(response => {
 				if (response.status === 200) {
 					getPromotions();
 					setLoading(false);
@@ -300,9 +280,8 @@ function Promotions() {
 						})
 					}
 				})
-
 				if (dataTable.length !== 0) {
-					const response = await axios.put(BASE_URL + "promotion",
+					const response = await API.put("promotion",
 						{
 							idPromotion: idUpdate,
 							name_promotion: values.name_promotion,
@@ -311,13 +290,11 @@ function Promotions() {
 							newProductsPromotion: array
 						}
 					);
-
 					if (response.status === 200) {
 						getPromotions();
 						setLoading(false);
 						message.success(response.data.message);
 						setExpandEditRow(!expandEditRow);
-
 						form.resetFields();
 						form.setFieldsValue({ price_promotion: maskMoney(0) });
 					} else {
@@ -328,34 +305,26 @@ function Promotions() {
 						form.resetFields();
 						form.setFieldsValue({ price_promotion: maskMoney(0) });
 					}
-
 				} else {
 					setLoading(false);
 					message.error("Informe produtos na promoção, por favor !");
 				}
-
 			} else {
 				setLoading(false);
 				message.error("Informe o nome da promoção, por favor !");
 			}
-
 		} catch (error) {
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor, tente novamente!");
 		}
 	}
 
-
 	const insertLineTable = () => {
 		setLoading(true);
-
 		const idProduct = form.getFieldValue("name_product");
 		const pricePromotion = form.getFieldValue("price_promotion");
-
 		if (idProduct && pricePromotion) {
-
 			const flag = dataTable.filter((item) => item.key === idProduct).length !== 0 ? true : false;
-
 			if (!flag) {
 				const product = dataProductsFilter.filter((item) => item.id_product === idProduct)[0];
 				let line = {
@@ -384,15 +353,10 @@ function Promotions() {
 		}
 	}
 
-
-
-
 	const setFildsDrawer = (id) => {
 		setLoading(true);
-
 		const line = dataPromotion.filter((item) => item.key === id)[0];
 		setIdUpdate(id);
-
 		let array = [];
 		line.products.forEach((product) => {
 			array.push({
@@ -405,13 +369,11 @@ function Promotions() {
 			})
 		})
 		setDataTable(array);
-
 		form.setFieldsValue({
 			name_promotion: line.name,
 			is_active: line.status,
 			description: line.description
 		});
-
 		setLoading(false);
 		setExpandEditRow(!expandEditRow);
 	}
@@ -420,7 +382,6 @@ function Promotions() {
 		const field = form.getFieldValue("price_promotion");
 		form.setFieldsValue({ price_promotion: await maskMoney(field) });
 	}
-
 
 	return (
 		<div>
@@ -450,28 +411,23 @@ function Promotions() {
 					onClose={() => setExpandEditRow(!expandEditRow)}
 					visible={expandEditRow}
 					bodyStyle={{ paddingBottom: 80 }}>
-
 					<Form layout="vertical" form={form} onFinish={onUpdatePromotion}>
 						<Row gutter={[16, 16]}>
-
 							<Col span={20}>
 								<Form.Item label="Nome" name="name_promotion">
 									<Input className="input-radius" />
 								</Form.Item>
 							</Col>
-
 							<Col span={4}>
 								<Form.Item label="Status" name="is_active" valuePropName="checked">
 									<Switch />
 								</Form.Item>
 							</Col>
-
 							<Col span={24}>
 								<Form.Item label="Descrição" name="description">
 									<TextArea rows={4} className="input-radius" />
 								</Form.Item>
 							</Col>
-
 							<Col span={5}>
 								<Form.Item label="Categoria" name="category">
 									<Select onChange={getFlavorsByCategory}>
@@ -486,7 +442,6 @@ function Promotions() {
 									</Select>
 								</Form.Item>
 							</Col>
-
 							<Col span={6}>
 								<Form.Item label="Sabor" name="flavor">
 									<Select onChange={getProductsByCategoryAndFlavor}>
@@ -501,7 +456,6 @@ function Promotions() {
 									</Select>
 								</Form.Item>
 							</Col>
-
 							<Col span={8}>
 								<Form.Item label="Produto" name="name_product">
 									<Select>
@@ -516,13 +470,11 @@ function Promotions() {
 									</Select>
 								</Form.Item>
 							</Col>
-
 							<Col span={4}>
 								<Form.Item label="Preço promocional" name="price_promotion">
 									<Input className="input-radius" onKeyUp={handleChangePrice} />
 								</Form.Item>
 							</Col>
-
 							<Col span={1}>
 								<Button
 									className="button"
@@ -532,7 +484,6 @@ function Promotions() {
 									onClick={() => insertLineTable()}
 								/>
 							</Col>
-
 							<Col span={24}>
 								<Table
 									size="middle"
@@ -540,24 +491,19 @@ function Promotions() {
 									dataSource={dataTable}
 								/>
 							</Col>
-
-
 							<Col span={24}>
 								<Button onClick={() => form.submit()} shape="round" className="button ac">
 									Editar
-										    </Button>
+							    </Button>
 								<Button onClick={() => setExpandEditRow(!expandEditRow)} shape="round" className="button-cancel ac">
 									Cancelar
-										    </Button>
+							    </Button>
 							</Col>
 						</Row>
 					</Form>
-
 				</Drawer>
-
 			</Spin>
 		</div>
 	);
 }
-
 export default Promotions;

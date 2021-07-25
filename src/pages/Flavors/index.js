@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-
+import API from "../../api.js";
 import {
 	Layout,
 	Button,
@@ -22,17 +21,12 @@ import {
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
-
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
-
 const { Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
-
-const BASE_URL = "http://localhost:8080/";
-
 function Flavors() {
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
@@ -41,16 +35,14 @@ function Flavors() {
 	const [form] = Form.useForm();
 	const [loading, setLoading] = useState(false);
 	const [dataCategory, setDataCategory] = useState([]);
-
 	useEffect(() => {
 		try {
-			axios.get(BASE_URL + "category").then((response) => {
+			API.get("category").then((response) => {
 				setDataCategory(response.data);
 			}).catch((error) => {
-				console.log("BUGOU: " + error);
+				message.error("Erro de comunicação com o servidor.");
 			});
-
-			axios.get(BASE_URL + "flavor").then((response) => {
+			API.get("flavor").then((response) => {
 				let array = [];
 				response.data.forEach((flavor) => {
 					array.push({
@@ -64,14 +56,12 @@ function Flavors() {
 				})
 				setData(array);
 			}).catch((error) => {
-				console.log("BUGOU: " + error);
+				message.error("Erro de comunicação com o servidor.");
 			});
 		} catch (error) {
 			message.error("Erro de comunicação com o servidor.");
 		}
-
 	}, []);
-
 
 	const columns = [
 		{ title: 'Código', dataIndex: 'code', key: 'code' },
@@ -120,10 +110,9 @@ function Flavors() {
 		},
 	];
 
-
 	const getFlavors = async () => {
 		try {
-			await axios.get(BASE_URL + "flavor").then((response) => {
+			API.get("flavor").then((response) => {
 				let array = [];
 				response.data.forEach((flavor) => {
 					array.push({
@@ -144,12 +133,10 @@ function Flavors() {
 		}
 	}
 
-
-
 	const deleteFlavor = async (id) => {
 		try {
 			setLoading(true);
-			await axios.delete(BASE_URL + "flavor/" + id).then(response => {
+			await API.delete("flavor/" + id).then(response => {
 				if (response.status === 200) {
 					getFlavors();
 					setLoading(false);
@@ -172,7 +159,7 @@ function Flavors() {
 		try {
 			setLoading(true);
 			if (values.name_flavor && values.category) {
-				const response = await axios.put(BASE_URL + "flavor",
+				const response = await API.put("flavor",
 					{
 						id: idUpdate,
 						name_flavor: values.name_flavor,
@@ -181,7 +168,6 @@ function Flavors() {
 						id_category: values.category
 					}
 				);
-
 				if (response.status === 200) {
 					getFlavors();
 					setLoading(false);
@@ -191,7 +177,6 @@ function Flavors() {
 					setLoading(false);
 					message.error(response.data.message);
 				}
-
 			} else {
 				setLoading(false);
 				message.error("Informe o nome do sabor, por favor !");
@@ -200,23 +185,19 @@ function Flavors() {
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor, tente novamente!");
 		}
-
 	}
 
 	const setFildsDrawer = (id) => {
 		const line = data.filter((item) => item.key === id)[0];
 		setIdUpdate(id);
-
 		form.setFieldsValue({
 			name_flavor: line.name,
 			description: line.description,
 			is_active: line.status,
 			category: line.category
 		});
-
 		setExpandEditRow(!expandEditRow);
 	}
-
 
 	return (
 		<div>
@@ -235,7 +216,6 @@ function Flavors() {
 						<FooterSite />
 					</Layout>
 				</Layout>
-
 				<Drawer
 					title="Editar sabor"
 					width={720}
@@ -268,13 +248,11 @@ function Flavors() {
 									<Switch />
 								</Form.Item>
 							</Col>
-
 							<Col span={24}>
 								<Form.Item label="Descrição" name="description">
 									<TextArea rows={4} className="input-radius" />
 								</Form.Item>
 							</Col>
-
 							<Col span={24}>
 								<Button onClick={() => form.submit()} shape="round" className="button ac">
 									Editar
@@ -290,5 +268,4 @@ function Flavors() {
 		</div>
 	);
 }
-
 export default Flavors;

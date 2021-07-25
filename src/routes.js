@@ -14,6 +14,7 @@ import Pdv from './pages/Pdv';
 import OrderTracking from './pages/OrderTracking';
 import NotFound from './pages/NotFound';
 import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
 
 import Products from './pages/Products';
 import Categories from './pages/Categories';
@@ -38,6 +39,7 @@ function Routes() {
 
                 <Route path="/pdv" component={Pdv} />
                 <Route path="/orderTracking" component={OrderTracking} />
+                <Route path="/dashboard" component={Dashboard} />
 
                 <Route path="/products" component={Products} />
                 <Route path="/categories" component={Categories} />

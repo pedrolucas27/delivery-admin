@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-
+import API from "../../api.js";
 import {
 	Layout,
 	Button,
@@ -10,7 +9,6 @@ import {
 	Spin,
 	Steps,
 	Typography,
-	Modal,
 	Table,
 	Tooltip,
 } from 'antd';
@@ -19,7 +17,6 @@ import {
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
-
 import { changeCommaForPoint } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
@@ -30,29 +27,23 @@ import CardCategory from "../../components/CardCategory";
 import CardAdditional from "../../components/CardAdditional";
 import ModalAddProductCart from "../../components/ModalAddProductCart";
 import ModalFinishOrder from "../../components/ModalFinishOrder";
-
+import EmptyData from "../../components/EmptyData";
 const { Content } = Layout;
 const { Step } = Steps;
 const { Title } = Typography;
-
-const BASE_URL = "http://localhost:8080/";
-
 function Pdv() {
 	const [expand, setExpand] = useState(false);
 	const [stepCurrent, setStepCurrent] = useState(0);
 	const [loading, setLoading] = useState(false);
-
 	const [dataCategory, setDataCategory] = useState([]);
 	const [dataFlavor, setDataFlavor] = useState([]);
 	const [dataProductsByFilter, setDataProductsByFilter] = useState([]);
 	const [dataAdditionalsByCategory, setDataAdditionalsByCategory] = useState([]);
 
-
 	//ID's que compõe o pedido
 	const [idCategoryOrder, setIdCategoryOrder] = useState(null);
 	const [idFlavorOrder, setIdFlavorOrder] = useState(null);
 	const [idsFlavorsProductMisto, setIdsFlavorsProductMisto] = useState([]);
-	const [idProductOrder, setIdProductOrder] = useState(null);
 
 	//states auxiliares
 	const [nameCategoryChange, setNameCategoryChange] = useState(null);
@@ -63,26 +54,30 @@ function Pdv() {
 	const [valueTotalOrder, setValueTotalOrder] = useState(0);
 
 	useEffect(() => {
-		axios.get(BASE_URL + "category").then((response) => {
-			let array = [];
-			response.data.forEach((category) => {
-				array.push({
-					id: category.id_category,
-					name: category.name_category,
-					check: false
+		try{
+			API.get("category").then((response) => {
+				let array = [];
+				response.data.forEach((category) => {
+					array.push({
+						id: category.id_category,
+						name: category.name_category,
+						check: false
+					})
 				})
-			})
-			setDataCategory(array);
-		}).catch((error) => {
-			console.log("BUGOU: " + error);
-		});
+				setDataCategory(array);
+			}).catch((error) => {
+				message.error("Erro de comunicação com o servidor.");
+			});
+		} catch (error) {
+			message.error("Erro de comunicação com o servidor.");
+		}
 	}, []);
 
 	const columns = [
 		{ title: 'Produto', dataIndex: 'product', key: 'product' },
 		{ title: 'Quantidade', dataIndex: 'quantity', key: 'quantity' },
 		{
-			title: 'Preço (R$)',
+			title: 'Preço unitário',
 			dataIndex: 'price',
 			key: 'price',
 			render: (__, record) => {
@@ -109,7 +104,6 @@ function Pdv() {
 		},
 	];
 
-
 	const deleteProductOrder = (idProductOrder) => {
 		setLoading(true);
 		const priceProductRemove = dataProductsCart.filter((item) => item.key === idProductOrder)[0].price;
@@ -119,80 +113,98 @@ function Pdv() {
 		setLoading(false);
 	}
 
-
 	const getFlavorsByCategory = async (idCategory) => {
-		await axios.get(BASE_URL + "flavor/byCategory/" + idCategory).then((response) => {
-			let array = [];
-			response.data.forEach((flavor) => {
-				array.push({
-					id: flavor.id,
-					name: flavor.name_flavor,
-					description: flavor.description,
-					check: false
+		try{
+			await API.get("flavor/byCategory/" + idCategory).then((response) => {
+				let array = [];
+				response.data.forEach((flavor) => {
+					array.push({
+						id: flavor.id,
+						name: flavor.name_flavor,
+						description: flavor.description,
+						check: false
+					})
 				})
-			})
-			setDataFlavor(array);
-		}).catch((error) => {
-			console.log("BUGOU: " + error);
-		});
+				setDataFlavor(array);
+			}).catch((error) => {
+				message.error("Erro de comunicação com o servidor.");
+			});
+		} catch (error) {
+			message.error("Erro de comunicação com o servidor! Tente novamente.");
+		}
+		
 	}
 
 	const getAdditionalsByCategory = async (idCategory) => {
-		await axios.get(BASE_URL + "additional/" + idCategory).then((response) => {
-			let array = [];
-			response.data.forEach((additional) => {
-				array.push({
-					id: additional.id,
-					name: additional.name,
-					price: parseFloat(additional.price),
-					quantity: 0
+		try{
+			await API.get("additional/" + idCategory).then((response) => {
+				let array = [];
+				response.data.forEach((additional) => {
+					array.push({
+						id: additional.id,
+						name: additional.name,
+						price: additional.price,
+						quantity: 0
+					})
 				})
-			})
-			setDataAdditionalsByCategory(array);
-			return array;
-		}).catch((error) => {
-			console.log("BUGOU: " + error);
-		});
+				setDataAdditionalsByCategory(array);
+				if(array && array.length !== 0) {
+					setStepCurrent(stepCurrent + 1);
+				}else {
+					setStepCurrent(4);
+				}
+				setLoading(false);
+			}).catch((error) => {
+				message.error("Erro de comunicação com o servidor.");
+			});
+		} catch (error) {
+			message.error("Erro de comunicação com o servidor! Tente novamente.");
+		}
 	}
 
 	const getProductsByCategoryAndFlavor = async (idCategory, idFlavor) => {
-		await axios.get(BASE_URL + "product/others/" + idCategory + "/" + idFlavor).then((response) => {
-			let array = [];
-			response.data.forEach((product) => {
-				array.push({
-					id: product.id_product,
-					name: product.name_product,
-					description: product.description,
-					price: parseFloat(product.price),
-					size: product.size_product + " (" + product.unit + " - " + product.abreviation + ")"
+		try{
+			await API.get("product/others/" + idCategory + "/" + idFlavor).then((response) => {
+				let array = [];
+				response.data.forEach((product) => {
+					array.push({
+						id: product.id_product,
+						name: product.name_product,
+						description: product.description,
+						price: parseFloat(product.price),
+						size: product.size_product + " (" + product.unit + " - " + product.abreviation + ")"
+					})
 				})
-			})
-			setDataProductsByFilter(array);
-		}).catch((error) => {
-			console.log("BUGOU: " + error);
-		});
+				setDataProductsByFilter(array);
+			}).catch((error) => {
+				message.error("Erro de comunicação com o servidor.");
+			});
+		} catch (error) {
+			message.error("Erro de comunicação com o servidor! Tente novamente.");
+		}
 	}
 
-
 	const getProductsByMisto = async (idCategory) => {
-		let array = [];
-		await axios.get(BASE_URL + "product/others/" + idCategory).then((response) => {
-			response.data.forEach((product) => {
-				if ((product.fk_id_flavor === idsFlavorsProductMisto[0]) || (product.fk_id_flavor === idsFlavorsProductMisto[1])) {
-					array.push(product);
-				}
-			})
-		}).catch((error) => {
-			console.log("BUGOU: " + error);
-		});
-
-		filterProductsMistoPerSize(array);
+		try{
+			let array = [];
+			await API.get("product/others/" + idCategory).then((response) => {
+				response.data.forEach((product) => {
+					if ((product.fk_id_flavor === idsFlavorsProductMisto[0]) || (product.fk_id_flavor === idsFlavorsProductMisto[1])) {
+						array.push(product);
+					}
+				})
+				filterProductsMistoPerSize(array);
+			}).catch((error) => {
+				message.error("Erro de comunicação com o servidor.");
+			});
+		} catch (error) {
+			message.error("Erro de comunicação com o servidor! Tente novamente.");
+		}		
 	}
 
 	const filterProductsMistoPerSize = (products) => {
 		let sizesSimilar = [];
 		let productsMisto = [];
-
 		const productsFlavorOne = products.filter((item) => item.fk_id_flavor === idsFlavorsProductMisto[0]);
 		const productsFlavorTwo = products.filter((item) => item.fk_id_flavor === idsFlavorsProductMisto[1]);
 
@@ -211,10 +223,8 @@ function Pdv() {
 				}
 			}
 		}
-
 		setDataProductsByFilter(productsMisto);
 	}
-
 
 	const updateStepCurrent = () => {
 		setLoading(true);
@@ -242,10 +252,7 @@ function Pdv() {
 			} else if (stepCurrent === 2) {
 				getAdditionalsByCategory(idCategoryOrder);
 				setStepCurrent(stepCurrent + 1);
-			} else {
-				//caso 2 -> ABRIR MODAL PARA CONFIRMAR ITEM (QUANTIDADE, ADICIONAIS, OBSERVAÇÃO...)
-				console.log("FAZER ALGUMA COISA");
-			}
+			} 
 			setLoading(false);
 		} else {
 			setLoading(false);
@@ -253,19 +260,13 @@ function Pdv() {
 		}
 	}
 
-
-
-
 	const onChangeCategory = (idCategory) => {
 		setLoading(true);
 		setIdCategoryOrder(idCategoryOrder === idCategory ? null : idCategory);
-
 		const category = dataCategory.filter((item) => item.id === idCategory)[0];
 		const newCategory = { id: idCategory, name: category.name, check: !category.check };
-
 		const nameCatgeory = category.name.toUpperCase();
 		setNameCategoryChange(nameCatgeory);
-
 		let array = [];
 		dataCategory.forEach((item) => {
 			if (item.id !== idCategory) {
@@ -274,20 +275,16 @@ function Pdv() {
 				array.push(newCategory);
 			}
 		})
-
 		setDataCategory(array);
 		setLoading(false);
 	}
 
-
 	const onChangeFlavor = (idFlavor) => {
 		setLoading(true);
-
 		if ((nameCategoryChange !== 'PIZZA') && (nameCategoryChange !== 'PIZZAS')) {
 			setIdFlavorOrder(idFlavorOrder === idFlavor ? null : idFlavor);
 			const flavor = dataFlavor.filter((item) => item.id === idFlavor)[0];
 			const newFlavor = { id: idFlavor, name: flavor.name, description: flavor.description, check: !flavor.check };
-
 			let array = [];
 			dataFlavor.forEach((item) => {
 				if (item.id !== idFlavor) {
@@ -299,13 +296,11 @@ function Pdv() {
 			setDataFlavor(array);
 		} else {
 			const exist = idsFlavorsProductMisto.filter((id) => id === idFlavor).length !== 0 ? true : false;
-
 			if (!exist) {
 				if (idsFlavorsProductMisto.length < 2) {
 					setIdsFlavorsProductMisto([...idsFlavorsProductMisto, idFlavor]);
 					const flavor = dataFlavor.filter((item) => item.id === idFlavor)[0];
 					const newFlavor = { id: idFlavor, name: flavor.name, description: flavor.description, check: true };
-
 					let array = [];
 					dataFlavor.forEach((item) => {
 						if (item.id !== idFlavor) {
@@ -323,7 +318,6 @@ function Pdv() {
 				setIdsFlavorsProductMisto(idsFlavorsProductMisto.filter((item) => item !== idFlavor));
 				const flavor = dataFlavor.filter((item) => item.id === idFlavor)[0];
 				const newFlavor = { id: idFlavor, name: flavor.name, description: flavor.description, check: false };
-
 				let array = [];
 				dataFlavor.forEach((item) => {
 					if (item.id !== idFlavor) {
@@ -334,25 +328,19 @@ function Pdv() {
 				})
 				setDataFlavor(array);
 			}
-
 		}
-
 		setLoading(false);
 	}
-
 
 	const onChangeProductOuthers = (idProduct) => {
 		const line = dataProductsByFilter.filter((item) => item.id === idProduct)[0];
 		setProductModal(line);
-		setIdProductOrder(idProduct);
-
 		setLoading(true);
 		setTimeout(() => {
 			setLoading(false);
 			setVisibleAddProductCart(true);
 		}, 1500);
 	}
-
 
 	const addProductCart = async (quantity) => {
 		setLoading(true);
@@ -363,10 +351,9 @@ function Pdv() {
 				key2: productModal.id_2,
 				product: productModal.name,
 				quantity: quantity,
-				price: quantity * productModal.price,
+				price: productModal.price,
 				is_additional: false,
 				is_product_misto: true,
-				object: productModal
 			};
 		} else {
 			productCart = {
@@ -374,40 +361,24 @@ function Pdv() {
 				key2: null,
 				product: productModal.name,
 				quantity: quantity,
-				price: quantity * productModal.price,
+				price: productModal.price,
 				is_additional: false,
 				is_product_misto: false,
-				object: productModal
 			};
 		}
-
-
-		setValueTotalOrder(valueTotalOrder + productCart.price);
+		setValueTotalOrder(valueTotalOrder + (productModal.price * quantity));
 		setDataProductsCart([...dataProductsCart, productCart]);
-		setLoading(true);
-
-		const additionals = await getAdditionalsByCategory(idCategoryOrder);
-		if (additionals && additionals.length !== 0) {
-			setStepCurrent(stepCurrent + 1);
-		} else {
-			setStepCurrent(4);
-		}
-
 		setVisibleAddProductCart(false);
-		setLoading(false);
+		await getAdditionalsByCategory(idCategoryOrder);
 	}
-
 
 	const backToStart = async () => {
 		setLoading(true);
-
 		setStepCurrent(0);
 		setIdCategoryOrder(null);
 		setIdFlavorOrder(null);
-		setIdProductOrder(null);
 		setIdsFlavorsProductMisto([]);
-
-		await axios.get(BASE_URL + "category").then((response) => {
+		await API.get("category").then((response) => {
 			let array = [];
 			response.data.forEach((category) => {
 				array.push({
@@ -418,12 +389,10 @@ function Pdv() {
 			})
 			setDataCategory(array);
 		}).catch((error) => {
-			console.log("BUGOU: " + error);
+			message.error("Erro de comunicação com o servidor.");
 		});
-
 		setLoading(false);
 	}
-
 
 	const viewOrder = () => {
 		setLoading(true);
@@ -433,13 +402,12 @@ function Pdv() {
 		}, 1500);
 	}
 
-
 	const updateQuantityAdditional = (flag, idAdditional) => {
 		const additional = dataAdditionalsByCategory.filter((item) => item.id === idAdditional)[0];
 		const newAdditional = {
 			id: additional.id,
 			name: additional.name,
-			price: parseFloat(additional.price),
+			price: additional.price,
 			quantity: flag ? (additional.quantity + 1) : (additional.quantity - 1)
 		}
 		let array = [];
@@ -448,7 +416,7 @@ function Pdv() {
 				array.push({
 					id: item.id,
 					name: item.name,
-					price: parseFloat(item.price),
+					price: item.price,
 					quantity: item.quantity
 				});
 			} else {
@@ -458,10 +426,33 @@ function Pdv() {
 		setDataAdditionalsByCategory(array);
 	}
 
+	//especificamente para pizza (no caso o adicional seria a borda).
+	const onChangeAdditional = (id) => {
+		const additional = dataAdditionalsByCategory.filter((item) => item.id === id)[0];
+		const newAdditional = {
+			id: additional.id,
+			name: additional.name,
+			price: additional.price,
+			quantity: additional.quantity !== 1 ? 1:0
+		}
+		let array = [];
+		dataAdditionalsByCategory.forEach((item) => {
+			if (item.id !== id) {
+				array.push({
+					id: item.id,
+					name: item.name,
+					price: item.price,
+					quantity: 0
+				});
+			} else {
+				array.push(newAdditional);
+			}
+		})
+		setDataAdditionalsByCategory(array);
+	}
 
 	const includeAdditionalsOrder = () => {
 		setLoading(true);
-
 		let additionals = [];
 		let count = 0;
 		dataAdditionalsByCategory.forEach((item) => {
@@ -471,59 +462,63 @@ function Pdv() {
 					key2: null,
 					product: item.name,
 					quantity: item.quantity,
-					price: item.quantity * item.price,
+					price: item.price,
 					is_additional: true,
 					is_product_misto: false,
-					object: item
 				});
 
 				count = count + (item.quantity * item.price)
 			}
 		})
-
 		setValueTotalOrder(valueTotalOrder + count);
 		setDataProductsCart(dataProductsCart.concat(additionals));
 		setStepCurrent(4);
 		setLoading(false);
 	}
 
-
-
-	const onFinishOrder = async (values) => {
+	// PRIMEIRRA FUNÇÃO A SER CHAMADA
+	const insertProductCart_PDV = async (values) => {
+		setVisibleModalFinishOrder(false);
 		setLoading(true);
-
-		let array = [];
-		let price_order = 0;
-
-		dataProductsCart.forEach((item) => {
-			array.push({
-				id_cart_fk: null,
-				id_product_fk: !item.is_additional ? item.key : null,
-				id_product_fk2: item.key2 || null,
-				quantity_item: item.quantity,
-				price_item_order: (item.quantity * item.price),
-				observation: null,
-				id_additional_fk: item.is_additional ? item.key : null
-			});
-
-			price_order = price_order + (item.quantity * item.price)
-
-		})
-
-
-		let address = `Nome: ${values.name_client};Telefone: ${values.phone_cell};Endereço: ${values.address}`
-
-		const responseProductCart = await axios.post(BASE_URL + "cart_product",
-			{
-				products: array,
-				is_pdv: true
+		try{
+			let array = [];
+			let price_order = 0
+			dataProductsCart.forEach((item) => {
+				array.push({
+					id_cart_fk: null,
+					id_product_fk: !item.is_additional ? item.key : null,
+					id_product_fk2: item.key2 || null,
+					quantity_item: item.quantity,
+					price_item_order: (item.quantity * item.price),
+					observation: item.is_product_misto ? item.product : null,
+					id_additional_fk: item.is_additional ? item.key : null
+				});
+				price_order = price_order + (item.quantity * item.price);
+			})
+			const responseProductCart = await API.post("cart_product",
+				{
+					products: array,
+					is_pdv: true
+				}
+			);
+			if(responseProductCart.status === 200){
+				const arrayIdsProducts = responseProductCart.data.ids_products_cart;
+				await createOrder_PDV(arrayIdsProducts, price_order, values);
+			}else{
+				message.error(responseProductCart.data.message);
+				setLoading(false);
 			}
-		);
+		}catch (error) {
+			message.error("Erro de comunicação com o servidor. Tente novamente!");
+			setLoading(false);
+		}
+	}
 
-
-		const arrayIdsProducts = responseProductCart.data.ids_products_cart;
-		if (responseProductCart.status === 200) {
-			const responseOrder = await axios.post(BASE_URL + "createOrder",
+	// SEGUNDA FUNÇÃO A SER CHAMADA
+	const createOrder_PDV = async (ids, price_order, values) => {
+		try{
+			const address = `Nome: ${values.name_client};Telefone: ${values.phone_cell};Endereço: ${values.address}`
+			const responseOrder = await API.post("createOrder",
 				{
 					name_coupom: values.coupom || null,
 					price: price_order,
@@ -531,72 +526,49 @@ function Pdv() {
 					observation: values.observation || null,
 					address_client: String(address),
 					id_client_fk: null,
-					is_pdv: true
+					is_pdv: true,
+					idsFormPayment: values.form_payment
 				}
 			);
-
-
-			const idOrder = responseOrder.data.id_order;
 			if (responseOrder.status === 200) {
-
-				const responseProductOrder = await axios.post(BASE_URL + "createProductsOrder",
-					{
-						id_order: idOrder,
-						ids_products: arrayIdsProducts
-					}
-				);
-
-				if (responseProductOrder.status === 200) {
-					message.success(responseProductOrder.data.message);
-					setVisibleModalFinishOrder(false);
-					setDataProductsCart([]);
-					setLoading(false);
-
-					window.location.href = "/orderTracking";
-				} else {
-					message.error(responseProductOrder.data.message);
-					setLoading(false);
-				}
-
-
+				const idOrder = responseOrder.data.id_order;
+				createOrderProductCart_PDV(ids, idOrder);
 			} else {
 				message.error(responseOrder.data.message);
 				setLoading(false);
 			}
-
-		} else {
-			message.error(responseProductCart.data.message);
+		} catch (error) {
 			setLoading(false);
+			message.error("Erro de comunicação com o servidor. Tente novamente!");
 		}
-
-
-
 	}
 
-
-
-	const showModalInfo = (idProduct) => {
-		const product = dataProductsByFilter.filter((item) => item.id === idProduct)[0];
-		Modal.info({
-			title: 'Informações do produto',
-			content: (
-				<div>
-					<p className="p-modal-detail">
-						<span className="span-modal-detail">Nome:</span> {product.name}
-					</p>
-					<p className="p-modal-detail">
-						<span className="span-modal-detail">Tamanho:</span> {product.id_size ? product.size : "-"}
-					</p>
-					<p className="p-modal-detail">
-						<span className="span-modal-detail">Descrição:</span> {product.description || "-"}
-					</p>
-				</div>
-			),
-			okButtonProps: { className: 'button', shape: 'round' },
-			onOk() { },
-		});
+	// TERCEIRA FUNÇÃO A SER CHAMADA
+	const createOrderProductCart_PDV = async (idsProducts, idOrder) => {
+		try{
+			const responseProductOrder = await API.post("createProductsOrder",
+				{
+					id_order: idOrder,
+					ids_products: idsProducts
+				}
+			);
+			if (responseProductOrder.status === 200) {
+				setLoading(false);
+				message.success(responseProductOrder.data.message);
+				setDataProductsCart([]);
+				setValueTotalOrder(0);
+				setTimeout(() => {
+					window.location.href = "/orderTracking";
+				}, 1000);
+			} else {
+				message.error(responseProductOrder.data.message);
+				setLoading(false);
+			}
+		}catch (error) {
+			setLoading(false);
+			message.error("Erro de comunicação com o servidor. Tente novamente!");
+		}
 	}
-
 
 	return (
 		<div>
@@ -620,83 +592,104 @@ function Pdv() {
 											stepCurrent === 0 ? (
 												<Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
 													{
-														dataCategory.map((category) => {
-															return (
-																<Col span={8} key={category.id}>
-																	<CardCategory
-																		check={category.check}
-																		name={category.name}
-																		onChangeCategory={() => onChangeCategory(category.id)}
-																	/>
-																</Col>
-															)
-														})
+														dataCategory.length !== 0 ?
+															dataCategory.map((category) => {
+																return (
+																	<Col span={8} key={category.id}>
+																		<CardCategory
+																			check={category.check}
+																			name={category.name}
+																			onChangeCategory={() => onChangeCategory(category.id)}
+																		/>
+																	</Col>
+																)
+															})
+														:
+															<EmptyData title='Não possui categorias cadastradas ativas ...' />
 													}
 												</Row>
 											) :
 												stepCurrent === 1 ? (
 													<Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
 														{
-															dataFlavor.map((flavor) => {
-																return (
-																	<Col span={8} key={flavor.id}>
-																		<CardFlavor
-																			check={flavor.check}
-																			name={flavor.name}
-																			description={flavor.description}
-																			onChangeFlavor={() => onChangeFlavor(flavor.id)}
-																		/>
-																	</Col>
-																)
-															})
+															dataFlavor.length !== 0 ?
+																dataFlavor.map((flavor) => {
+																	return (
+																		<Col span={8} key={flavor.id}>
+																			<CardFlavor
+																				check={flavor.check}
+																				name={flavor.name}
+																				description={flavor.description}
+																				onChangeFlavor={() => onChangeFlavor(flavor.id)}
+																			/>
+																		</Col>
+																	)
+																})
+															:
+																<EmptyData title='Não possui sabores nessa categoria escolhida ...' />
 														}
 													</Row>
 												) :
 													stepCurrent === 2 ? (
 														<Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
 															{
-																dataProductsByFilter.map((product) => {
-																	return (
-																		<Col span={8} key={product.id}>
-																			<CardProduct
-																				name={product.name}
-																				price={product.price}
-																				size={product.size}
-																				showModalDetail={() => showModalInfo(product.id)}
-																				onChangeProduct={() => onChangeProductOuthers(product.id)}
-																			/>
-																		</Col>
-																	)
-																})
+																dataProductsByFilter.length !== 0 ?
+																	dataProductsByFilter.map((product) => {
+																		return (
+																			<Col span={8} key={product.id}>
+																				<CardProduct
+																					name={product.name}
+																					price={product.price}
+																					size={product.size}
+																					onChangeProduct={() => onChangeProductOuthers(product.id)}
+																				/>
+																			</Col>
+																		)
+																	})
+																:
+																	<EmptyData title='Não possui produtos com essa combinação categoria-sabor(es) escolhida ...' />
 															}
 														</Row>
 													) :
-
 														stepCurrent === 3 ?
 															dataAdditionalsByCategory.length !== 0 ? (
 																<Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
 																	{
-																		dataAdditionalsByCategory.map((additional) => {
-																			return (
-																				<Col span={8} key={additional.id}>
-																					<CardAdditional
-																						name={additional.name}
-																						price={additional.price}
-																						quantity={additional.quantity}
-																						minusQuantityAdditional={() => updateQuantityAdditional(false, additional.id)}
-																						plusQuantityAdditional={() => updateQuantityAdditional(true, additional.id)}
-																					/>
-																				</Col>
-																			)
-																		})
+																		nameCategoryChange !== 'PIZZA' && nameCategoryChange !== 'PIZZAS' ?
+																			dataAdditionalsByCategory.map((additional) => {
+																				return (
+																					<Col span={8} key={additional.id}>
+																						<CardAdditional
+																							name={additional.name}
+																							price={additional.price}
+																							quantity={additional.quantity}
+																							minusQuantityAdditional={() => updateQuantityAdditional(false, additional.id)}
+																							plusQuantityAdditional={() => updateQuantityAdditional(true, additional.id)}
+																							isAdditionalDefault={true}
+																						/>
+																					</Col>
+																				)
+																			})
+																		:
+																			dataAdditionalsByCategory.map((additional) => {
+																				return (
+																					<Col span={8} key={additional.id}>
+																						<CardAdditional
+																							name={additional.name}
+																							price={additional.price}
+																							quantity={additional.quantity}
+																							isAdditionalDefault={false}
+																							onChangeAdditional={() => onChangeAdditional(additional.id)}
+																							check={additional.quantity !== 0 ? true:false}
+																						/>
+																					</Col>
+																				)
+																			})
 																	}
 																</Row>
 															) : (
 																<p>Esta categoria não possui adicionais.</p>
-															)
-
-
-															: (
+															) : (
 																<div>
 																	<Table
 																		size="middle"
@@ -705,15 +698,13 @@ function Pdv() {
 																	/>
 																	<Row justify="center">
 																		<Col span={10}>
-																			<Title level={3}>Valor total do pedido: R$ {valueTotalOrder}</Title>
+																			<Title level={3}>Valor total do pedido: R$ {changeCommaForPoint(valueTotalOrder)}</Title>
 																		</Col>
 																	</Row>
 																</div>
-
 															)
 										}
 									</div>
-
 									{
 										stepCurrent === 4 ? (
 											<Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} justify="center">
@@ -725,6 +716,7 @@ function Pdv() {
 														onClick={() => {
 															setDataProductsCart([]);
 															setValueTotalOrder(0);
+															backToStart();
 														}}
 														block
 													>
@@ -755,36 +747,37 @@ function Pdv() {
 												</Col>
 											</Row>
 										) : (
-
 											<div style={{ marginTop: "15px" }}>
-												<Button
-													onClick={
-														stepCurrent !== 3
-															?
-															() => updateStepCurrent()
-															:
-															() => includeAdditionalsOrder()
-													}
-													shape="round"
-													className="button"
-													style={{ margin: "5px" }}
-												>
-													{stepCurrent !== 3 ? "Seguir" : "Incluir no pedido"}
-												</Button>
-
 												{
-													stepCurrent !== 0 && (
+													stepCurrent !== 2 && (
+														<Button
+															onClick={
+																stepCurrent !== 3
+																	?
+																	() => updateStepCurrent()
+																	:
+																	() => includeAdditionalsOrder()
+															}
+															shape="round"
+															className="button"
+															style={{ margin: "5px" }}
+														>
+															Seguir
+														</Button>
+													)
+												}	
+												{
+													stepCurrent !== 0 && stepCurrent !== 3 && (
 														<Button
 															onClick={() => setStepCurrent(stepCurrent - 1)}
 															shape="round"
 															className="button-cancel"
 															style={{ margin: "5px" }}
 														>
-															{stepCurrent !== 3 ? "Voltar" : "Cancelar"}
+															Voltar
 														</Button>
 													)
 												}
-
 												{
 													dataProductsCart.length !== 0 && (
 														<Button
@@ -797,38 +790,30 @@ function Pdv() {
 														</Button>
 													)
 												}
-
 											</div>
 										)
 									}
-
-
-
 								</Col>
 							</Row>
 						</Content>
 						<FooterSite />
-
 						<ModalAddProductCart
 							isVisibleAddCart={visibleAddProductCard}
 							product={productModal}
 							onAddOrder={(quantity) => addProductCart(quantity)}
 							onCancelProductChange={() => {
-								setIdProductOrder(null);
 								setVisibleAddProductCart(!visibleAddProductCard);
 							}}
 						/>
-
 						<ModalFinishOrder
 							visibleModalFinishOrder={visibleModalFinishOrder}
-							insertDataOrder={(values) => onFinishOrder(values)}
+							insertDataOrder={(values) => insertProductCart_PDV(values)}
+							onCancelSubmitOrder={() => setVisibleAddProductCart(!visibleAddProductCard)}
 						/>
-
 					</Layout>
 				</Layout>
 			</Spin>
 		</div>
 	);
 }
-
 export default Pdv;

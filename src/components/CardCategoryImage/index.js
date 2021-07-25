@@ -9,9 +9,7 @@ import {
 	CheckCircleOutlined
 } from '@ant-design/icons';
 import '../../global.css';
-
 const { Title } = Typography;
-
 function CardCategoryImage(props) {
 	return (
 		<div>
@@ -38,11 +36,8 @@ function CardCategoryImage(props) {
 						)}
 					</Col>
 				</Row>
-
-
 			</Card>
 		</div>
 	);
 }
-
 export default CardCategoryImage;

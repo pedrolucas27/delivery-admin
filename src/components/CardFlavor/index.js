@@ -9,9 +9,7 @@ import {
 	CheckCircleOutlined
 } from '@ant-design/icons';
 import '../../global.css';
-
 const { Title } = Typography;
-
 function CardFlavor(props) {
 	return (
 		<div>
@@ -26,7 +24,6 @@ function CardFlavor(props) {
 				<p style={{ margin: 2 }}>
 					{props.description ? props.description : "Não possui descrição."}
 				</p>
-
 				{props.check && (
 					<Row>
 						<Col span={24}>
@@ -40,5 +37,4 @@ function CardFlavor(props) {
 		</div>
 	);
 }
-
 export default CardFlavor;

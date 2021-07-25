@@ -42,23 +42,27 @@ function Login() {
 
 
 								<Form.Item>
-									<Button
-										shape="round"
-										htmlType="submit"
-										className="button"
-										style={{ marginTop: "10px" }}
-										block
-									>
-										Entrar
-							        </Button>
-									<Button
-										shape="round"
-										className="button-cancel"
-										style={{ marginTop: "10px" }}
-										block
-									>
-										Cancelar
-							        </Button>
+									<Row>
+										<Col span={12}>
+											<Button
+												shape="round"
+												className="button-cancel"
+												style={{ marginTop: "10px" }}
+											>
+												Cancelar
+							        		</Button>
+										</Col>
+										<Col span={12}>
+										<Button
+											shape="round"
+											htmlType="submit"
+											className="button"
+											style={{ marginTop: "10px", float: "right" }}
+										>
+											Entrar
+							        	</Button>
+										</Col>
+									</Row>
 								</Form.Item>
 
 							</Form>
