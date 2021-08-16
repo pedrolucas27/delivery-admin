@@ -266,3 +266,9 @@
     display: flex;
     flex-wrap: wrap;
 }
+
+.header-register-establishment{
+    float: left;
+    width: 500px;
+    margin: 16px 24px 16px 0;
+}

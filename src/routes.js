@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
-//ROTAS DO PDV
 import AddProduct from './pages/AddProduct';
 import AddCategory from './pages/AddCategory';
 import AddFlavor from './pages/AddFlavor';
@@ -15,6 +14,8 @@ import OrderTracking from './pages/OrderTracking';
 import NotFound from './pages/NotFound';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import RegisterEstablishment from './pages/RegisterEstablishment';
+import MyCompany from './pages/MyCompany';
 
 import Products from './pages/Products';
 import Categories from './pages/Categories';
@@ -40,6 +41,8 @@ function Routes() {
                 <Route path="/pdv" component={Pdv} />
                 <Route path="/orderTracking" component={OrderTracking} />
                 <Route path="/dashboard" component={Dashboard} />
+                <Route path="/registerEstablishment" component={RegisterEstablishment} />
+                <Route path="/myCompany" component={MyCompany} />
 
                 <Route path="/products" component={Products} />
                 <Route path="/categories" component={Categories} />

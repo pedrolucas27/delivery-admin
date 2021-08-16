@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
+import { maskMoney, changeCommaForPoint, getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import {
 	Layout,
 	Button,
@@ -21,7 +22,6 @@ import {
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
-import { maskMoney, changeCommaForPoint } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
@@ -29,6 +29,9 @@ const { Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
 function Additionals() {
+	isLoggedAdmin();
+
+	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
 	const [idUpdate, setIdUpdate] = useState(null);
@@ -37,32 +40,9 @@ function Additionals() {
 	const [loading, setLoading] = useState(false);
 	const [dataCategory, setDataCategory] = useState([]);
 	useEffect(() => {
-		try {
-			API.get("additional").then((response) => {
-				let array = [];
-				response.data.forEach((additional) => {
-					array.push({
-						key: additional.id,
-						code: additional.code,
-						name: additional.name,
-						description: additional.description || "-",
-						category: additional.id_category,
-						value: additional.price,
-						status: additional.is_active
-					})
-				})
-				setData(array);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
-			API.get("category").then((response) => {
-				setDataCategory(response.data);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
-		} catch (error) {
-			message.error("Erro de comunicação com o servidor.");
-		}
+			setLoading(true);
+			getAdditionals();
+			setLoading(false);
 	}, []);
 
 	const columns = [
@@ -114,7 +94,12 @@ function Additionals() {
 
 	const getAdditionals = async () => {
 		try {
-			await API.get("additional").then((response) => {
+			API.get("category/" + idEstablishment).then((response) => {
+				setDataCategory(response.data);
+			}).catch((error) => {
+				message.error("Erro de comunicação com o servidor.");
+			});
+			await API.get("additional/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((additional) => {
 					array.push({
@@ -123,7 +108,8 @@ function Additionals() {
 						name: additional.name,
 						description: additional.description || "-",
 						value: additional.price,
-						status: additional.is_active
+						status: additional.is_active,
+						id_category: additional.id_category
 					})
 				})
 				setData(array);
@@ -168,7 +154,8 @@ function Additionals() {
 						description: values.description || null,
 						price: Number(values.price.replace(",", ".")),
 						is_active: values.is_active !== undefined ? values.is_active : true,
-						id_category: values.category
+						id_category: values.category,
+						id_company: idEstablishment
 					}
 				);
 				if (response.status === 200) {
@@ -193,15 +180,14 @@ function Additionals() {
 	const setFildsDrawer = (id) => {
 		const line = data.filter((item) => item.key === id)[0];
 		setIdUpdate(id);
-
 		form.setFieldsValue({
 			name_additional: line.name,
 			category: line.category,
-			price: line.value,
+			price: changeCommaForPoint(line.value),
 			is_active: line.status,
-			description: line.description
+			description: line.description,
+			category: line.id_category
 		});
-
 		setExpandEditRow(!expandEditRow);
 	}
 
@@ -245,7 +231,7 @@ function Additionals() {
 									<Select>
 										{
 											dataCategory.map((item) => (
-												<Option key={item.code} value={item.id_category}>
+												<Option key={item.id_category} value={item.id_category}>
 													{item.name_category}
 												</Option>
 											)

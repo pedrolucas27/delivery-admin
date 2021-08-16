@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
+import { maskMoney, maskNumer, changeCommaForPoint, getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import {
 	Layout,
 	Form,
@@ -9,6 +10,7 @@ import {
 	Switch,
 	Row,
 	Col,
+	Upload,
 	Table,
 	message,
 	Drawer,
@@ -17,18 +19,31 @@ import {
 } from 'antd';
 import {
 	DeleteOutlined,
+	PlusOutlined,
 	EditOutlined
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
-import { maskMoney, maskNumer, changeCommaForPoint } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 const { Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
+
+function getBase64(file) {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onload = () => resolve(reader.result);
+		reader.onerror = error => reject(error);
+	});
+}
+
 function Products() {
+	isLoggedAdmin();
+	
+	const { idEstablishment } = getStorageERP();
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
@@ -38,14 +53,18 @@ function Products() {
 	const [dataFlavor, setDataFlavor] = useState([]);
 	const [dataUnitMensuration, setDataUnitMensuration] = useState([]);
 	const [dataProduct, setDataProduct] = useState([]);
+
+	const [imageProduct, setImageProduct] = useState(null);
+	const [isUpdateImage, setIsUpdateImage] = useState(false);
+
 	useEffect(() => {
-		try {
-			API.get("category").then((response) => {
+			setLoading(true);
+			API.get("category/" + idEstablishment).then((response) => {
 				setDataCategory(response.data);
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
 			});
-			API.get("flavor").then((response) => {
+			API.get("flavor/" + idEstablishment).then((response) => {
 				setDataFlavor(response.data);
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
@@ -55,39 +74,15 @@ function Products() {
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
 			});
-			API.get("product").then((response) => {
-				let array = [];
-				response.data.forEach((product) => {
-					array.push({
-						key: product.id_product,
-						code: product.code,
-						product: product.name_product,
-						description: product.description || "-",
-						price: product.price,
-						status: product.is_active,
-						id_category: product.id_category,
-						category: product.name_category,
-						id_flavor: product.id,
-						flavor: product.name_flavor,
-						id_unit_fk: product.fk_id_unit,
-						size_value: product.size_product,
-						size: product.size_product + " (" + product.unit + " - " + product.abreviation + ")"
-					})
-				})
-				setDataProduct(array);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
-		} catch (error) {
-			message.error("Erro de comunicação com o servidor.");
-		}
+			getProducts();
+			setLoading(false);	
 	}, []);
 
 	const getFlavorsByCategory = async (idCategory) => {
 		setLoading(true);
 		try {
 			form.setFieldsValue({ flavor: null });
-			await API.get("flavor/byCategory/" + idCategory).then((response) => {
+			await API.get("flavor/byCategory/" + idCategory + "/" + idEstablishment).then((response) => {
 				setDataFlavor(response.data);
 				setLoading(false);
 			}).catch((error) => {
@@ -152,7 +147,7 @@ function Products() {
 
 	const getProducts = async () => {
 		try {
-			await API.get("product").then((response) => {
+			await API.get("product/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((product) => {
 					array.push({
@@ -168,7 +163,8 @@ function Products() {
 						flavor: product.name_flavor,
 						size_value: product.size_product,
 						id_unit_fk: product.fk_id_unit,
-						size: product.size_product + " (" + product.unit + " - " + product.abreviation + ")"
+						size: product.size_product + " (" + product.unit + " - " + product.abreviation + ")",
+						urlImage: product.image ? `http://192.168.0.107:8080/${product.image}`:null
 					})
 				})
 				setDataProduct(array);
@@ -216,7 +212,10 @@ function Products() {
 						fk_id_flavor: values.flavor,
 						fk_id_category: values.category,
 						size_product: values.size || 1,
-						fk_id_unit: values.unitMensuration || null
+						fk_id_unit: values.unitMensuration || null,
+						base64image: imageProduct,
+						isUpdateImage: isUpdateImage,
+						id_company: idEstablishment
 					}
 				);
 				if (response.status === 200) {
@@ -241,6 +240,9 @@ function Products() {
 	const setFildsDrawer = (id) => {
 		const line = dataProduct.filter((item) => item.key === id)[0];
 		setIdUpdate(id);
+		if(line.urlImage){
+			setImageProduct(line.urlImage);
+		}
 		form.setFieldsValue({
 			name_product: line.product,
 			description: line.description,
@@ -254,6 +256,12 @@ function Products() {
 		setExpandEditRow(!expandEditRow);
 	}
 
+	const handleChangeImage = async (file) => {
+		const image = await getBase64(file.fileList[0].originFileObj);
+		setIsUpdateImage(true);
+		setImageProduct(image);
+	}
+
 	const handleChangePrice = async () => {
 		const field = form.getFieldValue("price_product");
 		form.setFieldsValue({ price_product: await maskMoney(field) });
@@ -263,6 +271,13 @@ function Products() {
 		const field = form.getFieldValue("size");
 		form.setFieldsValue({ size: await maskNumer(field) });
 	}
+	
+	const uploadButton = (
+		<div className="div-icon-upload">
+			<PlusOutlined />
+			<div style={{ marginTop: 8 }}>Upload</div>
+		</div>
+	);
 
 	return (
 		<div>
@@ -357,12 +372,24 @@ function Products() {
 								</Form.Item>
 							</Col>
 							<Col span={24}>
-								<Button onClick={() => form.submit()} shape="round" className="button ac">
-									Editar
-								</Button>
-								<Button onClick={() => { form.resetFields() }} shape="round" className="button-cancel ac">
-									Cancelar
-								</Button>
+								<Form.Item label="" name="image">
+									<Upload
+										action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+										listType="picture-card"
+										showUploadList={false}
+										onChange={handleChangeImage}
+									>
+										{imageProduct ? <img src={imageProduct} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+									</Upload>
+								</Form.Item>
+							</Col>
+							<Col span={24}>
+							<Button onClick={() => form.submit()} shape="round" className="button ac">
+								Editar
+							</Button>
+							<Button onClick={() => { form.resetFields() }} shape="round" className="button-cancel ac">
+								Cancelar
+							</Button>
 							</Col>
 						</Row>
 					</Form>

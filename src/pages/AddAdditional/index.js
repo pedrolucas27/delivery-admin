@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
+import { maskMoney, getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import {
 	Layout,
 	Form,
@@ -14,24 +15,24 @@ import {
 } from 'antd';
 import 'antd/dist/antd.css';
 import '../../global.css';
-import { maskMoney } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 const { Content } = Layout;
 const { Option } = Select;
 const { TextArea } = Input;
-
 function AddAdditional() {
+	isLoggedAdmin();
+	
+	const { idEstablishment } = getStorageERP();
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [dataCategory, setDataCategory] = useState([]);
-	
 	useEffect(() => {
 		try {
 			form.setFieldsValue({ price: maskMoney(0) });
-			API.get("category").then((response) => {
+			API.get("category/" + idEstablishment).then((response) => {
 				setDataCategory(response.data);
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
@@ -51,7 +52,8 @@ function AddAdditional() {
 						description: values.description || null,
 						price: Number(values.price.replace(",", ".")),
 						is_active: values.is_active !== undefined ? values.is_active : true,
-						id_category: values.category
+						id_category: values.category,
+						id_company: idEstablishment
 					}
 				);
 				setLoading(false);

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
+import { changeCommaForPoint, isLoggedAdmin, getStorageERP } from "../../helpers.js";
 import {
 	Layout,
 	Button,
@@ -17,7 +18,6 @@ import {
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
-import { changeCommaForPoint } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
@@ -32,6 +32,9 @@ const { Content } = Layout;
 const { Step } = Steps;
 const { Title } = Typography;
 function Pdv() {
+	isLoggedAdmin();
+
+	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [stepCurrent, setStepCurrent] = useState(0);
 	const [loading, setLoading] = useState(false);
@@ -54,23 +57,7 @@ function Pdv() {
 	const [valueTotalOrder, setValueTotalOrder] = useState(0);
 
 	useEffect(() => {
-		try{
-			API.get("category").then((response) => {
-				let array = [];
-				response.data.forEach((category) => {
-					array.push({
-						id: category.id_category,
-						name: category.name_category,
-						check: false
-					})
-				})
-				setDataCategory(array);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
-		} catch (error) {
-			message.error("Erro de comunicação com o servidor.");
-		}
+		getCategoriesActives();
 	}, []);
 
 	const columns = [
@@ -115,7 +102,7 @@ function Pdv() {
 
 	const getFlavorsByCategory = async (idCategory) => {
 		try{
-			await API.get("flavor/byCategory/" + idCategory).then((response) => {
+			await API.get("flavor/byCategory/" + idCategory + "/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((flavor) => {
 					array.push({
@@ -132,12 +119,11 @@ function Pdv() {
 		} catch (error) {
 			message.error("Erro de comunicação com o servidor! Tente novamente.");
 		}
-		
 	}
 
 	const getAdditionalsByCategory = async (idCategory) => {
 		try{
-			await API.get("additional/" + idCategory).then((response) => {
+			await API.get("additional/" + idCategory + "/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((additional) => {
 					array.push({
@@ -372,26 +358,39 @@ function Pdv() {
 		await getAdditionalsByCategory(idCategoryOrder);
 	}
 
+
+	const getCategoriesActives = async () => {
+		setLoading(true);
+		try{
+			API.get("category/actives/" + idEstablishment).then((response) => {
+				let array = [];
+				response.data.forEach((category) => {
+					array.push({
+						id: category.id_category,
+						name: category.name_category,
+						check: false
+					})
+				})
+				setLoading(false);
+				setDataCategory(array);
+			}).catch((error) => {
+				setLoading(false);
+				message.error("Erro de comunicação com o servidor.");
+			});
+		} catch (error) {
+			setLoading(false);
+			message.error("Erro de comunicação com o servidor.");
+		}
+	}
+
 	const backToStart = async () => {
 		setLoading(true);
 		setStepCurrent(0);
 		setIdCategoryOrder(null);
 		setIdFlavorOrder(null);
 		setIdsFlavorsProductMisto([]);
-		await API.get("category").then((response) => {
-			let array = [];
-			response.data.forEach((category) => {
-				array.push({
-					id: category.id_category,
-					name: category.name_category,
-					check: false
-				})
-			})
-			setDataCategory(array);
-		}).catch((error) => {
-			message.error("Erro de comunicação com o servidor.");
-		});
 		setLoading(false);
+		getCategoriesActives();
 	}
 
 	const viewOrder = () => {
@@ -477,7 +476,7 @@ function Pdv() {
 	}
 
 	// PRIMEIRRA FUNÇÃO A SER CHAMADA
-	const insertProductCart_PDV = async (values) => {
+	const insertProductCart_PDV = async (values, valueDiscountCoupom) => {
 		setVisibleModalFinishOrder(false);
 		setLoading(true);
 		try{
@@ -495,6 +494,10 @@ function Pdv() {
 				});
 				price_order = price_order + (item.quantity * item.price);
 			})
+
+			//DESCONTAR O VALOR DO CUPOM
+			price_order = price_order - valueDiscountCoupom;
+
 			const responseProductCart = await API.post("cart_product",
 				{
 					products: array,
@@ -807,7 +810,7 @@ function Pdv() {
 						/>
 						<ModalFinishOrder
 							visibleModalFinishOrder={visibleModalFinishOrder}
-							insertDataOrder={(values) => insertProductCart_PDV(values)}
+							insertDataOrder={(values, valueDiscountCoupom) => insertProductCart_PDV(values, valueDiscountCoupom)}
 							onCancelSubmitOrder={() => setVisibleAddProductCart(!visibleAddProductCard)}
 						/>
 					</Layout>

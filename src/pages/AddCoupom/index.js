@@ -13,13 +13,16 @@ import {
 } from 'antd';
 import 'antd/dist/antd.css';
 import '../../global.css';
-import { maskMoney } from "../../helpers.js";
+import { maskMoney, getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 const { Content } = Layout;
 const { TextArea } = Input;
 function AddCoupom() {
+	isLoggedAdmin();
+	
+	const { idEstablishment } = getStorageERP();
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -33,6 +36,7 @@ function AddCoupom() {
 						description: values.description || null,
 						value_discount: Number(values.price.replace(",", ".")),
 						is_active: values.is_active !== undefined ? values.is_active : true,
+						id_company: idEstablishment
 					}
 				);
 				setLoading(false);

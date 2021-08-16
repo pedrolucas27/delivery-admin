@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
+import { getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import {
 	Layout,
 	Button,
@@ -12,11 +13,13 @@ import {
 	Switch,
 	Form,
 	message,
+	Upload,
 	Spin
 } from 'antd';
 import {
 	DeleteOutlined,
-	EditOutlined
+	EditOutlined,
+	PlusOutlined
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
@@ -24,32 +27,31 @@ import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 const { Content } = Layout;
+
+function getBase64(file) {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onload = () => resolve(reader.result);
+		reader.onerror = error => reject(error);
+	});
+}
+
 function Categories() {
+	isLoggedAdmin();
+	
+	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
 	const [form] = Form.useForm();
 	const [dataCategory, setDataCategory] = useState([]);
 	const [idUpdate, setIdUpdate] = useState(null);
 	const [loading, setLoading] = useState(false);
+	const [imageCategory, setImageCategory] = useState(null);
+	const [isUpdateImage, setIsUpdateImage] = useState(false);
+
 	useEffect(() => {
-		try {
-			API.get("category").then((response) => {
-				let array = [];
-				response.data.forEach((category) => {
-					array.push({
-						key: category.id_category,
-						code: category.code,
-						name: category.name_category,
-						status: category.is_active
-					})
-				})
-				setDataCategory(array);
-			}).catch((error) => {
-				console.log("BUGOU: " + error);
-			});
-		} catch (error) {
-			message.error("Erro de comunicação com o servidor.");
-		}
+		getCategories();
 	}, []);
 
 	const columns = [
@@ -87,22 +89,27 @@ function Categories() {
 	];
 
 	const getCategories = async () => {
+		setLoading(true);
 		try {
-			await API.get("category").then((response) => {
+			await API.get("category/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((category) => {
 					array.push({
 						key: category.id_category,
 						code: category.code,
 						name: category.name_category,
-						status: category.is_active
+						status: category.is_active,
+						urlImage: category.image ? `http://192.168.0.107:8080/${category.image}`:null
 					})
 				})
 				setDataCategory(array);
+				setLoading(false);
 			}).catch((error) => {
+				setLoading(false);
 				message.error("Erro de comunicação com o servidor.");
 			});
 		} catch (error) {
+			setLoading(false);
 			message.error("Erro de comunicação com o servidor.");
 		}
 	}
@@ -110,7 +117,7 @@ function Categories() {
 	const deleteCategory = async (id) => {
 		try {
 			setLoading(true);
-			await API.delete("category/" + id).then(response => {
+			await API.delete("category/" + id + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getCategories();
 					setLoading(false);
@@ -137,14 +144,21 @@ function Categories() {
 					{
 						id: idUpdate,
 						name_category: values.name_category,
-						is_active: values.is_active !== undefined ? values.is_active : true
+						is_active: values.is_active !== undefined ? values.is_active : true,
+						base64image: imageCategory,
+						isUpdateImage: isUpdateImage,
+						id_company: idEstablishment
 					}
 				);
+
+				console.log(response);
 				if (response.status === 200) {
-					getCategories();
+					setExpandEditRow(!expandEditRow);
 					setLoading(false);
 					message.success(response.data.message);
-					setExpandEditRow(!expandEditRow);
+					setIsUpdateImage(false);
+					setImageCategory(null);
+					getCategories();
 				} else {
 					setLoading(false);
 					message.error(response.data.message);
@@ -162,12 +176,28 @@ function Categories() {
 	const setFildsDrawer = (id) => {
 		const line = dataCategory.filter((item) => item.key === id)[0];
 		setIdUpdate(id);
+		if(line.urlImage){
+			setImageCategory(line.urlImage);
+		}
 		form.setFieldsValue({
 			name_category: line.name,
 			is_active: line.status
 		});
 		setExpandEditRow(!expandEditRow);
 	}
+
+	const handleChangeImage = async (file) => {
+		const image = await getBase64(file.fileList[0].originFileObj);
+		setIsUpdateImage(true);
+		setImageCategory(image);
+	}
+
+	const uploadButton = (
+		<div className="div-icon-upload">
+			<PlusOutlined />
+			<div style={{ marginTop: 8 }}>Upload</div>
+		</div>
+	);
 
 	return (
 		<div>
@@ -202,6 +232,18 @@ function Categories() {
 							<Col span={4}>
 								<Form.Item label="Status" name="is_active" valuePropName="checked">
 									<Switch />
+								</Form.Item>
+							</Col>
+							<Col span={24}>
+								<Form.Item label="" name="image">
+									<Upload
+										action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+										listType="picture-card"
+										showUploadList={false}
+										onChange={handleChangeImage}
+									>
+										{imageCategory ? <img src={imageCategory} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+									</Upload>
 								</Form.Item>
 							</Col>
 							<Col span={24}>

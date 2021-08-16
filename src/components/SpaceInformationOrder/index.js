@@ -24,7 +24,7 @@ function SpaceInformationOrder(props) {
 						props.products.map((item, index) => {
 							return (
 								<Col span={24} key={index}>
-									<p style={{ fontWeight: "bold", margin: 0 }}>{item.name_product}</p>
+									<p style={{ fontWeight: "bold", margin: 0 }}>{item.observation ? item.observation:item.name_product}</p>
 									<p style={{ margin: 0 }}>- Quantidade: {item.quantity_item}</p>
 									<p style={{ margin: 0 }}>- Preço do item: {changeCommaForPoint(item.price_item_order)}</p>
 									<p style={{ margin: 0 }}>- Unidade: {item.size_product} {item.unit} - {item.abreviation}</p>

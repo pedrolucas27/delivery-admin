@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
+import { changeCommaForPoint, isLoggedAdmin, getStorageERP } from "../../helpers.js";
 import moment from "moment";
 import 'moment/locale/pt-br';
 import {
@@ -23,7 +24,6 @@ import {
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
-import { changeCommaForPoint } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
@@ -32,6 +32,9 @@ import EmptyData from "../../components/EmptyData";
 const { Content } = Layout;
 const { TabPane } = Tabs;
 function OrderTracking() {
+	isLoggedAdmin();
+	
+	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [tab, setTab] = useState("1");
@@ -41,73 +44,7 @@ function OrderTracking() {
 	const [historyOfDeliveredOrders, setHistoryOfDeliveredOrders] = useState([]);
 
 	useEffect(() => {
-		try{
-			let arrayInAnalysis = [];
-			let arrayInProduction = [];
-			let arrayInReadyForDelivery = [];
-			let arrayInHistoryOfDeliveredOrders = [];
-			API.get("order").then((response) => {
-				response.data.forEach((order) => {
-					if (order.status_order === 0) {
-						arrayInAnalysis.push({
-							key: order.id_order,
-							code: order.code,
-							value: order.price_final,
-							is_pdv: order.is_pdv,
-							dateRequest: order.data_order,
-							observation: order.observation || "-",
-							addressClient: order.address_client,
-							status: order.status_order,
-							products: order.products
-						});
-					} else if (order.status_order === 1) {
-						arrayInProduction.push({
-							key: order.id_order,
-							code: order.code,
-							value: order.price_final,
-							is_pdv: order.is_pdv,
-							dateRequest: order.data_order,
-							observation: order.observation || "-",
-							addressClient: order.address_client,
-							status: order.status_order,
-							products: order.products
-						});
-					} else if(order.status_order === 2){
-						arrayInReadyForDelivery.push({
-							key: order.id_order,
-							code: order.code,
-							value: order.price_final,
-							is_pdv: order.is_pdv,
-							dateRequest: order.data_order,
-							observation: order.observation || "-",
-							addressClient: order.address_client,
-							status: order.status_order,
-							products: order.products
-						});
-					} else{
-						arrayInHistoryOfDeliveredOrders.push({
-							key: order.id_order,
-							code: order.code,
-							value: order.price_final,
-							is_pdv: order.is_pdv,
-							dateRequest: order.data_order,
-							observation: order.observation || "-",
-							addressClient: order.address_client,
-							status: order.status_order,
-							products: order.products
-						});
-					}
-				})
-				setAllOrdersInAnalysis(arrayInAnalysis);
-				setAllOrdersInProduction(arrayInProduction);
-				setAllOrdersInReadyForDelivery(arrayInReadyForDelivery);
-				setHistoryOfDeliveredOrders(arrayInHistoryOfDeliveredOrders);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor! Tente novamente recarregando á página.");
-			});
-		}catch (error) {
-			message.error("Erro de comunicação com o servidor! Tente novamente recarregando á página.");
-		}
+		getOrders();
 	}, []);
 
 	const columns = [
@@ -200,7 +137,10 @@ function OrderTracking() {
 								>
 									<ContainerOutlined
 										className="icon-table"
-										onClick={() => generateInvoiceOrder(record.status, record.key)}
+										onClick={() => {
+											updateStatusOrder(record.key, true, 2);
+											generateInvoiceOrder(record.key);
+										}}
 									/>
 								</Tooltip>
 							)
@@ -211,31 +151,7 @@ function OrderTracking() {
 		},
 	];
 
-	const generateInvoiceOrder = async (tab, idOrder) => {
-		if(tab === 2){
-			setLoading(true);
-			try{
-				const response = await API.put("order-status",
-					{
-						id_order: idOrder,
-						status_order: 3
-					}
-				);
-				if (response.status === 200) {
-					getOrders();
-					setTimeout(() => {
-						setLoading(false);
-						message.success(response.data.message);
-					}, 1500);
-				} else {
-					setLoading(false);
-					message.error(response.data.message);
-				}
-			}catch(error){
-				setLoading(false);
-				message.error("Erro de comunicação com o servidor.");
-			}
-		} 
+	const generateInvoiceOrder = async (idOrder) => {
 		try{
 			setLoading(true);
 			const response = await API.get("generate-invoice/" + idOrder);
@@ -243,8 +159,10 @@ function OrderTracking() {
 				//imprimir pdf
 				setLoading(false);
 				message.success(response.data.message);
-				window.location.href(response.data.pdf);
-				window.open(response.data.pdf, '_blank');
+
+				setTimeout(() => {
+					window.open(`http://192.168.0.107:8080/invoices/${idOrder}`);
+				}, []);
 			}else{
 				setLoading(false);
 				message.error(response.data.message);
@@ -258,7 +176,7 @@ function OrderTracking() {
 	const deleteOrder = async (idOrder) => {
 		setLoading(true);
 		try{
-			await API.delete("order/" + idOrder).then(response => {
+			await API.delete("order/" + idOrder + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getOrders();
 					setLoading(false);
@@ -285,7 +203,8 @@ function OrderTracking() {
 			const response = await API.put("order-status",
 				{
 					id_order: idOrder,
-					status_order: newStatus
+					status_order: newStatus,
+					id_company: idEstablishment
 				}
 			);
 			if (response.status === 200) {
@@ -310,7 +229,7 @@ function OrderTracking() {
 			let arrayInProduction = [];
 			let arrayInReadyForDelivery = [];
 			let arrayInHistoryOfDeliveredOrders = [];
-			API.get("order").then((response) => {
+			API.get("order/" + idEstablishment).then((response) => {
 				response.data.forEach((order) => {
 					if (order.status_order === 0) {
 						arrayInAnalysis.push({

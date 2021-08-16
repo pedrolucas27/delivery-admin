@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
+import { maskMoney, getStorageERP, maskNumer, isLoggedAdmin } from "../../helpers.js";
 import {
 	Layout,
 	Form,
@@ -19,7 +20,6 @@ import {
 import 'antd/dist/antd.css';
 import './addProduct.css';
 import '../../global.css';
-import { maskMoney, maskNumer } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
@@ -37,6 +37,9 @@ function getBase64(file) {
 }
 
 function AddProduct() {
+	isLoggedAdmin();
+	
+	const { idEstablishment } = getStorageERP();
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [dataFlavor, setDataFlavor] = useState([]);
@@ -45,28 +48,24 @@ function AddProduct() {
 	const [loading, setLoading] = useState(false);
 	const [imageProduct, setImageProduct] = useState(null);
 	useEffect(() => {
-		try {
 			form.setFieldsValue({ size: 1, price_product: maskMoney(0) });
 			API.get("unitMensuration").then((response) => {
 				setDataUnitMensuration(response.data);
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor, tente novamente !");
 			});
-			API.get("category").then((response) => {
+			API.get("category/"+idEstablishment).then((response) => {
 				setDataCategory(response.data);
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor, tente novamente !");
 			});
-		} catch (error) {
-			message.error("Erro de comunicação com o servidor.");
-		}
 	}, []);
 
 	const getFlavorsByCategory = async (idCategory) => {
 		setLoading(true);
 		try {
 			form.setFieldsValue({ flavor: null });
-			await API.get("flavor/byCategory/" + idCategory).then((response) => {
+			await API.get("flavor/byCategory/" + idCategory + "/" + idEstablishment).then((response) => {
 				setDataFlavor(response.data);
 				setLoading(false);
 			}).catch((error) => {
@@ -92,13 +91,15 @@ function AddProduct() {
 						size_product: values.size || 1,
 						fk_id_flavor: values.flavor,
 						fk_id_category: values.category,
-						fk_id_unit: values.unitMensuration || null
+						fk_id_unit: values.unitMensuration || null,
+						id_company: idEstablishment
 					}
 				);
 				setLoading(false);
 				if (response.status === 200) {
 					message.success(response.data.message);
 					form.resetFields();
+					setImageProduct(null);
 					form.setFieldsValue({ size: 1, price_product: maskMoney(0) });
 				} else {
 					message.error(response.data.message);

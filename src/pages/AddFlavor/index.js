@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
+import { getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import {
 	Layout,
 	Form,
@@ -20,14 +21,17 @@ import FooterSite from "../../components/Footer";
 const { TextArea } = Input;
 const { Content } = Layout;
 const { Option } = Select;
-function AddFlavor() {
+function AddFlavor(){
+	isLoggedAdmin();
+
+	const { idEstablishment } = getStorageERP();
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [dataCategory, setDataCategory] = useState([]);
 	useEffect(() => {
 		try {
-			API.get("category").then((response) => {
+			API.get("category/"+idEstablishment).then((response) => {
 				setDataCategory(response.data);
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
@@ -46,7 +50,8 @@ function AddFlavor() {
 						name_flavor: values.name_flavor,
 						description: values.description,
 						is_active: values.is_active !== undefined ? values.is_active : true,
-						id_category: values.category
+						id_category: values.category,
+						id_company: idEstablishment
 					}
 				);
 				setLoading(false);
@@ -58,7 +63,7 @@ function AddFlavor() {
 				}
 			} else {
 				setLoading(false);
-				message.error("Informe o nome do sabor, por favor !");
+				message.error("Informe o nome e categoria do sabor, por favor !");
 			}
 		} catch (error) {
 			setLoading(false);

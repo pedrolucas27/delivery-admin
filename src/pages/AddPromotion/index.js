@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
+import { maskMoney, changeCommaForPoint, getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import {
 	Layout,
 	Form,
@@ -20,7 +21,6 @@ import {
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
-import { maskMoney, changeCommaForPoint } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
@@ -28,6 +28,9 @@ const { Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
 function AddPromotion() {
+	isLoggedAdmin();
+
+	const { idEstablishment } = getStorageERP();
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -37,23 +40,21 @@ function AddPromotion() {
 	const [dataProductsFilter, setDataProductsFilter] = useState([]);
 	const [idCategoryProductPromotion, setIdCategoryProductPromotion] = useState(null);
 	useEffect(() => {
-		try {
-			form.setFieldsValue({ price_promotion: maskMoney(0) });
-			API.get("category").then((response) => {
-				setDataCategory(response.data);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
-		} catch (error) {
+		setLoading(true);
+		form.setFieldsValue({ price_promotion: maskMoney(0) });
+		API.get("category/"+idEstablishment).then((response) => {
+			setDataCategory(response.data);
+		}).catch((error) => {
 			message.error("Erro de comunicação com o servidor.");
-		}
+		});
+		setLoading(false);
 	}, []);
 
 	const getFlavorsByCategory = async (idCategory) => {
 		try {
 			setLoading(true);
 			setIdCategoryProductPromotion(idCategory);
-			await API.get("flavor/byCategory/" + idCategory).then((response) => {
+			await API.get("flavor/byCategory/" + idCategory  "/" + idEstablishment).then((response) => {
 				setDataFlavor(response.data);
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
@@ -68,7 +69,7 @@ function AddPromotion() {
 	const getProductsByCategoryAndFlavor = async (idFlavor) => {
 		try {
 			setLoading(true);
-			await API.get("product/others/" + idCategoryProductPromotion + "/" + idFlavor).then((response) => {
+			await API.get("product/others/" + idCategoryProductPromotion + "/" + idFlavor + "/" + idEstablishment).then((response) => {
 				setLoading(false);
 				setDataProductsFilter(response.data);
 			}).catch((error) => {
@@ -192,6 +193,7 @@ function AddPromotion() {
 							name_promotion: values.name_promotion,
 							is_active: values.is_active !== undefined ? values.is_active : true,
 							description: values.description || null,
+							id_company: idEstablishment,
 							products: array
 						}
 					);

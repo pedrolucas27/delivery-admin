@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import API from "../../api.js";
+import { getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import {
 	Layout,
 	Form,
@@ -32,6 +33,9 @@ function getBase64(file) {
 }
 
 function AddCategory() {
+	isLoggedAdmin();
+
+	const { idEstablishment } = getStorageERP();
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -45,7 +49,8 @@ function AddCategory() {
 					{
 						name_category: values.name_category,
 						is_active: values.is_active !== undefined ? values.is_active : true,
-						base64image: imageCategory
+						base64image: imageCategory,
+						id_company: idEstablishment
 					}
 				);
 

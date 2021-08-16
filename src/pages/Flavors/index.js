@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
+import { getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import {
 	Layout,
 	Button,
@@ -28,6 +29,9 @@ const { Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
 function Flavors() {
+	isLoggedAdmin();
+	
+	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
 	const [data, setData] = useState([]);
@@ -36,49 +40,16 @@ function Flavors() {
 	const [loading, setLoading] = useState(false);
 	const [dataCategory, setDataCategory] = useState([]);
 	useEffect(() => {
-		try {
-			API.get("category").then((response) => {
-				setDataCategory(response.data);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
-			API.get("flavor").then((response) => {
-				let array = [];
-				response.data.forEach((flavor) => {
-					array.push({
-						key: flavor.id,
-						code: flavor.code,
-						name: flavor.name_flavor,
-						description: flavor.description || "-",
-						category: flavor.id_category,
-						status: flavor.is_active
-					})
-				})
-				setData(array);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
-		} catch (error) {
-			message.error("Erro de comunicação com o servidor.");
-		}
+		setLoading(true);
+		getFlavors();
+		setLoading(false);
 	}, []);
 
 	const columns = [
 		{ title: 'Código', dataIndex: 'code', key: 'code' },
 		{ title: 'Nome', dataIndex: 'name', key: 'name' },
 		{ title: 'Descrição', dataIndex: 'description', key: 'description' },
-		{
-			title: 'Categoria pertencente',
-			dataIndex: 'category',
-			key: 'category',
-			render: (__, record) => {
-				return (
-					<div>
-						{ typeof (dataCategory.filter((item) => item.id_category === record.category)[0].name_category) || "-"}
-					</div>
-				);
-			}
-		},
+		{ title: 'Categoria pertencente', dataIndex: 'category', key: 'category' },
 		{
 			title: 'Status',
 			dataIndex: 'status',
@@ -111,16 +82,26 @@ function Flavors() {
 	];
 
 	const getFlavors = async () => {
+		
 		try {
-			API.get("flavor").then((response) => {
+			let arrayCategory = [];
+			API.get("category/" + idEstablishment).then((response) => {
+				setDataCategory(response.data);
+				arrayCategory = response.data;
+			}).catch((error) => {
+				message.error("Erro de comunicação com o servidor.");
+			});
+			
+			API.get("flavor/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((flavor) => {
+					let category = arrayCategory.filter((item) => item.id_category === flavor.id_category);
 					array.push({
 						key: flavor.id,
 						code: flavor.code,
 						name: flavor.name_flavor,
 						description: flavor.description || "-",
-						category: flavor.id_category,
+						category: category[0].name_category,
 						status: flavor.is_active
 					})
 				})
@@ -136,7 +117,7 @@ function Flavors() {
 	const deleteFlavor = async (id) => {
 		try {
 			setLoading(true);
-			await API.delete("flavor/" + id).then(response => {
+			await API.delete("flavor/" + id + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getFlavors();
 					setLoading(false);
@@ -165,7 +146,8 @@ function Flavors() {
 						name_flavor: values.name_flavor,
 						description: values.description,
 						is_active: values.is_active,
-						id_category: values.category
+						id_category: values.category,
+						id_company: idEstablishment
 					}
 				);
 				if (response.status === 200) {
@@ -186,6 +168,7 @@ function Flavors() {
 			message.error("Erro de comunicação com o servidor, tente novamente!");
 		}
 	}
+
 
 	const setFildsDrawer = (id) => {
 		const line = data.filter((item) => item.key === id)[0];

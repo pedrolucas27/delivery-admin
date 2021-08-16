@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
+import { getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import {
 	Layout,
 	Button,
@@ -25,6 +26,9 @@ import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 const { Content } = Layout;
 function FormsPayments() {
+	isLoggedAdmin();
+
+	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
 	const [form] = Form.useForm();
@@ -32,20 +36,11 @@ function FormsPayments() {
 	const [idUpdate, setIdUpdate] = useState(null);
 	const [loading, setLoading] = useState(false);
 	useEffect(() => {
-		API.get("form_payment").then((response) => {
-			let array = [];
-			response.data.forEach((formPayment) => {
-				array.push({
-					key: formPayment.id,
-					code: formPayment.code,
-					name: formPayment.name_form_payment,
-					status: formPayment.is_active
-				})
-			})
-			setDataFormPayment(array);
-		}).catch((error) => {
-			message.error("Erro de comunicação com o servidor.");
-		});
+		setLoading(true);
+		
+		getFormsPayments();
+
+		setLoading(false);
 	}, []);
 
 	const columns = [
@@ -84,7 +79,7 @@ function FormsPayments() {
 
 	const deleteFormPayment = async (id) => {
 		setLoading(true);
-		await API.delete("form_payment/" + id).then(response => {
+		await API.delete("form_payment/" + id + "/" + idEstablishment).then(response => {
 			if (response.status === 200) {
 				getFormsPayments();
 				setLoading(false);
@@ -100,7 +95,7 @@ function FormsPayments() {
 	}
 
 	const getFormsPayments = async () => {
-		await API.get("form_payment").then((response) => {
+		await API.get("form_payment/" + idEstablishment).then((response) => {
 			let array = [];
 			response.data.forEach((formPayment) => {
 				array.push({
@@ -124,6 +119,7 @@ function FormsPayments() {
 					id: idUpdate,
 					name_form_payment: values.name_form_payment,
 					is_active: values.is_active !== undefined ? values.is_active : true,
+					id_company: idEstablishment
 				}
 			);
 			setLoading(false);
@@ -188,7 +184,7 @@ function FormsPayments() {
 							</Col>
 							<Col span={24}>
 								<Button onClick={() => form.submit()} shape="round" className="button ac">
-									Salvar
+									Editar
 							    </Button>
 								<Button onClick={() => { form.resetFields() }} shape="round" className="button-cancel ac">
 									Cancelar

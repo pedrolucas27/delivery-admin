@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
+import { getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import moment from "moment";
 import {
 	Layout,	
@@ -24,6 +25,9 @@ import LineChartComponent from "../../components/LineChartComponent";
 const { Content } = Layout;
 const { Title } = Typography;
 function Dashboard(){
+	isLoggedAdmin();
+	
+	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [dataDashboard, setDataDashboard] = useState('');
@@ -40,7 +44,7 @@ function Dashboard(){
 		let dateArray = String(day).split("-");
 		let dayFormater = `${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`;
 		try{
-			await API.get('date-day/' + dayFormater).then((response) => {
+			await API.get('date-day/' + dayFormater + "/" + idEstablishment).then((response) => {
 				setDataGraphPie(response.data.dataGraph);
 				setDataDashboard(response.data);
 				setFilterDash("day");
@@ -61,7 +65,7 @@ function Dashboard(){
   		let startMonth = `${arrayDate[1]}-${arrayDate[0]}-01`;
   		let endMonth = moment(`${arrayDate[1]}-${arrayDate[0]}-01`).endOf("month").format('YYYY-MM-DD');
 		try{
-			await API.get('date-month/' + startMonth + '/' + endMonth).then((response) => {
+			await API.get('date-month/' + startMonth + '/' + endMonth + "/" + idEstablishment).then((response) => {
 				setDataGraphLine(response.data.dataGraph);
 				setDataDashboard(response.data);
 				setFilterDash("month");

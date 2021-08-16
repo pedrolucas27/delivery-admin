@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
-import { maskMoney, changeCommaForPoint } from "../../helpers.js";
+import { maskMoney, changeCommaForPoint, getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import {
 	Row,
 	Col,
@@ -31,6 +31,9 @@ const { Content } = Layout;
 const { Option } = Select;
 const { TextArea } = Input;
 function Promotions() {
+	isLoggedAdmin();
+	
+	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -44,28 +47,15 @@ function Promotions() {
 	const [idCategoryProductPromotion, setIdCategoryProductPromotion] = useState(null);
 	useEffect(() => {
 		try {
-			API.get("promotion").then((response) => {
-				let array = [];
-				response.data.forEach((promotion) => {
-					array.push({
-						key: promotion.id_promotion,
-						code: promotion.code,
-						name: promotion.name_promotion,
-						description: promotion.description || "-",
-						status: promotion.is_active,
-						products: promotion.products
-					})
-				})
-				setDataPromotion(array);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
+			setLoading(true);
+			getPromotions();
 			form.setFieldsValue({ price_promotion: maskMoney(0) });
-			API.get("category").then((response) => {
+			API.get("category/" + idEstablishment).then((response) => {
 				setDataCategory(response.data);
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
 			});
+			setLoading(false);
 		} catch (error) {
 			message.error("Erro de comunicação com o servidor.");
 		}
@@ -75,7 +65,7 @@ function Promotions() {
 		try {
 			setLoading(true);
 			setIdCategoryProductPromotion(idCategory);
-			await API.get("flavor/byCategory/" + idCategory).then((response) => {
+			await API.get("flavor/byCategory/" + idCategory + "/" + idEstablishment).then((response) => {
 				setDataFlavor(response.data);
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");

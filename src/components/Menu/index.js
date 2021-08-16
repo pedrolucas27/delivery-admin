@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Menu } from 'antd';
+import API from "../../api.js";
+import { getStorageERP } from "../../helpers.js";
+import { Layout, Menu, Typography } from 'antd';
 import {
   LineChartOutlined,
   FormOutlined,
@@ -12,9 +14,18 @@ import 'antd/dist/antd.css';
 import '../../global.css';
 const { Sider } = Layout;
 const { SubMenu } = Menu;
+const { Title } = Typography;
 function MenuSite(props) {
   const [openKeys, setOpenKeys] = useState([]);
+  const [nameCompany, setNameCompany] = useState("");
   useEffect(() => {
+    const { idAdmin } = getStorageERP();
+    API.get("establishment-admin/" + idAdmin).then((response) => {
+        setNameCompany(response.data[0].name);
+    }).catch((error) => {
+       console.log("Errorrrrr");
+    });
+
     if(props.openCurrent !== ''){
       setOpenKeys([...openKeys, props.openCurrent]);
     }else{
@@ -37,7 +48,11 @@ function MenuSite(props) {
 
   return (
     <Sider className="menu" trigger={null} collapsible collapsed={props.open}>
-      <div className="logo" />
+      <div style={{ backgroundColor: "#214185", margin: '15px 15px 15px 15px' }}>
+        <Title level={4} style={{ margin: 0, color: '#fff' }}>
+            {nameCompany}
+        </Title>
+      </div>
       <Menu className="menu" mode="inline" selectedKeys={[props.current]} openKeys={openKeys}>
         <Menu.Item className="i-menu" key="dashboard" icon={<LineChartOutlined />} onClick={() => redirect('/dashboard')}>
           Relatório
@@ -60,7 +75,7 @@ function MenuSite(props) {
           <Menu.Item className="i-menu" key="addPromotion" onClick={() => redirect('/addPromotion')}>Promoção</Menu.Item>
           <Menu.Item className="i-menu" key="addFormPayment" onClick={() => redirect('/addFormPayment')}>F. de Pagamento</Menu.Item>
         </SubMenu>
-        <SubMenu className="i-menu" key="list" onTitleClick={() => subMenuChange('register')} icon={<OrderedListOutlined />} title="Listagens">
+        <SubMenu className="i-menu" key="list" onTitleClick={() => subMenuChange('list')} icon={<OrderedListOutlined />} title="Listagens">
           <Menu.Item className="i-menu" key="products" onClick={() => redirect('/products')}>Produtos</Menu.Item>
           <Menu.Item className="i-menu" key="categories" onClick={() => redirect('/categories')}>Categorias</Menu.Item>
           <Menu.Item className="i-menu" key="flavors" onClick={() => redirect('/flavors')}>Sabores</Menu.Item>
@@ -69,6 +84,9 @@ function MenuSite(props) {
           <Menu.Item className="i-menu" key="promotions" onClick={() => redirect('/promotions')}>Promoções</Menu.Item>
           <Menu.Item className="i-menu" key="formsPayments" onClick={() => redirect('/formsPayments')}>Fs. de Pagamento</Menu.Item>
         </SubMenu>
+        <Menu.Item className="i-menu" key="myCompany" icon={<ShopOutlined />} onClick={() => redirect('/myCompany')}>
+          Dados da empresa
+        </Menu.Item>
       </Menu>
     </Sider>
   );

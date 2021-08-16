@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import API from "../../api.js";
+import { getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import {
 	Layout,
 	Form,
@@ -18,6 +19,9 @@ import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 const { Content } = Layout;
 function AddFormPayment() {
+	isLoggedAdmin();
+
+	const { idEstablishment } = getStorageERP();
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -29,6 +33,7 @@ function AddFormPayment() {
 					{
 						name_form_payment: values.name_form_payment,
 						is_active: values.is_active !== undefined ? values.is_active : true,
+						id_company: idEstablishment
 					}
 				);
 				setLoading(false);

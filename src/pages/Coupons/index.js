@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-
+import API from "../../api.js";
+import { maskMoney, changeCommaForPoint, getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import {
 	Layout,
 	Button,
@@ -21,49 +21,26 @@ import {
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import '../../global.css';
-
-import { maskMoney, changeCommaForPoint } from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
-
 const { Content } = Layout;
 const { TextArea } = Input;
-
-const BASE_URL = "http://localhost:8080/";
-
 function Coupons() {
+	isLoggedAdmin();
+
+	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
 	const [idUpdate, setIdUpdate] = useState(null);
 	const [form] = Form.useForm();
 	const [dataCoupons, setDataCoupons] = useState([]);
 	const [loading, setLoading] = useState(false);
-
 	useEffect(() => {
-		try {
-			axios.get(BASE_URL + "coupom").then((response) => {
-				let array = [];
-				response.data.forEach((coupom) => {
-					array.push({
-						key: coupom.id_coupom,
-						code: coupom.code,
-						name: coupom.name_coupom,
-						description: coupom.description || "-",
-						value_discount: coupom.value_discount,
-						status: coupom.is_active
-					})
-				})
-				setDataCoupons(array);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
-		} catch (error) {
-			message.error("Erro de comunicação com o servidor.");
-		}
-
+		setLoading(true);
+		getCoupons();
+		setLoading(false);
 	}, []);
-
 
 
 	const columns = [
@@ -116,7 +93,7 @@ function Coupons() {
 
 	const getCoupons = async () => {
 		try {
-			axios.get(BASE_URL + "coupom").then((response) => {
+			API.get("coupom/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((coupom) => {
 					array.push({
@@ -124,7 +101,7 @@ function Coupons() {
 						code: coupom.code,
 						name: coupom.name_coupom,
 						description: coupom.description || "-",
-						value_discount: parseFloat(coupom.value_discount),
+						value_discount: coupom.value_discount,
 						status: coupom.is_active
 					})
 				})
@@ -141,7 +118,7 @@ function Coupons() {
 	const deleteCoupom = async (id) => {
 		try {
 			setLoading(true);
-			await axios.delete(BASE_URL + "coupom/" + id).then(response => {
+			await API.delete("coupom/" + id + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getCoupons();
 					setLoading(false);
@@ -164,23 +141,22 @@ function Coupons() {
 		setLoading(true);
 		try {
 			if (values.name_coupom && values.price) {
-				const response = await axios.put(BASE_URL + "coupom",
+				const response = await API.put("coupom",
 					{
 						id_coupom: idUpdate,
 						name_coupom: values.name_coupom,
 						description: values.description,
 						value_discount: Number(values.price.replace(",", ".")),
-						is_active: values.is_active !== undefined ? values.is_active : true,
+						is_active: values.is_active,
+						id_company: idEstablishment
 					}
 				);
-
+				setLoading(false);
 				if (response.status === 200) {
 					getCoupons();
-					setLoading(false);
 					message.success(response.data.message);
 					setExpandEditRow(!expandEditRow);
 				} else {
-					setLoading(false);
 					message.error(response.data.message);
 				}
 
@@ -203,7 +179,7 @@ function Coupons() {
 
 		form.setFieldsValue({
 			name_coupom: line.name,
-			price: line.value_discount,
+			price: changeCommaForPoint(line.value_discount),
 			is_active: line.status,
 			description: line.description
 		});
@@ -257,8 +233,8 @@ function Coupons() {
 							</Col>
 
 							<Col span={4}>
-								<Form.Item label="Status" name="is_active">
-									<Switch defaultChecked />
+								<Form.Item label="Status" name="is_active" valuePropName="checked">
+									<Switch />
 								</Form.Item>
 							</Col>
 
