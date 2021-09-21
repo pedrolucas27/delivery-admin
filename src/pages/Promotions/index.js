@@ -62,35 +62,27 @@ function Promotions() {
 	}, []);
 
 	const getFlavorsByCategory = async (idCategory) => {
-		try {
-			setLoading(true);
-			setIdCategoryProductPromotion(idCategory);
-			await API.get("flavor/byCategory/" + idCategory + "/" + idEstablishment).then((response) => {
-				setDataFlavor(response.data);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
+		setLoading(true);
+		setIdCategoryProductPromotion(idCategory);
+		await API.get("flavor/byCategory/" + idCategory + "/" + idEstablishment).then((response) => {
+			setDataFlavor(response.data);
 			setLoading(false);
-		} catch (error) {
+		}).catch((error) => {
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor.");
-		}
+		});
+			
 	}
 
 	const getProductsByCategoryAndFlavor = async (idFlavor) => {
-		try {
-			setLoading(true);
-			await API.get("product/others/" + idCategoryProductPromotion + "/" + idFlavor).then((response) => {
-				setLoading(false);
-				setDataProductsFilter(response.data);
-			}).catch((error) => {
-				setLoading(false);
-				message.error("Erro de comunicação com o servidor.");
-			});
-		} catch (error) {
+		setLoading(true);
+		await API.get("product/others/" + idCategoryProductPromotion + "/" + idFlavor + "/" + idEstablishment).then((response) => {
+			setDataProductsFilter(response.data);
+			setLoading(false);
+		}).catch((error) => {
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor.");
-		}
+		});
 	}
 
 	const columns = [
@@ -213,7 +205,7 @@ function Promotions() {
 
 	const getPromotions = async () => {
 		try {
-			API.get("promotion").then((response) => {
+			API.get("promotion/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((promotion) => {
 					array.push({
@@ -277,21 +269,21 @@ function Promotions() {
 							name_promotion: values.name_promotion,
 							description: values.description,
 							is_active: values.is_active,
+							id_company: idEstablishment,
 							newProductsPromotion: array
 						}
 					);
 					if (response.status === 200) {
 						getPromotions();
+						setExpandEditRow(!expandEditRow);
 						setLoading(false);
 						message.success(response.data.message);
-						setExpandEditRow(!expandEditRow);
 						form.resetFields();
 						form.setFieldsValue({ price_promotion: maskMoney(0) });
 					} else {
+						setExpandEditRow(!expandEditRow);
 						setLoading(false);
 						message.error(response.data.message);
-						setExpandEditRow(!expandEditRow);
-
 						form.resetFields();
 						form.setFieldsValue({ price_promotion: maskMoney(0) });
 					}

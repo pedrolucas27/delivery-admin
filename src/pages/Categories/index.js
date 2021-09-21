@@ -203,7 +203,7 @@ function Categories() {
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} current={'categories'} openCurrent={'list'} />
+					<MenuSite onTitle={!expand} open={expand} current={'categories'} openCurrent={'list'} />
 					<Layout className="site-layout">
 						<HeaderSite title={'Listagem de categorias'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">

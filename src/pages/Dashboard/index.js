@@ -84,7 +84,7 @@ function Dashboard(){
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} current={'dashboard'} openCurrent={''} />
+					<MenuSite onTitle={!expand} open={expand} current={'dashboard'} openCurrent={''} />
 					<Layout className="site-layout">
 						<HeaderSite 
 							title={'Relatório'} 

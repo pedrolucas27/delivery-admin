@@ -7,11 +7,11 @@ import {
 	Row,
 	Col,
 	Typography,
+	Button,
 	Radio,
 	Space,
 	DatePicker,
-	ConfigProvider,
-	Input
+	ConfigProvider
 } from 'antd';
 import {
 	MenuUnfoldOutlined,
@@ -29,6 +29,14 @@ function HeaderSite(props) {
 			props.filterDataMonth(dateString);
 		}
 	}
+
+	function onLoggout(){
+		localStorage.removeItem('@masterpizza-admin-app/idEstablishment');
+		localStorage.removeItem('@masterpizza-admin-app/token');
+		localStorage.removeItem('@masterpizza-admin-app/idAdmin');
+
+		window.location.href = "/";
+	}
 	return (
 		<Header style={{ padding: 0, backgroundColor: '#fff' }}>
 			<Row>
@@ -43,9 +51,21 @@ function HeaderSite(props) {
 					<h2 style={{ display: 'inline-block' }}>{props.title}</h2>
 				</Col>
 				<Col span={props.isDashboard ? 10:8}>
-					{
+					{/*
 						props.isListView && (
 							<Input className="input-radius" placeholder="Pesquisar por nome, código ..." />
+						)
+					*/}
+					{
+						props.isHeaderMyCompany && (
+							<Button 
+								onClick={() => onLoggout()}
+								shape="round" 
+								className="button-cancel ac"
+								style={{ marginTop: '15px' }}
+							>
+								Sair da conta
+						    </Button>
 						)
 					}
 					{

@@ -1,5 +1,5 @@
 import React from 'react';
-import { maskMoney } from "../../helpers.js";
+import { changeCommaForPoint } from "../../helpers.js";
 import { Pie, measureTextWidth } from '@ant-design/charts';
 import 'antd/dist/antd.css';
 function PieChart(props) {
@@ -35,7 +35,7 @@ function PieChart(props) {
 		    meta: {
 		      value: {
 		        formatter: function formatter(v) {
-		          return 'R$ '.concat(maskMoney(v));
+		          return 'R$ '.concat(changeCommaForPoint(v));
 		        },
 		      },
 		    },
@@ -65,7 +65,7 @@ function PieChart(props) {
 		          var _container$getBoundin2 = container.getBoundingClientRect(),
 		            width = _container$getBoundin2.width;
 		          var text = datum
-		            ? 'R$ '.concat(maskMoney(datum.value))
+		            ? 'R$ '.concat(changeCommaForPoint(datum.value))
 		            : 'R$ '.concat(
 		                data.reduce(function (r, d) {
 		                  return r + d.value;

@@ -29,17 +29,14 @@ function ModalFinishOrder(props) {
 
 	const [flagConsultCoupom, setFlagConsultCoupom] = useState(false);
 	const [valueDiscount, setValueDiscount] = useState(0);
+	const [fkIdCoupom, setFkIdCoupom] = useState(null);
 
 	useEffect(() => {
-		try{
-			API.get("form_payment/"+idEstablishment).then((response) => {
-				setDataFormPayment(response.data);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
-		}catch (error) {
-			message.error("Erro de comunicação com o servidor. Tente novamente!");
-		}
+		API.get("form_payment/"+idEstablishment).then((response) => {
+			setDataFormPayment(response.data);
+		}).catch((error) => {
+			message.error("Erro de comunicação com o servidor.");
+		});
 	}, []);
 
 	const getCoupomChangeName = async () => {
@@ -51,6 +48,7 @@ function ModalFinishOrder(props) {
 						if(response.data){
 							setFlagConsultCoupom(true);
 							setValueDiscount(response.data[0].value_discount);
+							setFkIdCoupom(response.data[0].id_coupom);
 						}
 					}
 				}).catch((error) => {
@@ -67,7 +65,7 @@ function ModalFinishOrder(props) {
 	const insertDataClientOrder = (values) => {
 		setLoading(true);
 		form.resetFields();
-		props.insertDataOrder(values, valueDiscount);
+		props.insertDataOrder(values, valueDiscount, fkIdCoupom);
 		setLoading(false);
 	}
 

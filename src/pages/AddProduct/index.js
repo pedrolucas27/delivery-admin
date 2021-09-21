@@ -140,7 +140,7 @@ function AddProduct() {
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} current={'addProduct'} openCurrent={'register'} />
+					<MenuSite onTitle={!expand} open={expand} current={'addProduct'} openCurrent={'register'} />
 					<Layout className="site-layout">
 						<HeaderSite title={'Cadastro de produto'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">

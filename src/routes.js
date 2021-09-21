@@ -24,6 +24,7 @@ import Additionals from './pages/Additionals';
 import Promotions from './pages/Promotions';
 import Coupons from './pages/Coupons';
 import FormsPayments from './pages/FormsPayments';
+import Clients from './pages/Clients';
 
 
 function Routes() {
@@ -51,6 +52,7 @@ function Routes() {
                 <Route path="/promotions" component={Promotions} />
                 <Route path="/coupons" component={Coupons} />
                 <Route path="/formsPayments" component={FormsPayments} />
+                <Route path="/clients" component={Clients} />
 
                 <Route path="/" exact component={Login} />
                 <Route path="*" component={NotFound} />

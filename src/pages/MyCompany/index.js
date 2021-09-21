@@ -46,6 +46,7 @@ function MyCompany() {
 	const [imageCompany, setImageCompany] = useState(null);
 	const [editableCompany, setEditableCompany] = useState(false);
 	const [timeWorkEstablishment, setTimeWorkEstablishment] = useState(null);
+	const [isUpdateImage, setIsUpdateImage] = useState(false);
 
 	useEffect(() => {
 		setFildsCompany();
@@ -57,12 +58,13 @@ function MyCompany() {
 			const response = await API.get("establishment/"+idEstablishment);
 			if(response.data.length !== 0){
 				setTimeWorkEstablishment(
-					[moment(response.data[0].start_time).format("h:mm:ss"), moment(response.data[0].end_time).format("h:mm:ss")]
+					[response.data[0].start_time, response.data[0].end_time]
 				);
+				setImageCompany(`http://192.168.0.107:8080/${response.data[0].image}`);
 				form.setFieldsValue({
 					name_establishment: response.data[0].name,
 					phone_cell: maskPhoneCell(response.data[0].phone),
-					time_work: [moment(response.data[0].start_time).format("h:mm:ss"), moment(response.data[0].end_time).format("h:mm:ss")],
+					time_work: [moment(response.data[0].start_time, 'HH:mm:ss'), moment(response.data[0].end_time, 'HH:mm:ss')],
 					cep: response.data[0].cep,
 					city: response.data[0].city,
 					street: response.data[0].street,
@@ -100,6 +102,7 @@ function MyCompany() {
 			    number_house: values.number_house,
 			    start_time: timeWorkEstablishment[0],
 			    end_time: timeWorkEstablishment[1],
+			    isUpdateImage: isUpdateImage,
 			    id_establishment: idEstablishment
 			});
 			setLoading(false);
@@ -119,6 +122,7 @@ function MyCompany() {
 
 	const handleChangeImage = async (file) => {
 		const image = await getBase64(file.fileList[0].originFileObj);
+		setIsUpdateImage(true);
 		setImageCompany(image);
 	}
 
@@ -150,7 +154,7 @@ function MyCompany() {
 				<Layout>
 					<MenuSite open={expand} current={'myCompany'} openCurrent={''} />
 					<Layout className="site-layout">
-						<HeaderSite title={'Dados cadastrais'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
+						<HeaderSite title={'Dados cadastrais'} isHeaderMyCompany={true} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Form
 								layout="vertical"

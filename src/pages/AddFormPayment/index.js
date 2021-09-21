@@ -58,7 +58,7 @@ function AddFormPayment() {
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} current={'addFormPayment'} openCurrent={'register'} />
+					<MenuSite onTitle={!expand} open={expand} current={'addFormPayment'} openCurrent={'register'} />
 					<Layout className="site-layout">
 						<HeaderSite title={'Cadastro de forma de pagamento'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">

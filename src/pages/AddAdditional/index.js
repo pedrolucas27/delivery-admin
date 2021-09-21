@@ -82,7 +82,7 @@ function AddAdditional() {
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} current={'addAdditional'} openCurrent={'register'} />
+					<MenuSite onTitle={!expand} open={expand} current={'addAdditional'} openCurrent={'register'} />
 					<Layout className="site-layout">
 						<HeaderSite title={'Cadastro de adicional'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">

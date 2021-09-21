@@ -52,12 +52,12 @@ export function getStorageERP(){
 	}
 }
 
-export function isLoggedAdmin(){
+export async function isLoggedAdmin(){
 	const TOKEN = localStorage.getItem('@masterpizza-admin-app/token');
 	const ID_ADMIN = localStorage.getItem('@masterpizza-admin-app/idAdmin');
 	const API = "http://192.168.0.107:8080/";
 	try{
-		axios.post(API + "adminLogged", {  
+		await axios.post(API + "adminLogged", {  
 			id: ID_ADMIN
 		},{
 			headers: { Authorization: 'Bearer '.concat(TOKEN) }

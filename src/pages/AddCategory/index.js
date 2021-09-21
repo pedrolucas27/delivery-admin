@@ -91,7 +91,7 @@ function AddCategory() {
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} current={'addCategory'} openCurrent={'register'} />
+					<MenuSite onTitle={!expand} open={expand} current={'addCategory'} openCurrent={'register'} />
 					<Layout className="site-layout">
 						<HeaderSite title={'Cadastro de categoria'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">

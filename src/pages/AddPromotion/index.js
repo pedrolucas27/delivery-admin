@@ -54,7 +54,7 @@ function AddPromotion() {
 		try {
 			setLoading(true);
 			setIdCategoryProductPromotion(idCategory);
-			await API.get("flavor/byCategory/" + idCategory  "/" + idEstablishment).then((response) => {
+			await API.get("flavor/byCategory/" + idCategory + "/" + idEstablishment).then((response) => {
 				setDataFlavor(response.data);
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
@@ -227,7 +227,7 @@ function AddPromotion() {
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} current={'addPromotion'} openCurrent={'register'} />
+					<MenuSite onTitle={!expand} open={expand} current={'addPromotion'} openCurrent={'register'} />
 					<Layout className="site-layout">
 						<HeaderSite title={'Cadastro de promoção'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">

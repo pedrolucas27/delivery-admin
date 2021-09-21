@@ -76,7 +76,7 @@ function AddFlavor(){
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} current={'addFlavor'} openCurrent={'register'} />
+					<MenuSite onTitle={!expand} open={expand} current={'addFlavor'} openCurrent={'register'} />
 					<Layout className="site-layout">
 						<HeaderSite title={'Cadastro de sabor'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">

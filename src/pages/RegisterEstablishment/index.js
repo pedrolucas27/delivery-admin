@@ -47,7 +47,7 @@ function RegisterEstablishment() {
 				const response = await API.post("establishment", {
 			        name: values.name_establishment, 
 			        phone: values.phone_cell,
-			        image: imageCompany,
+			        base64image: imageCompany,
 			        user_instagram: values.user_instagram,
 			        user_facebook: values.user_facebook,
 			        user_whatsapp: values.user_whatsapp,

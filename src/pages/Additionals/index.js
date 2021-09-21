@@ -182,7 +182,6 @@ function Additionals() {
 		setIdUpdate(id);
 		form.setFieldsValue({
 			name_additional: line.name,
-			category: line.category,
 			price: changeCommaForPoint(line.value),
 			is_active: line.status,
 			description: line.description,
@@ -200,7 +199,7 @@ function Additionals() {
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} current={'additionals'} openCurrent={'list'} />
+					<MenuSite onTitle={!expand} open={expand} current={'additionals'} openCurrent={'list'} />
 					<Layout className="site-layout">
 						<HeaderSite title={'Listagem de adicionais'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">

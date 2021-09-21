@@ -65,7 +65,7 @@ function AddCoupom() {
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout>
-					<MenuSite open={expand} current={'addCoupom'} openCurrent={'register'} />
+					<MenuSite onTitle={!expand} open={expand} current={'addCoupom'} openCurrent={'register'} />
 					<Layout className="site-layout">
 						<HeaderSite title={'Cadastro de cupom'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">

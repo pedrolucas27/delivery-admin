@@ -150,7 +150,7 @@ function Pdv() {
 
 	const getProductsByCategoryAndFlavor = async (idCategory, idFlavor) => {
 		try{
-			await API.get("product/others/" + idCategory + "/" + idFlavor).then((response) => {
+			await API.get("product/others/" + idCategory + "/" + idFlavor + "/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((product) => {
 					array.push({
@@ -173,7 +173,7 @@ function Pdv() {
 	const getProductsByMisto = async (idCategory) => {
 		try{
 			let array = [];
-			await API.get("product/others/" + idCategory).then((response) => {
+			await API.get("product/others/" + idCategory + "/" + idEstablishment).then((response) => {
 				response.data.forEach((product) => {
 					if ((product.fk_id_flavor === idsFlavorsProductMisto[0]) || (product.fk_id_flavor === idsFlavorsProductMisto[1])) {
 						array.push(product);
@@ -476,7 +476,7 @@ function Pdv() {
 	}
 
 	// PRIMEIRRA FUNÇÃO A SER CHAMADA
-	const insertProductCart_PDV = async (values, valueDiscountCoupom) => {
+	const insertProductCart_PDV = async (values, valueDiscountCoupom, fkIdCoupom) => {
 		setVisibleModalFinishOrder(false);
 		setLoading(true);
 		try{
@@ -490,7 +490,8 @@ function Pdv() {
 					quantity_item: item.quantity,
 					price_item_order: (item.quantity * item.price),
 					observation: item.is_product_misto ? item.product : null,
-					id_additional_fk: item.is_additional ? item.key : null
+					id_additional_fk: item.is_additional ? item.key : null,
+					id_company: idEstablishment
 				});
 				price_order = price_order + (item.quantity * item.price);
 			})
@@ -506,7 +507,7 @@ function Pdv() {
 			);
 			if(responseProductCart.status === 200){
 				const arrayIdsProducts = responseProductCart.data.ids_products_cart;
-				await createOrder_PDV(arrayIdsProducts, price_order, values);
+				await createOrder_PDV(arrayIdsProducts, price_order, values, fkIdCoupom);
 			}else{
 				message.error(responseProductCart.data.message);
 				setLoading(false);
@@ -518,18 +519,20 @@ function Pdv() {
 	}
 
 	// SEGUNDA FUNÇÃO A SER CHAMADA
-	const createOrder_PDV = async (ids, price_order, values) => {
+	const createOrder_PDV = async (ids, price_order, values, fkIdCoupom) => {
 		try{
 			const address = `Nome: ${values.name_client};Telefone: ${values.phone_cell};Endereço: ${values.address}`
 			const responseOrder = await API.post("createOrder",
 				{
-					name_coupom: values.coupom || null,
 					price: price_order,
+					price_final: price_order,
 					status_order: 0,
 					observation: values.observation || null,
 					address_client: String(address),
+					id_coupom_fk: fkIdCoupom,
 					id_client_fk: null,
 					is_pdv: true,
+					id_company: idEstablishment,
 					idsFormPayment: values.form_payment
 				}
 			);
@@ -552,6 +555,7 @@ function Pdv() {
 			const responseProductOrder = await API.post("createProductsOrder",
 				{
 					id_order: idOrder,
+					id_company: idEstablishment,
 					ids_products: idsProducts
 				}
 			);
@@ -810,7 +814,9 @@ function Pdv() {
 						/>
 						<ModalFinishOrder
 							visibleModalFinishOrder={visibleModalFinishOrder}
-							insertDataOrder={(values, valueDiscountCoupom) => insertProductCart_PDV(values, valueDiscountCoupom)}
+							insertDataOrder={
+								(values, valueDiscountCoupom, fkIdCoupom) => insertProductCart_PDV(values, valueDiscountCoupom, fkIdCoupom)
+							}
 							onCancelSubmitOrder={() => setVisibleAddProductCart(!visibleAddProductCard)}
 						/>
 					</Layout>

@@ -176,7 +176,7 @@ function OrderTracking() {
 	const deleteOrder = async (idOrder) => {
 		setLoading(true);
 		try{
-			await API.delete("order/" + idOrder + "/" + idEstablishment).then(response => {
+			await API.delete("order/" + idOrder).then(response => {
 				if (response.status === 200) {
 					getOrders();
 					setLoading(false);
