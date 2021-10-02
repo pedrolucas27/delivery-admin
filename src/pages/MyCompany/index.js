@@ -60,7 +60,7 @@ function MyCompany() {
 				setTimeWorkEstablishment(
 					[response.data[0].start_time, response.data[0].end_time]
 				);
-				setImageCompany(`http://192.168.0.107:8080/${response.data[0].image}`);
+				setImageCompany(`https://api-master-pizza.herokuapp.com/${response.data[0].image}`);
 				form.setFieldsValue({
 					name_establishment: response.data[0].name,
 					phone_cell: maskPhoneCell(response.data[0].phone),

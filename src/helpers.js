@@ -55,7 +55,7 @@ export function getStorageERP(){
 export async function isLoggedAdmin(){
 	const TOKEN = localStorage.getItem('@masterpizza-admin-app/token');
 	const ID_ADMIN = localStorage.getItem('@masterpizza-admin-app/idAdmin');
-	const API = "http://192.168.0.107:8080/";
+	const API = "https://api-master-pizza.herokuapp.com/";
 	try{
 		await axios.post(API + "adminLogged", {  
 			id: ID_ADMIN

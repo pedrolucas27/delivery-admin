@@ -44,6 +44,7 @@ function RegisterEstablishment() {
 		try{
 			if(timeWorkEstablishment){
 				const { idAdmin } = getStorageERP();
+				
 				const response = await API.post("establishment", {
 			        name: values.name_establishment, 
 			        phone: values.phone_cell,
@@ -248,7 +249,12 @@ function RegisterEstablishment() {
 										</Form.Item>
 									</Col>
 									<Col span={8}>
-										<Form.Item label="Whatsapp" name="user_whatsapp">
+										<Form.Item label="Whatsapp" name="user_whatsapp" 
+										rules={[
+												{
+													required: true,
+												}
+											]}>
 											<Input className="input-radius" maxLength={15} onChange={handleChangePhoneCellUserWpp} />
 										</Form.Item>
 									</Col>
