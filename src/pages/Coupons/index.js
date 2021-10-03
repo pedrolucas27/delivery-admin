@@ -118,7 +118,7 @@ function Coupons() {
 	const deleteCoupom = async (id) => {
 		try {
 			setLoading(true);
-			await API.delete("coupom/" + id + "/" + idEstablishment).then(response => {
+			API.delete("coupom/" + id + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getCoupons();
 					setLoading(false);
@@ -159,7 +159,6 @@ function Coupons() {
 				} else {
 					message.error(response.data.message);
 				}
-
 			} else {
 				setLoading(false);
 				message.error("Informe os campos pedidos, por favor !");
@@ -171,19 +170,15 @@ function Coupons() {
 
 	}
 
-
-
 	const setFildsDrawer = (id) => {
 		const line = dataCoupons.filter((item) => item.key === id)[0];
 		setIdUpdate(id);
-
 		form.setFieldsValue({
 			name_coupom: line.name,
 			price: changeCommaForPoint(line.value_discount),
 			is_active: line.status,
 			description: line.description
 		});
-
 		setExpandEditRow(!expandEditRow);
 	}
 

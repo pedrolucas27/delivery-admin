@@ -32,7 +32,7 @@ const { Option } = Select;
 const { TextArea } = Input;
 function Promotions() {
 	isLoggedAdmin();
-	
+
 	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
@@ -71,7 +71,7 @@ function Promotions() {
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor.");
 		});
-			
+
 	}
 
 	const getProductsByCategoryAndFlavor = async (idFlavor) => {
@@ -179,7 +179,7 @@ function Promotions() {
 			let isNewProduct = dataTable.filter((item) => item.key === key)[0].is_new_product;
 			if (!isNewProduct) {
 				setLoading(true);
-				await API.delete("product-promotion/" + key).then((response) => {
+				API.delete("product-promotion/" + key + "/" + idEstablishment).then((response) => {
 					if (response.status === 200) {
 						setLoading(false);
 						message.success(response.data.message);
@@ -229,7 +229,7 @@ function Promotions() {
 	const deletePromotion = async (id) => {
 		try {
 			setLoading(true);
-			await API.delete("promotion/" + id).then(response => {
+			API.delete("promotion/" + id + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getPromotions();
 					setLoading(false);

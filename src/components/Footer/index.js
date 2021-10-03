@@ -4,7 +4,7 @@ import 'antd/dist/antd.css';
 const { Footer } = Layout;
 function FooterSite(props) {
 	return (
-		<Footer style={{ textAlign: 'center' }}> Master pizza @2021 </Footer>
+		<Footer style={{ textAlign: 'center' }}> Master Pizza @2021 </Footer>
 	);
 }
 export default FooterSite;

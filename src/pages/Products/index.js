@@ -42,7 +42,7 @@ function getBase64(file) {
 
 function Products() {
 	isLoggedAdmin();
-	
+
 	const { idEstablishment } = getStorageERP();
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
@@ -75,14 +75,14 @@ function Products() {
 				message.error("Erro de comunicação com o servidor.");
 			});
 			getProducts();
-			setLoading(false);	
+			setLoading(false);
 	}, []);
 
 	const getFlavorsByCategory = async (idCategory) => {
 		setLoading(true);
 		try {
 			form.setFieldsValue({ flavor: null });
-			await API.get("flavor/byCategory/" + idCategory + "/" + idEstablishment).then((response) => {
+			API.get("flavor/byCategory/" + idCategory + "/" + idEstablishment).then((response) => {
 				setDataFlavor(response.data);
 				setLoading(false);
 			}).catch((error) => {
@@ -147,7 +147,7 @@ function Products() {
 
 	const getProducts = async () => {
 		try {
-			await API.get("product/" + idEstablishment).then((response) => {
+			API.get("product/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((product) => {
 					array.push({
@@ -179,7 +179,7 @@ function Products() {
 	const deleteProduct = async (id) => {
 		try {
 			setLoading(true);
-			await API.delete("product/" + id).then(response => {
+			API.delete("product/" + id + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getProducts();
 					setLoading(false);
@@ -271,7 +271,7 @@ function Products() {
 		const field = form.getFieldValue("size");
 		form.setFieldsValue({ size: await maskNumer(field) });
 	}
-	
+
 	const uploadButton = (
 		<div className="div-icon-upload">
 			<PlusOutlined />

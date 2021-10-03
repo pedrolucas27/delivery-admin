@@ -99,7 +99,7 @@ function Additionals() {
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
 			});
-			await API.get("additional/" + idEstablishment).then((response) => {
+			API.get("additional/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((additional) => {
 					array.push({
@@ -124,7 +124,7 @@ function Additionals() {
 	const deleteAdditional = async (id) => {
 		setLoading(true);
 		try {
-			await API.delete("additional/" + id).then(response => {
+			API.delete("additional/" + id + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getAdditionals();
 					setLoading(false);

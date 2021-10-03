@@ -33,7 +33,7 @@ const { Content } = Layout;
 const { TabPane } = Tabs;
 function OrderTracking() {
 	isLoggedAdmin();
-	
+
 	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -102,9 +102,9 @@ function OrderTracking() {
 						{
 							tab === "1" && (
 								<Tooltip placement="top" title='Deletar pedido'>
-									<DeleteOutlined 
+									<DeleteOutlined
 										className="icon-table"
-										onClick={() => deleteOrder(record.key)} 
+										onClick={() => deleteOrder(record.key)}
 									/>
 								</Tooltip>
 							)
@@ -131,8 +131,8 @@ function OrderTracking() {
 						}
 						{
 							(tab === "3" || tab === "4") && (
-								<Tooltip 
-									placement="top" 
+								<Tooltip
+									placement="top"
 									title={tab === "3" ? "Gerar nota fiscal e enviar para entrega.":"Gerar nota fiscal novamente."}
 								>
 									<ContainerOutlined
@@ -176,7 +176,7 @@ function OrderTracking() {
 	const deleteOrder = async (idOrder) => {
 		setLoading(true);
 		try{
-			await API.delete("order/" + idOrder).then(response => {
+			API.delete("order/" + idOrder + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getOrders();
 					setLoading(false);
@@ -305,13 +305,13 @@ function OrderTracking() {
 						<HeaderSite title={'Acompanhamento de pedidos'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Tabs defaultActiveKey="1" size="large" centered onChange={(key) => setTab(key)}>
-								<TabPane 
+								<TabPane
 									tab={
 										<span>
 								          	<IssuesCloseOutlined />
 								          	Pedidos em análise
         								</span>
-        							} 
+        							}
         							key="1"
         						>
 									{
@@ -330,13 +330,13 @@ function OrderTracking() {
 										)
 									}
 								</TabPane>
-								<TabPane 
+								<TabPane
 									tab={
 										<span>
 								          	<FieldTimeOutlined />
 								          	Pedidos em produção
         								</span>
-        							}  
+        							}
 									key="2"
 								>
 									{
@@ -355,13 +355,13 @@ function OrderTracking() {
 										)
 									}
 								</TabPane>
-								<TabPane 
+								<TabPane
 									tab={
 										<span>
 								          	<DeliveredProcedureOutlined />
 								          	Pedidos aguardando retirada
         								</span>
-        							} 
+        							}
 									key="3"
 								>
 									{
@@ -380,13 +380,13 @@ function OrderTracking() {
 										)
 									}
 								</TabPane>
-								<TabPane 
+								<TabPane
 									tab={
 										<span>
 								          	<HistoryOutlined />
 								          	Histórico de pedidos entregues
         								</span>
-        							} 
+        							}
 									key="4"
 								>
 									{

@@ -30,7 +30,7 @@ const { TextArea } = Input;
 const { Option } = Select;
 function Flavors() {
 	isLoggedAdmin();
-	
+
 	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
@@ -82,7 +82,6 @@ function Flavors() {
 	];
 
 	const getFlavors = async () => {
-		
 		try {
 			let arrayCategory = [];
 			API.get("category/" + idEstablishment).then((response) => {
@@ -91,7 +90,7 @@ function Flavors() {
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
 			});
-			
+
 			API.get("flavor/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((flavor) => {
@@ -117,7 +116,7 @@ function Flavors() {
 	const deleteFlavor = async (id) => {
 		try {
 			setLoading(true);
-			await API.delete("flavor/" + id + "/" + idEstablishment).then(response => {
+			API.delete("flavor/" + id + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getFlavors();
 					setLoading(false);

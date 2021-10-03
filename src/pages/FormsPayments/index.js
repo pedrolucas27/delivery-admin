@@ -37,9 +37,7 @@ function FormsPayments() {
 	const [loading, setLoading] = useState(false);
 	useEffect(() => {
 		setLoading(true);
-		
 		getFormsPayments();
-
 		setLoading(false);
 	}, []);
 
@@ -79,7 +77,7 @@ function FormsPayments() {
 
 	const deleteFormPayment = async (id) => {
 		setLoading(true);
-		await API.delete("form_payment/" + id + "/" + idEstablishment).then(response => {
+		API.delete("form_payment/" + id + "/" + idEstablishment).then(response => {
 			if (response.status === 200) {
 				getFormsPayments();
 				setLoading(false);
@@ -95,7 +93,7 @@ function FormsPayments() {
 	}
 
 	const getFormsPayments = async () => {
-		await API.get("form_payment/" + idEstablishment).then((response) => {
+		API.get("form_payment/" + idEstablishment).then((response) => {
 			let array = [];
 			response.data.forEach((formPayment) => {
 				array.push({

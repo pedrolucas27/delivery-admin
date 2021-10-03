@@ -39,7 +39,7 @@ function getBase64(file) {
 
 function Categories() {
 	isLoggedAdmin();
-	
+
 	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
@@ -91,7 +91,7 @@ function Categories() {
 	const getCategories = async () => {
 		setLoading(true);
 		try {
-			await API.get("category/" + idEstablishment).then((response) => {
+			API.get("category/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((category) => {
 					array.push({
@@ -117,7 +117,7 @@ function Categories() {
 	const deleteCategory = async (id) => {
 		try {
 			setLoading(true);
-			await API.delete("category/" + id + "/" + idEstablishment).then(response => {
+			API.delete("category/" + id + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getCategories();
 					setLoading(false);
