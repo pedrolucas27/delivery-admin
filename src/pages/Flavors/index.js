@@ -83,6 +83,7 @@ function Flavors() {
 
 	const getFlavors = async () => {
 		try {
+			/*
 			let arrayCategory = [];
 			API.get("category/" + idEstablishment).then((response) => {
 				setDataCategory(response.data);
@@ -90,17 +91,19 @@ function Flavors() {
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
 			});
+			*/
 
 			API.get("flavor/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((flavor) => {
-					let category = arrayCategory.filter((item) => item.id_category === flavor.id_category);
+					//let category = arrayCategory.filter((item) => item.id_category === flavor.id_category);
 					array.push({
 						key: flavor.id,
 						code: flavor.code,
 						name: flavor.name_flavor,
 						description: flavor.description || "-",
-						category: category[0].name_category,
+						category: "nome da categoria",
+						//category: category[0].name_category,
 						status: flavor.is_active
 					})
 				})
