@@ -14,7 +14,8 @@ import {
 	Switch,
 	Spin,
 	Select,
-	message
+	message,
+	Popconfirm
 } from 'antd';
 import {
 	DeleteOutlined,

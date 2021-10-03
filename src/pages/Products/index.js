@@ -13,6 +13,7 @@ import {
 	Upload,
 	Table,
 	message,
+	Popconfirm,
 	Drawer,
 	Tooltip,
 	Spin

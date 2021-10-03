@@ -13,6 +13,7 @@ import {
 	Table,
 	Spin,
 	message,
+	Popconfirm,
 	Switch,
 	Drawer
 } from 'antd';

@@ -13,6 +13,7 @@ import {
 	Table,
 	Tooltip,
 	Drawer,
+	Popconfirm,
 	message,
 	Spin
 } from 'antd';
@@ -81,7 +82,14 @@ function Additionals() {
 				return (
 					<div>
 						<Tooltip placement="top" title='Deletar adicional'>
-							<DeleteOutlined className="icon-table" onClick={() => deleteAdditional(record.key)} />
+							<Popconfirm
+								 title="Tem certeza que deseja deletar ?"
+								 onConfirm={() => deleteAdditional(record.key)}
+								 okText="Sim"
+								 cancelText="Não"
+							 >
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
 						</Tooltip>
 						<Tooltip placement="top" title='Editar adicional'>
 							<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)} />

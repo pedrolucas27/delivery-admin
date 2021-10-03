@@ -6,6 +6,7 @@ import 'moment/locale/pt-br';
 import {
 	Layout,
 	message,
+	Popconfirm,
 	Tabs,
 	Table,
 	Tooltip,
