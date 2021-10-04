@@ -77,6 +77,7 @@ function Categories() {
 			render: (__, record) => {
 				return (
 					<div>
+						{/*
 						<Popconfirm
 								 title="Tem certeza que deseja deletar ?"
 								 onConfirm={() => deleteCategory(record.key)}
@@ -87,7 +88,15 @@ function Categories() {
 									<DeleteOutlined className="icon-table" />
 								</Tooltip>
 						</Popconfirm>
-					
+						*/}
+						<Popconfirm
+								 title="Tem certeza que deseja deletar ?"
+								 onConfirm={() => deleteCategory(record.key)}
+								 okText="Sim"
+								 cancelText="Não"
+						 >
+							<DeleteOutlined className="icon-table" />
+						</Popconfirm>
 						<Tooltip placement="top" title='Editar categoria'>
 							<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)} />
 						</Tooltip>
