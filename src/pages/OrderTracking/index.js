@@ -162,7 +162,7 @@ function OrderTracking() {
 				message.success(response.data.message);
 
 				setTimeout(() => {
-					window.open(`http://192.168.0.107:8080/invoices/${idOrder}`);
+					window.open(`https://api-master-pizza.herokuapp.com/invoices/${idOrder}`);
 				}, []);
 			}else{
 				setLoading(false);
