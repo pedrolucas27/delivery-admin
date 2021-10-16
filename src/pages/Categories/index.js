@@ -77,26 +77,16 @@ function Categories() {
 			render: (__, record) => {
 				return (
 					<div>
-						{/*
-						<Popconfirm
+						<Tooltip placement="top" title='Deletar categoria'>
+							<Popconfirm
 								 title="Tem certeza que deseja deletar ?"
 								 onConfirm={() => deleteCategory(record.key)}
 								 okText="Sim"
 								 cancelText="Não"
-						 >
-								<Tooltip placement="top" title='Deletar categoria'>
-									<DeleteOutlined className="icon-table" />
-								</Tooltip>
-						</Popconfirm>
-						*/}
-						<Popconfirm
-								 title="Tem certeza que deseja deletar ?"
-								 onConfirm={() => deleteCategory(record.key)}
-								 okText="Sim"
-								 cancelText="Não"
-						 >
-							<DeleteOutlined className="icon-table" />
-						</Popconfirm>
+							 >
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
+						</Tooltip>
 						<Tooltip placement="top" title='Editar categoria'>
 							<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)} />
 						</Tooltip>
@@ -117,7 +107,7 @@ function Categories() {
 						code: category.code,
 						name: category.name_category,
 						status: category.is_active,
-						urlImage: category.image ? `http://192.168.0.107:8080/${category.image}`:null
+						urlImage: category.image ? `https://api-master-pizza.herokuapp.com/${category.image}`:null
 					})
 				})
 				setDataCategory(array);
@@ -220,9 +210,9 @@ function Categories() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite onTitle={!expand} open={expand} current={'categories'} openCurrent={'list'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Listagem de categorias'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Table

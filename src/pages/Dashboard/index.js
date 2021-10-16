@@ -45,9 +45,9 @@ function Dashboard(){
 		let dayFormater = `${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`;
 		try{
 			await API.get('date-day/' + dayFormater + "/" + idEstablishment).then((response) => {
+				setFilterDash("day");
 				setDataGraphPie(response.data.dataGraph);
 				setDataDashboard(response.data);
-				setFilterDash("day");
 				setLoading(false);
 			}).catch((error) => {
 				setLoading(false);
@@ -66,9 +66,9 @@ function Dashboard(){
   		let endMonth = moment(`${arrayDate[1]}-${arrayDate[0]}-01`).endOf("month").format('YYYY-MM-DD');
 		try{
 			await API.get('date-month/' + startMonth + '/' + endMonth + "/" + idEstablishment).then((response) => {
+				setFilterDash("month");
 				setDataGraphLine(response.data.dataGraph);
 				setDataDashboard(response.data);
-				setFilterDash("month");
 				setLoading(false);
 			}).catch((error) => {
 				setLoading(false);
@@ -83,9 +83,9 @@ function Dashboard(){
 	return(
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite onTitle={!expand} open={expand} current={'dashboard'} openCurrent={''} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite 
 							title={'Relatório'} 
 							isListView={false} 

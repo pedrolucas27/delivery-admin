@@ -97,7 +97,7 @@ function Promotions() {
 			render: (__, record) => {
 				return (
 					<div>
-						{ record.status ? "Ativo" : "Inativo"}
+						{record.status ? "Ativo" : "Inativo"}
 					</div>
 				);
 			}
@@ -109,8 +109,15 @@ function Promotions() {
 			render: (__, record) => {
 				return (
 					<div>
-						<Tooltip placement="top" title='Deletar promoção' onClick={() => deletePromotion(record.key)}>
-							<DeleteOutlined className="icon-table" />
+						<Tooltip placement="top" title='Deletar promoção'>
+							<Popconfirm
+								title="Tem certeza que deseja deletar ?"
+								onConfirm={() => deletePromotion(record.key)}
+								okText="Sim"
+								cancelText="Não"
+							>
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
 						</Tooltip>
 						<Tooltip placement="top" title='Editar promoção' onClick={() => setFildsDrawer(record.key)}>
 							<EditOutlined className="icon-table" />
@@ -369,9 +376,9 @@ function Promotions() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite open={expand} current={'promotions'} openCurrent={'list'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Listagem das promoções'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Table
@@ -477,10 +484,10 @@ function Promotions() {
 							<Col span={24}>
 								<Button onClick={() => form.submit()} shape="round" className="button ac">
 									Editar
-							    </Button>
+								</Button>
 								<Button onClick={() => setExpandEditRow(!expandEditRow)} shape="round" className="button-cancel ac">
 									Cancelar
-							    </Button>
+								</Button>
 							</Col>
 						</Row>
 					</Form>

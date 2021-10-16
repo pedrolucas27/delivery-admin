@@ -135,6 +135,7 @@ function RegisterEstablishment() {
 											rules={[
 												{
 													required: true,
+													message: "Informe o nome do estabelecimento."
 												}
 											]}
 										>
@@ -148,6 +149,7 @@ function RegisterEstablishment() {
 											rules={[
 												{
 													required: true,
+													message: "Informe o telefone celular do estabelecimento."
 												}
 											]}
 										>
@@ -161,6 +163,7 @@ function RegisterEstablishment() {
 											rules={[
 												{
 													required: true,
+													message: "Informe o horário de funcinamento do estabelecimento."
 												}
 											]}
 										>
@@ -180,6 +183,7 @@ function RegisterEstablishment() {
 											rules={[
 												{
 													required: true,
+													message: "Informe o cep do endereço do estabelecimento."
 												}
 											]}
 										>
@@ -193,6 +197,7 @@ function RegisterEstablishment() {
 											rules={[
 												{
 													required: true,
+													message: "Informe a cidade do estabelecimento."
 												}
 											]}
 										>
@@ -206,6 +211,7 @@ function RegisterEstablishment() {
 											rules={[
 												{
 													required: true,
+													message: "Informe a rua do estabelecimento."
 												}
 											]}
 										>
@@ -219,6 +225,7 @@ function RegisterEstablishment() {
 											rules={[
 												{
 													required: true,
+													message: "Informe o bairro do estabelecimento."
 												}
 											]}
 										>
@@ -232,6 +239,7 @@ function RegisterEstablishment() {
 											rules={[
 												{
 													required: true,
+													message: "Informe o número do estabelecimento."
 												}
 											]}
 										>
@@ -253,6 +261,7 @@ function RegisterEstablishment() {
 										rules={[
 												{
 													required: true,
+													message: "Informe o whatsapp do estabelecimento."
 												}
 											]}>
 											<Input className="input-radius" maxLength={15} onChange={handleChangePhoneCellUserWpp} />

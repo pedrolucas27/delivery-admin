@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import API from "../../api.js";
 import {
 	Layout,
@@ -26,6 +26,11 @@ function AddCoupom() {
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		form.setFieldsValue({ price: maskMoney(0) });
+	}, []);
+
 	const onSaveCoupom = async (values) => {
 		try {
 			setLoading(true);
@@ -43,6 +48,7 @@ function AddCoupom() {
 				if (response.status === 200) {
 					message.success(response.data.message);
 					form.resetFields();
+					form.setFieldsValue({ price: maskMoney(0) });
 				} else {
 					message.error(response.data.message);
 				}
@@ -64,9 +70,9 @@ function AddCoupom() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite onTitle={!expand} open={expand} current={'addCoupom'} openCurrent={'register'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Cadastro de cupom'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Form layout="vertical" form={form} onFinish={onSaveCoupom}>

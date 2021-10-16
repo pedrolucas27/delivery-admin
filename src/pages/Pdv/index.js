@@ -101,7 +101,7 @@ function Pdv() {
 	}
 
 	const getFlavorsByCategory = async (idCategory) => {
-		try{
+		try {
 			await API.get("flavor/byCategory/" + idCategory + "/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((flavor) => {
@@ -122,7 +122,7 @@ function Pdv() {
 	}
 
 	const getAdditionalsByCategory = async (idCategory) => {
-		try{
+		try {
 			await API.get("additional/" + idCategory + "/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((additional) => {
@@ -134,9 +134,9 @@ function Pdv() {
 					})
 				})
 				setDataAdditionalsByCategory(array);
-				if(array && array.length !== 0) {
+				if (array && array.length !== 0) {
 					setStepCurrent(stepCurrent + 1);
-				}else {
+				} else {
 					setStepCurrent(4);
 				}
 				setLoading(false);
@@ -149,7 +149,7 @@ function Pdv() {
 	}
 
 	const getProductsByCategoryAndFlavor = async (idCategory, idFlavor) => {
-		try{
+		try {
 			await API.get("product/others/" + idCategory + "/" + idFlavor + "/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((product) => {
@@ -171,7 +171,7 @@ function Pdv() {
 	}
 
 	const getProductsByMisto = async (idCategory) => {
-		try{
+		try {
 			let array = [];
 			await API.get("product/others/" + idCategory + "/" + idEstablishment).then((response) => {
 				response.data.forEach((product) => {
@@ -185,7 +185,7 @@ function Pdv() {
 			});
 		} catch (error) {
 			message.error("Erro de comunicação com o servidor! Tente novamente.");
-		}		
+		}
 	}
 
 	const filterProductsMistoPerSize = (products) => {
@@ -238,7 +238,7 @@ function Pdv() {
 			} else if (stepCurrent === 2) {
 				getAdditionalsByCategory(idCategoryOrder);
 				setStepCurrent(stepCurrent + 1);
-			} 
+			}
 			setLoading(false);
 		} else {
 			setLoading(false);
@@ -361,7 +361,7 @@ function Pdv() {
 
 	const getCategoriesActives = async () => {
 		setLoading(true);
-		try{
+		try {
 			API.get("category/actives/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((category) => {
@@ -432,7 +432,7 @@ function Pdv() {
 			id: additional.id,
 			name: additional.name,
 			price: additional.price,
-			quantity: additional.quantity !== 1 ? 1:0
+			quantity: additional.quantity !== 1 ? 1 : 0
 		}
 		let array = [];
 		dataAdditionalsByCategory.forEach((item) => {
@@ -479,7 +479,7 @@ function Pdv() {
 	const insertProductCart_PDV = async (values, valueDiscountCoupom, fkIdCoupom) => {
 		setVisibleModalFinishOrder(false);
 		setLoading(true);
-		try{
+		try {
 			let array = [];
 			let price_order = 0
 			dataProductsCart.forEach((item) => {
@@ -505,14 +505,14 @@ function Pdv() {
 					is_pdv: true
 				}
 			);
-			if(responseProductCart.status === 200){
+			if (responseProductCart.status === 200) {
 				const arrayIdsProducts = responseProductCart.data.ids_products_cart;
 				await createOrder_PDV(arrayIdsProducts, price_order, values, fkIdCoupom);
-			}else{
+			} else {
 				message.error(responseProductCart.data.message);
 				setLoading(false);
 			}
-		}catch (error) {
+		} catch (error) {
 			message.error("Erro de comunicação com o servidor. Tente novamente!");
 			setLoading(false);
 		}
@@ -520,7 +520,7 @@ function Pdv() {
 
 	// SEGUNDA FUNÇÃO A SER CHAMADA
 	const createOrder_PDV = async (ids, price_order, values, fkIdCoupom) => {
-		try{
+		try {
 			const address = `Nome: ${values.name_client};Telefone: ${values.phone_cell};Endereço: ${values.address}`
 			const responseOrder = await API.post("createOrder",
 				{
@@ -551,7 +551,7 @@ function Pdv() {
 
 	// TERCEIRA FUNÇÃO A SER CHAMADA
 	const createOrderProductCart_PDV = async (idsProducts, idOrder) => {
-		try{
+		try {
 			const responseProductOrder = await API.post("createProductsOrder",
 				{
 					id_order: idOrder,
@@ -571,7 +571,7 @@ function Pdv() {
 				message.error(responseProductOrder.data.message);
 				setLoading(false);
 			}
-		}catch (error) {
+		} catch (error) {
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor. Tente novamente!");
 		}
@@ -580,9 +580,9 @@ function Pdv() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite open={expand} current={'pdv'} openCurrent={''} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Ponto de venda'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Row>
@@ -611,7 +611,7 @@ function Pdv() {
 																	</Col>
 																)
 															})
-														:
+															:
 															<EmptyData title='Não possui categorias cadastradas ativas ...' />
 													}
 												</Row>
@@ -632,7 +632,7 @@ function Pdv() {
 																		</Col>
 																	)
 																})
-															:
+																:
 																<EmptyData title='Não possui sabores nessa categoria escolhida ...' />
 														}
 													</Row>
@@ -653,7 +653,7 @@ function Pdv() {
 																			</Col>
 																		)
 																	})
-																:
+																	:
 																	<EmptyData title='Não possui produtos com essa combinação categoria-sabor(es) escolhida ...' />
 															}
 														</Row>
@@ -677,7 +677,7 @@ function Pdv() {
 																					</Col>
 																				)
 																			})
-																		:
+																			:
 																			dataAdditionalsByCategory.map((additional) => {
 																				return (
 																					<Col span={8} key={additional.id}>
@@ -687,7 +687,7 @@ function Pdv() {
 																							quantity={additional.quantity}
 																							isAdditionalDefault={false}
 																							onChangeAdditional={() => onChangeAdditional(additional.id)}
-																							check={additional.quantity !== 0 ? true:false}
+																							check={additional.quantity !== 0 ? true : false}
 																						/>
 																					</Col>
 																				)
@@ -772,7 +772,7 @@ function Pdv() {
 															Seguir
 														</Button>
 													)
-												}	
+												}
 												{
 													stepCurrent !== 0 && stepCurrent !== 3 && (
 														<Button

@@ -71,7 +71,14 @@ function Flavors() {
 				return (
 					<div>
 						<Tooltip placement="top" title='Deletar sabor'>
-							<DeleteOutlined className="icon-table" onClick={() => deleteFlavor(record.key)} />
+							<Popconfirm
+								 title="Tem certeza que deseja deletar ?"
+								 onConfirm={() => deleteFlavor(record.key)}
+								 okText="Sim"
+								 cancelText="Não"
+							 >
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
 						</Tooltip>
 						<Tooltip placement="top" title='Editar sabor'>
 							<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)} />
@@ -83,36 +90,35 @@ function Flavors() {
 	];
 
 	const getFlavors = async () => {
-		try {
-			/*
-			let arrayCategory = [];
+		try {		
+			let arrayCategory = [];	
 			API.get("category/" + idEstablishment).then((response) => {
 				setDataCategory(response.data);
 				arrayCategory = response.data;
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
 			});
-			*/
 
 			API.get("flavor/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((flavor) => {
-					//let category = arrayCategory.filter((item) => item.id_category === flavor.id_category);
+					let nameFromCategory = getCategoryName(flavor.id_category, arrayCategory);
 					array.push({
 						key: flavor.id,
 						code: flavor.code,
 						name: flavor.name_flavor,
 						description: flavor.description || "-",
-						category: "nome da categoria",
-						//category: category[0].name_category,
+						category: nameFromCategory,
 						status: flavor.is_active
 					})
 				})
 				setData(array);
 			}).catch((error) => {
+				console.log("2:"+error);
 				message.error("Erro de comunicação com o servidor.");
 			});
 		} catch (error) {
+			console.log("3:"+error);
 			message.error("Erro de comunicação com o servidor.");
 		}
 	}
@@ -167,6 +173,7 @@ function Flavors() {
 				message.error("Informe o nome do sabor, por favor !");
 			}
 		} catch (error) {
+			console.log(error);
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor, tente novamente!");
 		}
@@ -175,22 +182,28 @@ function Flavors() {
 
 	const setFildsDrawer = (id) => {
 		const line = data.filter((item) => item.key === id)[0];
+		const categoryFromFlavor = dataCategory.filter((item) => item.name_category === line.category)[0]
 		setIdUpdate(id);
 		form.setFieldsValue({
 			name_flavor: line.name,
 			description: line.description,
 			is_active: line.status,
-			category: line.category
+			category: categoryFromFlavor.id_category
 		});
 		setExpandEditRow(!expandEditRow);
+	}
+
+	const getCategoryName = (id, arrayCategory) => {
+		let category = arrayCategory.filter(element => element.id_category === id)[0];
+		return category ? category.name_category:null;
 	}
 
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite onTitle={!expand} open={expand} current={'flavors'} openCurrent={'list'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Listagem de sabores'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Table

@@ -54,7 +54,6 @@ function Products() {
 	const [dataFlavor, setDataFlavor] = useState([]);
 	const [dataUnitMensuration, setDataUnitMensuration] = useState([]);
 	const [dataProduct, setDataProduct] = useState([]);
-
 	const [imageProduct, setImageProduct] = useState(null);
 	const [isUpdateImage, setIsUpdateImage] = useState(false);
 
@@ -135,7 +134,14 @@ function Products() {
 				return (
 					<div>
 						<Tooltip placement="top" title='Deletar produto'>
-							<DeleteOutlined className="icon-table" onClick={() => deleteProduct(record.key)} />
+							<Popconfirm
+								 title="Tem certeza que deseja deletar ?"
+								 onConfirm={() => deleteProduct(record.key)}
+								 okText="Sim"
+								 cancelText="Não"
+							 >
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
 						</Tooltip>
 						<Tooltip placement="top" title='Editar produto'>
 							<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)} />
@@ -165,7 +171,7 @@ function Products() {
 						size_value: product.size_product,
 						id_unit_fk: product.fk_id_unit,
 						size: product.size_product + " (" + product.unit + " - " + product.abreviation + ")",
-						urlImage: product.image ? `http://192.168.0.107:8080/${product.image}`:null
+						urlImage: product.image ? `https://api-master-pizza.herokuapp.com/${product.image}`:null
 					})
 				})
 				setDataProduct(array);
@@ -283,9 +289,9 @@ function Products() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite open={expand} current={'products'} openCurrent={'list'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Listagem de produtos'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Table

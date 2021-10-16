@@ -11,7 +11,7 @@ import {
 function LineChartComponent(props) {
 	return (
 		<LineChart
-			width={950}
+			width={1000}
 			height={500}
 			data={props.data}
 			margin={{

@@ -190,7 +190,7 @@ function ModalFinishOrder(props) {
 										</div>
 									</Col>
 									<Col span={8}>
-										<Form.Item label="*" name="btn">
+										<Form.Item label="" name="btn">
 											<Button
 												shape="round"
 												className="button"

@@ -151,9 +151,9 @@ function MyCompany() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite open={expand} current={'myCompany'} openCurrent={''} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Dados cadastrais'} isHeaderMyCompany={true} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Form

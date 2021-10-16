@@ -20,7 +20,6 @@ import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 const { Content } = Layout;
 
-
 function Clients() {
 	isLoggedAdmin();
 
@@ -67,7 +66,14 @@ function Clients() {
 				return (
 					<div>
 						<Tooltip placement="top" title='Deletar cliente'>
-							<DeleteOutlined className="icon-table" onClick={() => deleteClient(record.key)} />
+							<Popconfirm
+								 title="Tem certeza que deseja deletar ?"
+								 onConfirm={() => deleteClient(record.key)}
+								 okText="Sim"
+								 cancelText="Não"
+							 >
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
 						</Tooltip>
 					</div>
 				)
@@ -125,7 +131,7 @@ function Clients() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite onTitle={!expand} open={expand} current={'clients'} />
 					<Layout className="site-layout">
 						<HeaderSite title={'Clientes cadastrados'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />

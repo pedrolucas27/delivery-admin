@@ -22,15 +22,27 @@ const { Header } = Layout;
 const { Title } = Typography;
 function HeaderSite(props) {
 	const [filterDash, setFilterDash] = useState("day");
+	const [dateTeste, setDateTeste] = useState(moment(props.dateChange, 'DD-MM-YYYY'));
 	function onChangeDateFilter(date, dateString) {
-		if(filterDash === "day"){
+		setDateTeste(date);
+		if (filterDash === "day") {
 			props.filterDataDay(dateString);
-		}else{
+		} else {
 			props.filterDataMonth(dateString);
 		}
 	}
 
-	function onLoggout(){
+	function handleTypeFilterGraph(type) {
+		if (type === "day") {
+			props.filterDataDay(dateTeste._i);
+		} else {
+			let dateFormated = moment(dateTeste).format("MM-YYYY");
+			props.filterDataMonth(dateFormated);
+		}
+		setFilterDash(type);
+	}
+
+	function onLoggout() {
 		localStorage.removeItem('@masterpizza-admin-app/idEstablishment');
 		localStorage.removeItem('@masterpizza-admin-app/token');
 		localStorage.removeItem('@masterpizza-admin-app/idAdmin');
@@ -40,7 +52,7 @@ function HeaderSite(props) {
 	return (
 		<Header style={{ padding: 0, backgroundColor: '#fff' }}>
 			<Row>
-				<Col span={props.isDashboard ? 14:16}>
+				<Col span={16}>
 					{
 						props.expandMenu ? (
 							<MenuUnfoldOutlined className='trigger' onClick={props.updateExpandMenu} />
@@ -50,22 +62,17 @@ function HeaderSite(props) {
 					}
 					<h2 style={{ display: 'inline-block' }}>{props.title}</h2>
 				</Col>
-				<Col span={props.isDashboard ? 10:8}>
-					{/*
-						props.isListView && (
-							<Input className="input-radius" placeholder="Pesquisar por nome, código ..." />
-						)
-					*/}
+				<Col span={8} style={{ float: 'right' }}>
 					{
 						props.isHeaderMyCompany && (
-							<Button 
+							<Button
 								onClick={() => onLoggout()}
-								shape="round" 
+								shape="round"
 								className="button-cancel ac"
 								style={{ marginTop: '15px' }}
 							>
 								Sair da conta
-						    </Button>
+							</Button>
 						)
 					}
 					{
@@ -76,42 +83,49 @@ function HeaderSite(props) {
 										Filtrar por:
 									</Title>
 								</Col>
-								<Col span={8}>
-									<Radio.Group
-								        value={filterDash}
-								        onChange={(e) => setFilterDash(e.target.value)}
-							        >
-							        	<Space >
-							        		<Radio value="day">Dia</Radio>
-								        	<Radio value="month">Mês</Radio>
-							        	</Space>
-							        </Radio.Group>
-								</Col>
-								<Col span={10}>
-									<ConfigProvider locale={ptBR}>
-										{
-											filterDash === "day" ? (
-												<DatePicker 
-													onChange={onChangeDateFilter} 
-													placeholder="Selecione o dia" 
-													defaultValue={moment(props.dateChange, 'DD-MM-YYYY')}
-													format="DD-MM-YYYY" 
-												/>
-											):(
-												<DatePicker onChange={onChangeDateFilter} placeholder="Selecione o mês" picker="month" format="MM-YYYY" />
-											)
-										}
-									</ConfigProvider>
+								<Col span={18}>
+									<Row>
+										<Col span={10}>
+											<Radio.Group
+												value={filterDash}
+												onChange={(e) => handleTypeFilterGraph(e.target.value)}
+											>
+												<Space>
+													<Radio value="day">Dia</Radio>
+													<Radio value="month">Mês</Radio>
+												</Space>
+											</Radio.Group>
+										</Col>
+										<Col span={14}>
+											<ConfigProvider locale={ptBR}>
+												{
+													filterDash === "day" ? (
+														<DatePicker
+															onChange={onChangeDateFilter}
+															placeholder="Selecione o dia"
+															defaultValue={moment(props.dateChange, 'DD-MM-YYYY')}
+															format="DD-MM-YYYY"
+														/>
+													) : (
+														<DatePicker
+															onChange={onChangeDateFilter}
+															placeholder="Selecione o mês"
+															picker="month"
+															format="MM-YYYY"
+														/>
+													)
+												}
+											</ConfigProvider>
+										</Col>
+									</Row>
 								</Col>
 							</Row>
 						)
 					}
 				</Col>
 			</Row>
-
 		</Header>
 	);
 }
 export default HeaderSite;
 
-		

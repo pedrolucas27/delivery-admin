@@ -79,8 +79,15 @@ function Coupons() {
 			render: (__, record) => {
 				return (
 					<div>
-						<Tooltip placement="top" title='Deletar cupom' onClick={() => deleteCoupom(record.key)}>
-							<DeleteOutlined className="icon-table" />
+						<Tooltip placement="top" title='Deletar cupom'>
+							<Popconfirm
+								 title="Tem certeza que deseja deletar ?"
+								 onConfirm={() => deleteCoupom(record.key)}
+								 okText="Sim"
+								 cancelText="Não"
+							 >
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
 						</Tooltip>
 						<Tooltip placement="top" title='Editar cupom'>
 							<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)} />
