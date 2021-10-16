@@ -1,11 +1,14 @@
 const axios = require("axios");
 
 export function maskMoney(value){
-	var v = String(value).replace(/\D/g,'');
-	v = (v/100).toFixed(2) + '';
-	v = v.replace(".", ",");
-	v = v.replace(/(\d)(\d{3})(\d{3}),/g, "$1.$2.$3,");
-	v = v.replace(/(\d)(\d{3}),/g, "$1.$2,");
+	var v = value;
+	if(value){
+		v = String(value).replace(/\D/g,'');
+		v = (v/100).toFixed(2) + '';
+		v = v.replace(".", ",");
+		v = v.replace(/(\d)(\d{3})(\d{3}),/g, "$1.$2.$3,");
+		v = v.replace(/(\d)(\d{3}),/g, "$1.$2,");
+	}
 	return v;
 }
 
@@ -20,8 +23,11 @@ export function maskPhoneCell(value){
 }
 
 export function changeCommaForPoint(value){
-	var v = value.toFixed(2);
-	v = String(v).replace(".", ",");
+	var v = value;
+	if (value){
+		v = value.toFixed(2);
+		v = String(v).replace(".", ",");
+	} 
 	return v;
 }
 
@@ -55,7 +61,7 @@ export function getStorageERP(){
 export async function isLoggedAdmin(){
 	const TOKEN = localStorage.getItem('@masterpizza-admin-app/token');
 	const ID_ADMIN = localStorage.getItem('@masterpizza-admin-app/idAdmin');
-	const API = "http://192.168.0.107:8080/";
+	const API = "https://api-master-pizza.herokuapp.com/";
 	try{
 		await axios.post(API + "adminLogged", {  
 			id: ID_ADMIN

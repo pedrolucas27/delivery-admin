@@ -13,6 +13,7 @@ import {
 	Switch,
 	Form,
 	message,
+	Popconfirm,
 	Spin
 } from 'antd';
 import {
@@ -37,9 +38,7 @@ function FormsPayments() {
 	const [loading, setLoading] = useState(false);
 	useEffect(() => {
 		setLoading(true);
-		
 		getFormsPayments();
-
 		setLoading(false);
 	}, []);
 
@@ -66,7 +65,14 @@ function FormsPayments() {
 				return (
 					<div>
 						<Tooltip placement="top" title='Deletar forma de pagamento'>
-							<DeleteOutlined className="icon-table" onClick={() => deleteFormPayment(record.key)} />
+							<Popconfirm
+								 title="Tem certeza que deseja deletar ?"
+								 onConfirm={() => deleteFormPayment(record.key)}
+								 okText="Sim"
+								 cancelText="Não"
+							 >
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
 						</Tooltip>
 						<Tooltip placement="top" title='Editar forma de pagamento'>
 							<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)} />
@@ -79,7 +85,7 @@ function FormsPayments() {
 
 	const deleteFormPayment = async (id) => {
 		setLoading(true);
-		await API.delete("form_payment/" + id + "/" + idEstablishment).then(response => {
+		API.delete("form_payment/" + id + "/" + idEstablishment).then(response => {
 			if (response.status === 200) {
 				getFormsPayments();
 				setLoading(false);
@@ -95,7 +101,7 @@ function FormsPayments() {
 	}
 
 	const getFormsPayments = async () => {
-		await API.get("form_payment/" + idEstablishment).then((response) => {
+		API.get("form_payment/" + idEstablishment).then((response) => {
 			let array = [];
 			response.data.forEach((formPayment) => {
 				array.push({
@@ -150,9 +156,9 @@ function FormsPayments() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite open={expand} current={'formsPayments'} openCurrent={'list'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Listagem de formas de pagamentos'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Table

@@ -146,7 +146,6 @@ function AddPromotion() {
 		const idProduct = form.getFieldValue("name_product");
 		const pricePromotion = form.getFieldValue("price_promotion");
 		if (idProduct && pricePromotion) {
-			//verificando se o produto selecionado já está na promoção.
 			const flag = dataTable.filter((item) => item.key === idProduct).length !== 0 ? true : false;
 			if (!flag) {
 				const product = dataProductsFilter.filter((item) => item.id_product === idProduct)[0];
@@ -177,7 +176,6 @@ function AddPromotion() {
 	const onSavePromotion = async (values) => {
 		try {
 			setLoading(true);
-			//array de produtos inseridos na promoção
 			let array = [];
 			dataTable.forEach((item) => {
 				array.push({
@@ -226,9 +224,9 @@ function AddPromotion() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite onTitle={!expand} open={expand} current={'addPromotion'} openCurrent={'register'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Cadastro de promoção'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Form layout="vertical" form={form} onFinish={onSavePromotion}>

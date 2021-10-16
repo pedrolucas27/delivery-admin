@@ -13,6 +13,7 @@ import {
 	Table,
 	Spin,
 	message,
+	Popconfirm,
 	Switch,
 	Drawer
 } from 'antd';
@@ -32,7 +33,7 @@ const { Option } = Select;
 const { TextArea } = Input;
 function Promotions() {
 	isLoggedAdmin();
-	
+
 	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [expandEditRow, setExpandEditRow] = useState(false);
@@ -71,7 +72,7 @@ function Promotions() {
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor.");
 		});
-			
+
 	}
 
 	const getProductsByCategoryAndFlavor = async (idFlavor) => {
@@ -96,7 +97,7 @@ function Promotions() {
 			render: (__, record) => {
 				return (
 					<div>
-						{ record.status ? "Ativo" : "Inativo"}
+						{record.status ? "Ativo" : "Inativo"}
 					</div>
 				);
 			}
@@ -108,8 +109,15 @@ function Promotions() {
 			render: (__, record) => {
 				return (
 					<div>
-						<Tooltip placement="top" title='Deletar promoção' onClick={() => deletePromotion(record.key)}>
-							<DeleteOutlined className="icon-table" />
+						<Tooltip placement="top" title='Deletar promoção'>
+							<Popconfirm
+								title="Tem certeza que deseja deletar ?"
+								onConfirm={() => deletePromotion(record.key)}
+								okText="Sim"
+								cancelText="Não"
+							>
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
 						</Tooltip>
 						<Tooltip placement="top" title='Editar promoção' onClick={() => setFildsDrawer(record.key)}>
 							<EditOutlined className="icon-table" />
@@ -179,7 +187,7 @@ function Promotions() {
 			let isNewProduct = dataTable.filter((item) => item.key === key)[0].is_new_product;
 			if (!isNewProduct) {
 				setLoading(true);
-				await API.delete("product-promotion/" + key).then((response) => {
+				API.delete("product-promotion/" + key + "/" + idEstablishment).then((response) => {
 					if (response.status === 200) {
 						setLoading(false);
 						message.success(response.data.message);
@@ -229,7 +237,7 @@ function Promotions() {
 	const deletePromotion = async (id) => {
 		try {
 			setLoading(true);
-			await API.delete("promotion/" + id).then(response => {
+			API.delete("promotion/" + id + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getPromotions();
 					setLoading(false);
@@ -368,9 +376,9 @@ function Promotions() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite open={expand} current={'promotions'} openCurrent={'list'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Listagem das promoções'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Table
@@ -476,10 +484,10 @@ function Promotions() {
 							<Col span={24}>
 								<Button onClick={() => form.submit()} shape="round" className="button ac">
 									Editar
-							    </Button>
+								</Button>
 								<Button onClick={() => setExpandEditRow(!expandEditRow)} shape="round" className="button-cancel ac">
 									Cancelar
-							    </Button>
+								</Button>
 							</Col>
 						</Row>
 					</Form>

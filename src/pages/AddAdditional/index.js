@@ -60,6 +60,7 @@ function AddAdditional() {
 				if (response.status === 200) {
 					message.success(response.data.message);
 					form.resetFields();
+					form.setFieldsValue({ price: maskMoney(0) });
 				} else {
 					message.error(response.data.message);
 				}
@@ -81,9 +82,9 @@ function AddAdditional() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite onTitle={!expand} open={expand} current={'addAdditional'} openCurrent={'register'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Cadastro de adicional'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Form layout="vertical" form={form} onFinish={onSaveAdditional}>
@@ -101,8 +102,7 @@ function AddAdditional() {
 														<Option key={item.code} value={item.id_category}>
 															{item.name_category}
 														</Option>
-													)
-													)
+													))
 												}
 											</Select>
 										</Form.Item>

@@ -13,6 +13,7 @@ import {
 	Upload,
 	Table,
 	message,
+	Popconfirm,
 	Drawer,
 	Tooltip,
 	Spin
@@ -42,7 +43,7 @@ function getBase64(file) {
 
 function Products() {
 	isLoggedAdmin();
-	
+
 	const { idEstablishment } = getStorageERP();
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
@@ -53,7 +54,6 @@ function Products() {
 	const [dataFlavor, setDataFlavor] = useState([]);
 	const [dataUnitMensuration, setDataUnitMensuration] = useState([]);
 	const [dataProduct, setDataProduct] = useState([]);
-
 	const [imageProduct, setImageProduct] = useState(null);
 	const [isUpdateImage, setIsUpdateImage] = useState(false);
 
@@ -75,14 +75,14 @@ function Products() {
 				message.error("Erro de comunicação com o servidor.");
 			});
 			getProducts();
-			setLoading(false);	
+			setLoading(false);
 	}, []);
 
 	const getFlavorsByCategory = async (idCategory) => {
 		setLoading(true);
 		try {
 			form.setFieldsValue({ flavor: null });
-			await API.get("flavor/byCategory/" + idCategory + "/" + idEstablishment).then((response) => {
+			API.get("flavor/byCategory/" + idCategory + "/" + idEstablishment).then((response) => {
 				setDataFlavor(response.data);
 				setLoading(false);
 			}).catch((error) => {
@@ -134,7 +134,14 @@ function Products() {
 				return (
 					<div>
 						<Tooltip placement="top" title='Deletar produto'>
-							<DeleteOutlined className="icon-table" onClick={() => deleteProduct(record.key)} />
+							<Popconfirm
+								 title="Tem certeza que deseja deletar ?"
+								 onConfirm={() => deleteProduct(record.key)}
+								 okText="Sim"
+								 cancelText="Não"
+							 >
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
 						</Tooltip>
 						<Tooltip placement="top" title='Editar produto'>
 							<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)} />
@@ -147,7 +154,7 @@ function Products() {
 
 	const getProducts = async () => {
 		try {
-			await API.get("product/" + idEstablishment).then((response) => {
+			API.get("product/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((product) => {
 					array.push({
@@ -164,7 +171,7 @@ function Products() {
 						size_value: product.size_product,
 						id_unit_fk: product.fk_id_unit,
 						size: product.size_product + " (" + product.unit + " - " + product.abreviation + ")",
-						urlImage: product.image ? `http://192.168.0.107:8080/${product.image}`:null
+						urlImage: product.image ? `https://api-master-pizza.herokuapp.com/${product.image}`:null
 					})
 				})
 				setDataProduct(array);
@@ -179,7 +186,7 @@ function Products() {
 	const deleteProduct = async (id) => {
 		try {
 			setLoading(true);
-			await API.delete("product/" + id).then(response => {
+			API.delete("product/" + id + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getProducts();
 					setLoading(false);
@@ -271,7 +278,7 @@ function Products() {
 		const field = form.getFieldValue("size");
 		form.setFieldsValue({ size: await maskNumer(field) });
 	}
-	
+
 	const uploadButton = (
 		<div className="div-icon-upload">
 			<PlusOutlined />
@@ -282,9 +289,9 @@ function Products() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite open={expand} current={'products'} openCurrent={'list'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Listagem de produtos'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Table

@@ -90,27 +90,23 @@ function AddCategory() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite onTitle={!expand} open={expand} current={'addCategory'} openCurrent={'register'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Cadastro de categoria'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
-
 							<Form layout="vertical" form={form} onFinish={onSaveCategory}>
 								<Row gutter={[8, 0]}>
-
 									<Col span={20}>
 										<Form.Item label="Nome" name="name_category">
 											<Input className="input-radius" />
 										</Form.Item>
 									</Col>
-
 									<Col span={4}>
 										<Form.Item label="Status" name="is_active">
 											<Switch defaultChecked />
 										</Form.Item>
 									</Col>
-
 									<Col span={24}>
 										<Form.Item label="" name="image">
 											<Upload
@@ -123,7 +119,6 @@ function AddCategory() {
 											</Upload>
 										</Form.Item>
 									</Col>
-
 									<Col span={24}>
 										<Button onClick={() => form.submit()} shape="round" className="button ac">
 											Salvar
@@ -149,5 +144,4 @@ function AddCategory() {
 		</div>
 	);
 }
-
 export default AddCategory;

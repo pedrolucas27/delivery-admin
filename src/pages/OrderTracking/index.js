@@ -6,6 +6,7 @@ import 'moment/locale/pt-br';
 import {
 	Layout,
 	message,
+	Popconfirm,
 	Tabs,
 	Table,
 	Tooltip,
@@ -33,7 +34,7 @@ const { Content } = Layout;
 const { TabPane } = Tabs;
 function OrderTracking() {
 	isLoggedAdmin();
-	
+
 	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -81,7 +82,7 @@ function OrderTracking() {
 		},
 		{ title: 'Observação', dataIndex: 'observation', key: 'observation' },
 		{
-			title: 'Valor (R$)',
+			title: 'Valor total (R$)',
 			dataIndex: 'value',
 			key: 'value',
 			render: (__, record) => {
@@ -101,11 +102,16 @@ function OrderTracking() {
 					<div>
 						{
 							tab === "1" && (
+								
 								<Tooltip placement="top" title='Deletar pedido'>
-									<DeleteOutlined 
-										className="icon-table"
-										onClick={() => deleteOrder(record.key)} 
-									/>
+									<Popconfirm
+										title="Tem certeza que deseja deletar ?"
+										onConfirm={() => deleteOrder(record.key)}
+										okText="Sim"
+										cancelText="Não"
+									>
+										<DeleteOutlined className="icon-table" />
+									</Popconfirm>
 								</Tooltip>
 							)
 						}
@@ -131,8 +137,8 @@ function OrderTracking() {
 						}
 						{
 							(tab === "3" || tab === "4") && (
-								<Tooltip 
-									placement="top" 
+								<Tooltip
+									placement="top"
 									title={tab === "3" ? "Gerar nota fiscal e enviar para entrega.":"Gerar nota fiscal novamente."}
 								>
 									<ContainerOutlined
@@ -159,9 +165,8 @@ function OrderTracking() {
 				//imprimir pdf
 				setLoading(false);
 				message.success(response.data.message);
-
 				setTimeout(() => {
-					window.open(`http://192.168.0.107:8080/invoices/${idOrder}`);
+					window.open(`http://192.168.0.110:8080/invoices/${idOrder}`);
 				}, []);
 			}else{
 				setLoading(false);
@@ -176,13 +181,11 @@ function OrderTracking() {
 	const deleteOrder = async (idOrder) => {
 		setLoading(true);
 		try{
-			await API.delete("order/" + idOrder).then(response => {
+			API.delete("order/" + idOrder + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getOrders();
 					setLoading(false);
 					message.success(response.data.message);
-					window.location.href(response.data.pdf);
-					window.open(response.data.pdf, '_blank');
 				} else {
 					setLoading(false);
 					message.error(response.data.message);
@@ -241,7 +244,8 @@ function OrderTracking() {
 							observation: order.observation || "-",
 							addressClient: order.address_client,
 							status: order.status_order,
-							products: order.products
+							products: order.products,
+							additionais: order.additionais
 						});
 					} else if (order.status_order === 1) {
 						arrayInProduction.push({
@@ -253,7 +257,8 @@ function OrderTracking() {
 							observation: order.observation || "-",
 							addressClient: order.address_client,
 							status: order.status_order,
-							products: order.products
+							products: order.products,
+							additionais: order.additionais
 						});
 					}else if(order.status_order === 2){
 						arrayInReadyForDelivery.push({
@@ -265,7 +270,8 @@ function OrderTracking() {
 							observation: order.observation || "-",
 							addressClient: order.address_client,
 							status: order.status_order,
-							products: order.products
+							products: order.products,
+							additionais: order.additionais
 						});
 					} else{
 						arrayInHistoryOfDeliveredOrders.push({
@@ -277,7 +283,8 @@ function OrderTracking() {
 							observation: order.observation || "-",
 							addressClient: order.address_client,
 							status: order.status_order,
-							products: order.products
+							products: order.products,
+							additionais: order.additionais
 						});
 					}
 				})
@@ -299,19 +306,19 @@ function OrderTracking() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite open={expand} current={'orders'} openCurrent={''}/>
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Acompanhamento de pedidos'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Tabs defaultActiveKey="1" size="large" centered onChange={(key) => setTab(key)}>
-								<TabPane 
+								<TabPane
 									tab={
 										<span>
 								          	<IssuesCloseOutlined />
 								          	Pedidos em análise
         								</span>
-        							} 
+        							}
         							key="1"
         						>
 									{
@@ -321,7 +328,12 @@ function OrderTracking() {
 												columns={columns}
 												dataSource={allOrdersInAnalysis}
 												expandable={{
-													expandedRowRender: record => <SpaceInformationOrder addressClient={record.addressClient} products={record.products} />,
+													expandedRowRender: record => 
+														<SpaceInformationOrder 
+															addressClient={record.addressClient} 
+															products={record.products}
+															additionais={record.additionais}
+														/>,
 													rowExpandable: record => record.products.length !== 0,
 												}}
 											/>
@@ -330,13 +342,13 @@ function OrderTracking() {
 										)
 									}
 								</TabPane>
-								<TabPane 
+								<TabPane
 									tab={
 										<span>
 								          	<FieldTimeOutlined />
 								          	Pedidos em produção
         								</span>
-        							}  
+        							}
 									key="2"
 								>
 									{
@@ -355,13 +367,13 @@ function OrderTracking() {
 										)
 									}
 								</TabPane>
-								<TabPane 
+								<TabPane
 									tab={
 										<span>
 								          	<DeliveredProcedureOutlined />
 								          	Pedidos aguardando retirada
         								</span>
-        							} 
+        							}
 									key="3"
 								>
 									{
@@ -380,13 +392,13 @@ function OrderTracking() {
 										)
 									}
 								</TabPane>
-								<TabPane 
+								<TabPane
 									tab={
 										<span>
 								          	<HistoryOutlined />
 								          	Histórico de pedidos entregues
         								</span>
-        							} 
+        							}
 									key="4"
 								>
 									{

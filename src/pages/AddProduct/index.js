@@ -139,9 +139,9 @@ function AddProduct() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite onTitle={!expand} open={expand} current={'addProduct'} openCurrent={'register'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Cadastro de produto'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Form

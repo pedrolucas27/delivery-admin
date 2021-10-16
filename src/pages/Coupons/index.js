@@ -13,6 +13,7 @@ import {
 	Tooltip,
 	Drawer,
 	message,
+	Popconfirm,
 	Spin
 } from 'antd';
 import {
@@ -78,8 +79,15 @@ function Coupons() {
 			render: (__, record) => {
 				return (
 					<div>
-						<Tooltip placement="top" title='Deletar cupom' onClick={() => deleteCoupom(record.key)}>
-							<DeleteOutlined className="icon-table" />
+						<Tooltip placement="top" title='Deletar cupom'>
+							<Popconfirm
+								 title="Tem certeza que deseja deletar ?"
+								 onConfirm={() => deleteCoupom(record.key)}
+								 okText="Sim"
+								 cancelText="Não"
+							 >
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
 						</Tooltip>
 						<Tooltip placement="top" title='Editar cupom'>
 							<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)} />
@@ -118,7 +126,7 @@ function Coupons() {
 	const deleteCoupom = async (id) => {
 		try {
 			setLoading(true);
-			await API.delete("coupom/" + id + "/" + idEstablishment).then(response => {
+			API.delete("coupom/" + id + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getCoupons();
 					setLoading(false);
@@ -159,7 +167,6 @@ function Coupons() {
 				} else {
 					message.error(response.data.message);
 				}
-
 			} else {
 				setLoading(false);
 				message.error("Informe os campos pedidos, por favor !");
@@ -171,19 +178,15 @@ function Coupons() {
 
 	}
 
-
-
 	const setFildsDrawer = (id) => {
 		const line = dataCoupons.filter((item) => item.key === id)[0];
 		setIdUpdate(id);
-
 		form.setFieldsValue({
 			name_coupom: line.name,
 			price: changeCommaForPoint(line.value_discount),
 			is_active: line.status,
 			description: line.description
 		});
-
 		setExpandEditRow(!expandEditRow);
 	}
 

@@ -13,6 +13,7 @@ import {
 	Table,
 	Tooltip,
 	Drawer,
+	Popconfirm,
 	message,
 	Spin
 } from 'antd';
@@ -81,7 +82,14 @@ function Additionals() {
 				return (
 					<div>
 						<Tooltip placement="top" title='Deletar adicional'>
-							<DeleteOutlined className="icon-table" onClick={() => deleteAdditional(record.key)} />
+							<Popconfirm
+								 title="Tem certeza que deseja deletar ?"
+								 onConfirm={() => deleteAdditional(record.key)}
+								 okText="Sim"
+								 cancelText="Não"
+							 >
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
 						</Tooltip>
 						<Tooltip placement="top" title='Editar adicional'>
 							<EditOutlined className="icon-table" onClick={() => setFildsDrawer(record.key)} />
@@ -95,11 +103,12 @@ function Additionals() {
 	const getAdditionals = async () => {
 		try {
 			API.get("category/" + idEstablishment).then((response) => {
+				console.log(response.data);
 				setDataCategory(response.data);
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
 			});
-			await API.get("additional/" + idEstablishment).then((response) => {
+			API.get("additional/" + idEstablishment).then((response) => {
 				let array = [];
 				response.data.forEach((additional) => {
 					array.push({
@@ -109,7 +118,7 @@ function Additionals() {
 						description: additional.description || "-",
 						value: additional.price,
 						status: additional.is_active,
-						id_category: additional.id_category
+						fk_id_category: additional.fk_id_category
 					})
 				})
 				setData(array);
@@ -124,7 +133,7 @@ function Additionals() {
 	const deleteAdditional = async (id) => {
 		setLoading(true);
 		try {
-			await API.delete("additional/" + id).then(response => {
+			API.delete("additional/" + id + "/" + idEstablishment).then(response => {
 				if (response.status === 200) {
 					getAdditionals();
 					setLoading(false);
@@ -185,7 +194,7 @@ function Additionals() {
 			price: changeCommaForPoint(line.value),
 			is_active: line.status,
 			description: line.description,
-			category: line.id_category
+			category: line.fk_id_category
 		});
 		setExpandEditRow(!expandEditRow);
 	}
@@ -198,9 +207,9 @@ function Additionals() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite onTitle={!expand} open={expand} current={'additionals'} openCurrent={'list'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Listagem de adicionais'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Table
@@ -233,8 +242,7 @@ function Additionals() {
 												<Option key={item.id_category} value={item.id_category}>
 													{item.name_category}
 												</Option>
-											)
-											)
+											))
 										}
 									</Select>
 								</Form.Item>

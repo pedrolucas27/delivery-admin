@@ -7,6 +7,7 @@ import {
 	Table,
 	Tooltip,
 	message,
+	Popconfirm,
 	Spin
 } from 'antd';
 import {
@@ -19,10 +20,9 @@ import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 const { Content } = Layout;
 
-
 function Clients() {
 	isLoggedAdmin();
-	
+
 	const { idEstablishment } = getStorageERP();
 	const [expand, setExpand] = useState(false);
 	const [dataClient, setDataClient] = useState([]);
@@ -36,7 +36,7 @@ function Clients() {
 		{ title: 'Código', dataIndex: 'code', key: 'code' },
 		{ title: 'Nome', dataIndex: 'name', key: 'name' },
 		{ title: 'E-mail', dataIndex: 'email', key: 'email' },
-		{ title: 'Telefone celular', dataIndex: 'phoneCell', key: 'phoneCell', 
+		{ title: 'Telefone celular', dataIndex: 'phoneCell', key: 'phoneCell',
 			render: (__, record) => {
 				return (
 					<div>
@@ -44,7 +44,7 @@ function Clients() {
 					</div>
 				);
 			}
-		
+
 		},
 		{
 			title: 'Data de cadastrado',
@@ -66,7 +66,14 @@ function Clients() {
 				return (
 					<div>
 						<Tooltip placement="top" title='Deletar cliente'>
-							<DeleteOutlined className="icon-table" onClick={() => deleteClient(record.key)} />
+							<Popconfirm
+								 title="Tem certeza que deseja deletar ?"
+								 onConfirm={() => deleteClient(record.key)}
+								 okText="Sim"
+								 cancelText="Não"
+							 >
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
 						</Tooltip>
 					</div>
 				)
@@ -77,7 +84,7 @@ function Clients() {
 	const deleteClient = async (idClient) => {
 		setLoading(true);
 		try{
-			const response = await API.delete("client/" + idClient);
+			const response = await API.delete("client/" + idClient + "/" + idEstablishment);
 			setLoading(false);
 			if(response.status === 200){
 				getClients();
@@ -94,7 +101,7 @@ function Clients() {
 	const getClients = async () => {
 		setLoading(true);
 		try{
-			await API.get("client/" + idEstablishment)
+			API.get("client/" + idEstablishment)
 			.then((response) => {
 				let array = [];
 				response.data.forEach((client) => {
@@ -119,12 +126,12 @@ function Clients() {
 			message.error("Erro de comunicação com o servidor.");
 		}
 	}
-	
+
 
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite onTitle={!expand} open={expand} current={'clients'} />
 					<Layout className="site-layout">
 						<HeaderSite title={'Clientes cadastrados'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />

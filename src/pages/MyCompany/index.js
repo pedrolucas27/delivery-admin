@@ -60,7 +60,7 @@ function MyCompany() {
 				setTimeWorkEstablishment(
 					[response.data[0].start_time, response.data[0].end_time]
 				);
-				setImageCompany(`http://192.168.0.107:8080/${response.data[0].image}`);
+				setImageCompany(`https://api-master-pizza.herokuapp.com/${response.data[0].image}`);
 				form.setFieldsValue({
 					name_establishment: response.data[0].name,
 					phone_cell: maskPhoneCell(response.data[0].phone),
@@ -151,9 +151,9 @@ function MyCompany() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite open={expand} current={'myCompany'} openCurrent={''} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Dados cadastrais'} isHeaderMyCompany={true} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Form

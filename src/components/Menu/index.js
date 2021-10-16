@@ -57,14 +57,14 @@ function MenuSite(props) {
               {
                 !props.open ? (
                   <img 
-                    src={`http://192.168.0.107:8080/${image}`} 
+                    src={`https://api-master-pizza.herokuapp.com/${image}`} 
                     alt="logo" 
                     width="100"
                     style={{ borderRadius: '50%' }}
                   />
                 ):(
                   <img 
-                    src={`http://192.168.0.107:8080/${image}`} 
+                    src={`https://api-master-pizza.herokuapp.com/${image}`} 
                     alt="logo" 
                     width="50"
                     style={{ borderRadius: '50%' }}
