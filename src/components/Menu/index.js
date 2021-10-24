@@ -67,7 +67,7 @@ function MenuSite(props) {
                     src={`https://api-master-pizza.herokuapp.com/${image}`} 
                     alt="logo" 
                     width="50"
-                    style={{ borderRadius: '50%' }}
+                    style={{ borderRadius: '20%' }}
                   />
                 )
               }
