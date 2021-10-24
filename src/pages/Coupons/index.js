@@ -198,9 +198,9 @@ function Coupons() {
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
-				<Layout>
+				<Layout className="container-body">
 					<MenuSite onTitle={!expand} open={expand} current={'coupons'} openCurrent={'list'} />
-					<Layout className="site-layout">
+					<Layout>
 						<HeaderSite title={'Listagem de cupons'} isListView={true} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
 							<Table
@@ -212,42 +212,34 @@ function Coupons() {
 						<FooterSite />
 					</Layout>
 				</Layout>
-
 				<Drawer
 					title="Editar cupom"
 					width={720}
 					onClose={() => setExpandEditRow(!expandEditRow)}
 					visible={expandEditRow}
 					bodyStyle={{ paddingBottom: 80 }}>
-
 					<Form layout="vertical" form={form} onFinish={updateCoupom}>
 						<Row gutter={[8, 0]}>
-
 							<Col span={16}>
 								<Form.Item label="Nome" name="name_coupom">
 									<Input className="input-radius" />
 								</Form.Item>
 							</Col>
-
 							<Col span={4}>
 								<Form.Item label="Valor (R$)" name="price">
 									<Input className="input-radius" onKeyUp={handleChangePrice} />
 								</Form.Item>
 							</Col>
-
 							<Col span={4}>
 								<Form.Item label="Status" name="is_active" valuePropName="checked">
 									<Switch />
 								</Form.Item>
 							</Col>
-
 							<Col span={24}>
 								<Form.Item label="Descrição" name="description">
 									<TextArea rows={4} className="input-radius" />
 								</Form.Item>
 							</Col>
-
-
 							<Col span={24}>
 								<Button onClick={() => form.submit()} shape="round" className="button ac">
 									Editar
@@ -256,14 +248,11 @@ function Coupons() {
 									Cancelar
 							    </Button>
 							</Col>
-
 						</Row>
 					</Form>
-
 				</Drawer>
 			</Spin>
 		</div>
 	);
 }
-
 export default Coupons;

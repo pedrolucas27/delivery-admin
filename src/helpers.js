@@ -44,6 +44,15 @@ export function maskNumer(value){
 	return v;
 }
 
+export function maskCep(value){
+	var v = value;
+	if(v){
+		v = v.replace(/\D/g,"");
+	   	v = v.replace(/(\d)(\d{3})$/,"$1-$2");
+	}
+	return v;
+}
+
 export function setTokenIdAdmin(token, idEstablishment, idAdmin){
 	localStorage.setItem('@masterpizza-admin-app/token', token);
 	localStorage.setItem('@masterpizza-admin-app/idEstablishment', idEstablishment);

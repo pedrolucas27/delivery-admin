@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import API from "../../api.js";
-import { getStorageERP, maskPhoneCell } from "../../helpers.js";
+import { 
+	getStorageERP, 
+	maskPhoneCell,
+	maskCep
+} from "../../helpers.js";
 import {
 	Layout,
 	Form,
@@ -92,6 +96,11 @@ function RegisterEstablishment() {
 	const handleChangePhoneCellUserWpp = async () => {
 		const field = form.getFieldValue("user_whatsapp");
 		form.setFieldsValue({ user_whatsapp: await maskPhoneCell(field) });
+	}
+
+	const handleChangeCep = async () => {
+		const field = form.getFieldValue("cep");
+		form.setFieldsValue({ cep: await maskCep(field) });
 	}
 
 	function onChangeTimeWork(time, timeString){
@@ -187,7 +196,7 @@ function RegisterEstablishment() {
 												}
 											]}
 										>
-											<Input className="input-radius" />
+											<Input maxLength={9} className="input-radius" onChange={handleChangeCep} />
 										</Form.Item>
 									</Col>
 									<Col span={5}>
@@ -273,7 +282,16 @@ function RegisterEstablishment() {
 										</Form.Item>
 									</Col>
 									<Col span={24}>
-										<Form.Item label="" name="image">
+										<Form.Item 
+											label="" 
+											name="image"
+											rules={[
+												{
+													required: true,
+													message: "Escolha uma logomarca para seu estabelecimento."
+												}
+											]}
+										>
 											<Upload
 												action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
 												listType="picture-card"

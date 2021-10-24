@@ -12,6 +12,7 @@ import {
 	Typography,
 	Table,
 	Tooltip,
+	Popconfirm
 } from 'antd';
 import {
 	DeleteOutlined
@@ -83,7 +84,14 @@ function Pdv() {
 				return (
 					<div>
 						<Tooltip placement="top" title='Deletar item'>
-							<DeleteOutlined className="icon-table" onClick={() => deleteProductOrder(record.key)} />
+							<Popconfirm
+								 title="Tem certeza que deseja deletar ?"
+								 onConfirm={() => deleteProductOrder(record.key)}
+								 okText="Sim"
+								 cancelText="Não"
+							 >
+								<DeleteOutlined className="icon-table" />
+							</Popconfirm>
 						</Tooltip>
 					</div>
 				)
@@ -98,6 +106,8 @@ function Pdv() {
 		setValueTotalOrder(valueTotalOrder - priceProductRemove);
 		setDataProductsCart(newData);
 		setLoading(false);
+
+		if(newData.length === 0){ backToStart(); }
 	}
 
 	const getFlavorsByCategory = async (idCategory) => {
@@ -223,17 +233,21 @@ function Pdv() {
 					message.warning('Escolha uma categoria para poder seguir.');
 				}
 			} else if (stepCurrent === 1) {
-				if ((nameCategoryChange !== 'PIZZA') && (nameCategoryChange !== 'PIZZAS')) {
-					getProductsByCategoryAndFlavor(idCategoryOrder, idFlavorOrder);
-					setStepCurrent(stepCurrent + 1);
-				} else {
-					if (idsFlavorsProductMisto.length === 1) {
-						getProductsByCategoryAndFlavor(idCategoryOrder, idsFlavorsProductMisto[0]);
+				if(idFlavorOrder !== null || idsFlavorsProductMisto.length !== 0){
+					if ((nameCategoryChange !== 'PIZZA') && (nameCategoryChange !== 'PIZZAS')) {
+						getProductsByCategoryAndFlavor(idCategoryOrder, idFlavorOrder);
 						setStepCurrent(stepCurrent + 1);
 					} else {
-						getProductsByMisto(idCategoryOrder);
-						setStepCurrent(stepCurrent + 1);
+						if (idsFlavorsProductMisto.length === 1) {
+							getProductsByCategoryAndFlavor(idCategoryOrder, idsFlavorsProductMisto[0]);
+							setStepCurrent(stepCurrent + 1);
+						} else {
+							getProductsByMisto(idCategoryOrder);
+							setStepCurrent(stepCurrent + 1);
+						}
 					}
+				} else {
+					message.warning("Escolha ao menos um sabor para poder seguir.");
 				}
 			} else if (stepCurrent === 2) {
 				getAdditionalsByCategory(idCategoryOrder);
@@ -817,7 +831,7 @@ function Pdv() {
 							insertDataOrder={
 								(values, valueDiscountCoupom, fkIdCoupom) => insertProductCart_PDV(values, valueDiscountCoupom, fkIdCoupom)
 							}
-							onCancelSubmitOrder={() => setVisibleAddProductCart(!visibleAddProductCard)}
+							onCancelSubmitOrder={() => setVisibleModalFinishOrder(!visibleModalFinishOrder)}
 						/>
 					</Layout>
 				</Layout>

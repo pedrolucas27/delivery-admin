@@ -79,6 +79,7 @@ function ModalFinishOrder(props) {
 				<Modal
 					title="Adicionar informações do pedido"
 					visible={props.visibleModalFinishOrder}
+					onCancel={() => props.onCancelSubmitOrder()}
 					style={{ top: 10 }}
 					footer={[
 						<Button
@@ -190,7 +191,7 @@ function ModalFinishOrder(props) {
 										</div>
 									</Col>
 									<Col span={8}>
-										<Form.Item label="" name="btn">
+										<Form.Item label=" " name="btn">
 											<Button
 												shape="round"
 												className="button"

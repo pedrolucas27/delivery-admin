@@ -139,7 +139,7 @@ function OrderTracking() {
 							(tab === "3" || tab === "4") && (
 								<Tooltip
 									placement="top"
-									title={tab === "3" ? "Gerar nota fiscal e enviar para entrega.":"Gerar nota fiscal novamente."}
+									title={tab === "3" ? "Gerar nota auxiliar e enviar para entrega.":"Gerar nota auxiliar novamente."}
 								>
 									<ContainerOutlined
 										className="icon-table"
@@ -166,7 +166,7 @@ function OrderTracking() {
 				setLoading(false);
 				message.success(response.data.message);
 				setTimeout(() => {
-					window.open(`http://192.168.0.110:8080/invoices/${idOrder}`);
+					window.open(`https://api-master-pizza.herokuapp.com/invoices/${idOrder}`);
 				}, []);
 			}else{
 				setLoading(false);

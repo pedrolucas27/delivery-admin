@@ -26,8 +26,7 @@ import Coupons from './pages/Coupons';
 import FormsPayments from './pages/FormsPayments';
 import Clients from './pages/Clients';
 
-
-function Routes() {
+const Routes = () => {
     return (
         <BrowserRouter>
             <Switch>
@@ -38,13 +37,11 @@ function Routes() {
                 <Route path="/addPromotion" component={AddPromotion} />
                 <Route path="/addCoupom" component={AddCoupom} />
                 <Route path="/addFormPayment" component={AddFormPayment} />
-
                 <Route path="/pdv" component={Pdv} />
                 <Route path="/orderTracking" component={OrderTracking} />
                 <Route path="/dashboard" component={Dashboard} />
                 <Route path="/registerEstablishment" component={RegisterEstablishment} />
                 <Route path="/myCompany" component={MyCompany} />
-
                 <Route path="/products" component={Products} />
                 <Route path="/categories" component={Categories} />
                 <Route path="/flavors" component={Flavors} />
@@ -53,7 +50,6 @@ function Routes() {
                 <Route path="/coupons" component={Coupons} />
                 <Route path="/formsPayments" component={FormsPayments} />
                 <Route path="/clients" component={Clients} />
-
                 <Route path="/" exact component={Login} />
                 <Route path="*" component={NotFound} />
             </Switch>

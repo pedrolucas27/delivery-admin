@@ -30,6 +30,7 @@ function ModalAddProductCart(props) {
 				<Modal
 					title="Adicionar no carrinho"
 					visible={props.isVisibleAddCart}
+					onCancel={() => props.onCancelProductChange()}
 					footer={[
 						<Button
 							shape="round"
