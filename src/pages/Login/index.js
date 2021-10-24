@@ -13,10 +13,12 @@ import {
 } from 'antd';
 import 'antd/dist/antd.css';
 import './loginAdmin.css';
-import { maskPhoneCell, setTokenIdAdmin } from "../../helpers.js";
+import { maskPhoneCell, setTokenIdAdmin, isLoggedAdmin } from "../../helpers.js";
 import loginImage from "../../images/login_admin.png";
 const { Title } = Typography;
 function Login() {
+	isLoggedAdmin("/");
+
 	const [form] = Form.useForm();
 	const [action, setAction] = useState("login");
 	const [stepRegister, setStepRegister] = useState(1);

@@ -8,7 +8,6 @@ import AddAdditional from './pages/AddAdditional';
 import AddPromotion from './pages/AddPromotion';
 import AddCoupom from './pages/AddCoupom';
 import AddFormPayment from './pages/AddFormPayment';
-
 import Pdv from './pages/Pdv';
 import OrderTracking from './pages/OrderTracking';
 import NotFound from './pages/NotFound';
@@ -16,7 +15,6 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import RegisterEstablishment from './pages/RegisterEstablishment';
 import MyCompany from './pages/MyCompany';
-
 import Products from './pages/Products';
 import Categories from './pages/Categories';
 import Flavors from './pages/Flavors';
@@ -56,5 +54,4 @@ const Routes = () => {
         </BrowserRouter>
     );
 };
-
 export default Routes;
