@@ -8,6 +8,7 @@ import AddAdditional from './pages/AddAdditional';
 import AddPromotion from './pages/AddPromotion';
 import AddCoupom from './pages/AddCoupom';
 import AddFormPayment from './pages/AddFormPayment';
+import AddFreight from './pages/AddFreight';
 import Pdv from './pages/Pdv';
 import OrderTracking from './pages/OrderTracking';
 import NotFound from './pages/NotFound';
@@ -22,6 +23,7 @@ import Additionals from './pages/Additionals';
 import Promotions from './pages/Promotions';
 import Coupons from './pages/Coupons';
 import FormsPayments from './pages/FormsPayments';
+import Freights from './pages/Freights';
 import Clients from './pages/Clients';
 
 const Routes = () => {
@@ -35,6 +37,7 @@ const Routes = () => {
                 <Route path="/addPromotion" component={AddPromotion} />
                 <Route path="/addCoupom" component={AddCoupom} />
                 <Route path="/addFormPayment" component={AddFormPayment} />
+                <Route path="/addFreight" component={AddFreight} />
                 <Route path="/pdv" component={Pdv} />
                 <Route path="/orderTracking" component={OrderTracking} />
                 <Route path="/dashboard" component={Dashboard} />
@@ -48,6 +51,7 @@ const Routes = () => {
                 <Route path="/coupons" component={Coupons} />
                 <Route path="/formsPayments" component={FormsPayments} />
                 <Route path="/clients" component={Clients} />
+                <Route path="/freights" component={Freights} />
                 <Route path="/" exact component={Login} />
                 <Route path="*" component={NotFound} />
             </Switch>

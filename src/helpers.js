@@ -67,19 +67,22 @@ export function getStorageERP() {
 	}
 }
 
-export async function isLoggedAdmin(path) {
+export async function isLoggedAdmin() {
 	const TOKEN = localStorage.getItem('@masterpizza-admin-app/token');
 	const ID_ADMIN = localStorage.getItem('@masterpizza-admin-app/idAdmin');
 	try{
-		const response = await API.post("adminLogged", {
+		API.post("adminLogged", {  
 			id: ID_ADMIN
-		}, {
+		},{
 			headers: { Authorization: 'Bearer '.concat(TOKEN) }
+		}).then((response) => {
+			if(response.status !== 200){
+				window.location.href = "/";	
+			}
+		}).catch((error) => {
+			window.location.href = "/";
 		});
-		if(path){
-			response.status === 200 ? window.location.href = "/dashboard" : window.location.href = "/"
-		}
-	}catch(error){
-		console.log("Usuário não autenticado.");
-	}
+	} catch(error){
+		window.location.href = "/";
+	}	
 }

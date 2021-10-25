@@ -75,20 +75,32 @@ function OrderTracking() {
 			render: (__, record) => {
 				return (
 					<div>
-						{moment(record.dateRequest).format("DD-MM-YYYY [ás] HH:MM:SS")}
+						{moment(record.dateRequest).format("DD-MM-YYYY [ás] HH:mm:ss")}
 					</div>
 				);
 			}
 		},
 		{ title: 'Observação', dataIndex: 'observation', key: 'observation' },
 		{
-			title: 'Valor total (R$)',
+			title: 'Valor do pedido',
 			dataIndex: 'value',
 			key: 'value',
 			render: (__, record) => {
 				return (
 					<div>
-						{changeCommaForPoint(record.value)}
+						R$ {changeCommaForPoint(record.value)}
+					</div>
+				);
+			}
+		},
+		{
+			title: 'Valor do frete',
+			dataIndex: 'freight',
+			key: 'freight',
+			render: (__, record) => {
+				return (
+					<div>
+						R$ {changeCommaForPoint(record.freight)}
 					</div>
 				);
 			}
@@ -102,7 +114,6 @@ function OrderTracking() {
 					<div>
 						{
 							tab === "1" && (
-								
 								<Tooltip placement="top" title='Deletar pedido'>
 									<Popconfirm
 										title="Tem certeza que deseja deletar ?"
@@ -126,7 +137,7 @@ function OrderTracking() {
 							)
 						}
 						{
-							tab !== "3" && tab !== "4" && (
+							(tab === "1" || tab === "2" || tab === "3") && (
 								<Tooltip placement="top" title='Atualizar status do pedido para à próxima etapa'>
 									<RedoOutlined
 										className="icon-table"
@@ -136,7 +147,7 @@ function OrderTracking() {
 							)
 						}
 						{
-							(tab === "3" || tab === "4") && (
+							(tab === "2" || tab === "3" || tab === "4") && (
 								<Tooltip
 									placement="top"
 									title={tab === "3" ? "Gerar nota auxiliar e enviar para entrega.":"Gerar nota auxiliar novamente."}
@@ -144,7 +155,6 @@ function OrderTracking() {
 									<ContainerOutlined
 										className="icon-table"
 										onClick={() => {
-											updateStatusOrder(record.key, true, 2);
 											generateInvoiceOrder(record.key);
 										}}
 									/>
@@ -233,12 +243,14 @@ function OrderTracking() {
 			let arrayInReadyForDelivery = [];
 			let arrayInHistoryOfDeliveredOrders = [];
 			API.get("order/" + idEstablishment).then((response) => {
+				console.log(response);
 				response.data.forEach((order) => {
 					if (order.status_order === 0) {
 						arrayInAnalysis.push({
 							key: order.id_order,
 							code: order.code,
 							value: order.price_final,
+							freight: order.freight,
 							is_pdv: order.is_pdv,
 							dateRequest: order.data_order,
 							observation: order.observation || "-",
@@ -252,6 +264,7 @@ function OrderTracking() {
 							key: order.id_order,
 							code: order.code,
 							value: order.price_final,
+							freight: order.freight,
 							is_pdv: order.is_pdv,
 							dateRequest: order.data_order,
 							observation: order.observation || "-",
@@ -265,6 +278,7 @@ function OrderTracking() {
 							key: order.id_order,
 							code: order.code,
 							value: order.price_final,
+							freight: order.freight,
 							is_pdv: order.is_pdv,
 							dateRequest: order.data_order,
 							observation: order.observation || "-",
@@ -278,6 +292,7 @@ function OrderTracking() {
 							key: order.id_order,
 							code: order.code,
 							value: order.price_final,
+							freight: order.freight,
 							is_pdv: order.is_pdv,
 							dateRequest: order.data_order,
 							observation: order.observation || "-",
@@ -358,7 +373,12 @@ function OrderTracking() {
 												columns={columns}
 												dataSource={allOrdersInProduction}
 												expandable={{
-													expandedRowRender: record => <SpaceInformationOrder addressClient={record.addressClient} products={record.products} />,
+													expandedRowRender: record => 
+														<SpaceInformationOrder 
+															addressClient={record.addressClient} 
+															products={record.products}
+															additionais={record.additionais} 
+														/>,
 													rowExpandable: record => record.products.length !== 0,
 												}}
 											/>
@@ -383,7 +403,12 @@ function OrderTracking() {
 												columns={columns}
 												dataSource={allOrdersInReadyForDelivery}
 												expandable={{
-													expandedRowRender: record => <SpaceInformationOrder addressClient={record.addressClient} products={record.products} />,
+													expandedRowRender: record => 
+														<SpaceInformationOrder 
+															addressClient={record.addressClient} 
+															products={record.products} 
+															additionais={record.additionais}
+														/>,
 													rowExpandable: record => record.products.length !== 0,
 												}}
 											/>
@@ -408,7 +433,12 @@ function OrderTracking() {
 												columns={columns}
 												dataSource={historyOfDeliveredOrders}
 												expandable={{
-													expandedRowRender: record => <SpaceInformationOrder addressClient={record.addressClient} products={record.products} />,
+													expandedRowRender: record => 
+														<SpaceInformationOrder 
+															addressClient={record.addressClient} 
+															products={record.products} 
+															additionais={record.additionais}
+														/>,
 													rowExpandable: record => record.products.length !== 0,
 												}}
 											/>

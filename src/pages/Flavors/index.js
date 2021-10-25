@@ -114,11 +114,9 @@ function Flavors() {
 				})
 				setData(array);
 			}).catch((error) => {
-				console.log("2:"+error);
 				message.error("Erro de comunicação com o servidor.");
 			});
 		} catch (error) {
-			console.log("3:"+error);
 			message.error("Erro de comunicação com o servidor.");
 		}
 	}
@@ -173,7 +171,6 @@ function Flavors() {
 				message.error("Informe o nome do sabor, por favor !");
 			}
 		} catch (error) {
-			console.log(error);
 			setLoading(false);
 			message.error("Erro de comunicação com o servidor, tente novamente!");
 		}

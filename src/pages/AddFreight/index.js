@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
-import { getStorageERP, isLoggedAdmin } from "../../helpers.js";
 import {
 	Layout,
 	Form,
@@ -10,52 +9,47 @@ import {
 	Row,
 	Col,
 	message,
-	Select,
 	Spin
 } from 'antd';
 import 'antd/dist/antd.css';
 import '../../global.css';
+import {
+	maskMoney,
+	getStorageERP,
+	isLoggedAdmin
+} from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
-const { TextArea } = Input;
 const { Content } = Layout;
-const { Option } = Select;
-function AddFlavor() {
+const { TextArea } = Input;
+function AddFreight() {
 	isLoggedAdmin();
 
 	const { idEstablishment } = getStorageERP();
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [dataCategory, setDataCategory] = useState([]);
+
 	useEffect(() => {
-		try {
-			API.get("category/" + idEstablishment).then((response) => {
-				setDataCategory(response.data);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
-		} catch (error) {
-			message.error("Erro de comunicação com o servidor.");
-		}
+		form.setFieldsValue({ price: maskMoney(0) });
 	}, []);
 
-	const onSaveFlavor = async (values) => {
+	const onSaveFreight = async (values) => {
 		try {
 			setLoading(true);
-			if (values.name_flavor && values.category) {
-				const response = await API.post("flavor",
-					{
-						name_flavor: values.name_flavor,
-						description: values.description,
-						is_active: values.is_active !== undefined ? values.is_active : true,
-						id_category: values.category,
-						id_company: idEstablishment
-					}
-				);
+			if (values.name_region && values.price) {
+				const response = await API.post("freight", {
+					name_region: values.name_region,
+					delivery_value: Number(values.price.replace(",", ".")),
+					is_active: values.is_active !== undefined ? values.is_active : true,
+					description: values.description,
+					id_company: idEstablishment
+				});
+
 				setLoading(false);
 				if (response.status === 200) {
+					form.setFieldsValue({ price: maskMoney(0) });
 					message.success(response.data.message);
 					form.resetFields();
 				} else {
@@ -63,7 +57,7 @@ function AddFlavor() {
 				}
 			} else {
 				setLoading(false);
-				message.error("Informe o nome e categoria do sabor, por favor !");
+				message.error("Informe o nome da região e o valor do frete, por favor !");
 			}
 		} catch (error) {
 			setLoading(false);
@@ -71,34 +65,29 @@ function AddFlavor() {
 		}
 	}
 
+	const handleChangePrice = async () => {
+		const field = form.getFieldValue("price");
+		form.setFieldsValue({ price: await maskMoney(field) });
+	}
 
 	return (
 		<div>
 			<Spin size="large" spinning={loading}>
 				<Layout className="container-body">
-					<MenuSite onTitle={!expand} open={expand} current={'addFlavor'} openCurrent={'register'} />
+					<MenuSite onTitle={!expand} open={expand} current={'addFreight'} openCurrent={'register'} />
 					<Layout>
-						<HeaderSite title={'Cadastro de sabor'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
+						<HeaderSite title={'Cadastro de frete'} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
 						<Content className="container-main">
-							<Form layout="vertical" form={form} onFinish={onSaveFlavor}>
+							<Form layout="vertical" form={form} onFinish={onSaveFreight}>
 								<Row gutter={[8, 0]}>
-									<Col span={14}>
-										<Form.Item label="Nome" name="name_flavor">
+									<Col span={16}>
+										<Form.Item label="Nome da região" name="name_region">
 											<Input className="input-radius" />
 										</Form.Item>
 									</Col>
-									<Col span={6}>
-										<Form.Item label="Categoria" name="category">
-											<Select>
-												{
-													dataCategory.map((item) => (
-														<Option key={item.code} value={item.id_category}>
-															{item.name_category}
-														</Option>
-													)
-													)
-												}
-											</Select>
+									<Col span={4}>
+										<Form.Item label="Valor do frete (R$)" name="price">
+											<Input className="input-radius" onKeyUp={handleChangePrice} />
 										</Form.Item>
 									</Col>
 									<Col span={4}>
@@ -129,4 +118,4 @@ function AddFlavor() {
 		</div>
 	);
 }
-export default AddFlavor;
+export default AddFreight;

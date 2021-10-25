@@ -60,14 +60,14 @@ function MenuSite(props) {
                     src={`https://api-master-pizza.herokuapp.com/${image}`} 
                     alt="logo" 
                     width="100"
-                    style={{ borderRadius: '20%' }}
+                    style={{ borderRadius: '50%' }}
                   />
                 ):(
                   <img 
                     src={`https://api-master-pizza.herokuapp.com/${image}`} 
                     alt="logo" 
                     width="50"
-                    style={{ borderRadius: '20%' }}
+                    style={{ borderRadius: '50%' }}
                   />
                 )
               }
@@ -106,6 +106,7 @@ function MenuSite(props) {
           <Menu.Item className="i-menu" key="addCoupom" onClick={() => redirect('/addCoupom')}>Cupom</Menu.Item>
           <Menu.Item className="i-menu" key="addPromotion" onClick={() => redirect('/addPromotion')}>Promoção</Menu.Item>
           <Menu.Item className="i-menu" key="addFormPayment" onClick={() => redirect('/addFormPayment')}>F. de Pagamento</Menu.Item>
+          <Menu.Item className="i-menu" key="addFreight" onClick={() => redirect('/addFreight')}>Frete</Menu.Item>
         </SubMenu>
         <SubMenu className="i-menu" key="list" onTitleClick={() => subMenuChange('list')} icon={<OrderedListOutlined />} title="Listagens">
           <Menu.Item className="i-menu" key="products" onClick={() => redirect('/products')}>Produtos</Menu.Item>
@@ -115,6 +116,7 @@ function MenuSite(props) {
           <Menu.Item className="i-menu" key="coupons" onClick={() => redirect('/coupons')}>Cupons</Menu.Item>
           <Menu.Item className="i-menu" key="promotions" onClick={() => redirect('/promotions')}>Promoções</Menu.Item>
           <Menu.Item className="i-menu" key="formsPayments" onClick={() => redirect('/formsPayments')}>Fs. de Pagamento</Menu.Item>
+          <Menu.Item className="i-menu" key="freights" onClick={() => redirect('/freights')}>Fretes</Menu.Item>
         </SubMenu>
         <Menu.Item className="i-menu" key="myCompany" icon={<ShopOutlined />} onClick={() => redirect('/myCompany')}>
           Dados da empresa

@@ -13,11 +13,35 @@ import {
 } from 'antd';
 import 'antd/dist/antd.css';
 import './loginAdmin.css';
-import { maskPhoneCell, setTokenIdAdmin, isLoggedAdmin } from "../../helpers.js";
+import { 
+	maskPhoneCell, 
+	setTokenIdAdmin,
+	getStorageERP
+} from "../../helpers.js";
 import loginImage from "../../images/login_admin.png";
 const { Title } = Typography;
+
+const isAuthenticated = () => {
+	const { token, idAdmin } = getStorageERP();
+	try{
+		API.post("adminLogged", {  
+			id: idAdmin
+		},{
+			headers: { Authorization: 'Bearer '.concat(token) }
+		}).then((response) => {
+			if(response.status === 200){
+				window.location.href = "/dashboard";	
+			}
+		}).catch((error) => {
+			console.log("Usuário não autenticado.");
+		});
+	} catch(error){
+		console.log("Usuário não autenticado.");
+	}
+}
+
 function Login() {
-	isLoggedAdmin("/");
+	isAuthenticated();
 
 	const [form] = Form.useForm();
 	const [action, setAction] = useState("login");

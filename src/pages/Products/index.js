@@ -350,7 +350,7 @@ function Products() {
 								</Form.Item>
 							</Col>
 							<Col span={3}>
-								<Form.Item label="Tamanho" name="size">
+								<Form.Item label="Tamanho/Volume" name="size">
 									<Input className="input-radius" onKeyUp={handleChangeSize} />
 								</Form.Item>
 							</Col>

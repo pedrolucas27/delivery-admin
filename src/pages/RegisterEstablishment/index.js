@@ -3,7 +3,8 @@ import API from "../../api.js";
 import { 
 	getStorageERP, 
 	maskPhoneCell,
-	maskCep
+	maskCep,
+	maskNumer
 } from "../../helpers.js";
 import {
 	Layout,
@@ -101,6 +102,11 @@ function RegisterEstablishment() {
 	const handleChangeCep = async () => {
 		const field = form.getFieldValue("cep");
 		form.setFieldsValue({ cep: await maskCep(field) });
+	}
+
+	const handleNumberHouse = async () => {
+		const field = form.getFieldValue("number_house");
+		form.setFieldsValue({ number_house: await maskNumer(field) });
 	}
 
 	function onChangeTimeWork(time, timeString){
@@ -252,7 +258,7 @@ function RegisterEstablishment() {
 												}
 											]}
 										>
-											<Input className="input-radius" />
+											<Input className="input-radius" onChange={handleNumberHouse} />
 										</Form.Item>
 									</Col>
 									<Col span={24}>

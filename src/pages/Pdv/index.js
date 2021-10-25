@@ -490,7 +490,7 @@ function Pdv() {
 	}
 
 	// PRIMEIRRA FUNÇÃO A SER CHAMADA
-	const insertProductCart_PDV = async (values, valueDiscountCoupom, fkIdCoupom) => {
+	const insertProductCart_PDV = async (values, freight, valueDiscountCoupom, fkIdCoupom) => {
 		setVisibleModalFinishOrder(false);
 		setLoading(true);
 		try {
@@ -521,7 +521,7 @@ function Pdv() {
 			);
 			if (responseProductCart.status === 200) {
 				const arrayIdsProducts = responseProductCart.data.ids_products_cart;
-				await createOrder_PDV(arrayIdsProducts, price_order, values, fkIdCoupom);
+				await createOrder_PDV(arrayIdsProducts, price_order, freight, values, fkIdCoupom);
 			} else {
 				message.error(responseProductCart.data.message);
 				setLoading(false);
@@ -533,13 +533,15 @@ function Pdv() {
 	}
 
 	// SEGUNDA FUNÇÃO A SER CHAMADA
-	const createOrder_PDV = async (ids, price_order, values, fkIdCoupom) => {
+	const createOrder_PDV = async (ids, price_order, freight, values, fkIdCoupom) => {
 		try {
-			const address = `Nome: ${values.name_client};Telefone: ${values.phone_cell};Endereço: ${values.address}`
+			let fields_address = `${values.street},${values.district},${values.number_house}`;
+			const address = `Nome: ${values.name_client};Telefone: ${values.phone_cell};Endereço: ${fields_address}`
 			const responseOrder = await API.post("createOrder",
 				{
-					price: price_order,
+					amount_paid: values.amount_paid ? Number(values.amount_paid.replace(",", ".")):0,
 					price_final: price_order,
+					freight: freight,
 					status_order: 0,
 					observation: values.observation || null,
 					address_client: String(address),
@@ -828,8 +830,9 @@ function Pdv() {
 						/>
 						<ModalFinishOrder
 							visibleModalFinishOrder={visibleModalFinishOrder}
+							valueOrder={valueTotalOrder}
 							insertDataOrder={
-								(values, valueDiscountCoupom, fkIdCoupom) => insertProductCart_PDV(values, valueDiscountCoupom, fkIdCoupom)
+								(values, freight, valueDiscountCoupom, fkIdCoupom) => insertProductCart_PDV(values, freight, valueDiscountCoupom, fkIdCoupom)
 							}
 							onCancelSubmitOrder={() => setVisibleModalFinishOrder(!visibleModalFinishOrder)}
 						/>

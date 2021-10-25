@@ -38,7 +38,7 @@ function getBase64(file) {
 
 function AddProduct() {
 	isLoggedAdmin();
-	
+
 	const { idEstablishment } = getStorageERP();
 	const [form] = Form.useForm();
 	const [expand, setExpand] = useState(false);
@@ -48,17 +48,17 @@ function AddProduct() {
 	const [loading, setLoading] = useState(false);
 	const [imageProduct, setImageProduct] = useState(null);
 	useEffect(() => {
-			form.setFieldsValue({ size: 1, price_product: maskMoney(0) });
-			API.get("unitMensuration").then((response) => {
-				setDataUnitMensuration(response.data);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor, tente novamente !");
-			});
-			API.get("category/"+idEstablishment).then((response) => {
-				setDataCategory(response.data);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor, tente novamente !");
-			});
+		form.setFieldsValue({ size: 1, price_product: maskMoney(0) });
+		API.get("unitMensuration").then((response) => {
+			setDataUnitMensuration(response.data);
+		}).catch((error) => {
+			message.error("Erro de comunicação com o servidor, tente novamente !");
+		});
+		API.get("category/" + idEstablishment).then((response) => {
+			setDataCategory(response.data);
+		}).catch((error) => {
+			message.error("Erro de comunicação com o servidor, tente novamente !");
+		});
 	}, []);
 
 	const getFlavorsByCategory = async (idCategory) => {
@@ -189,7 +189,7 @@ function AddProduct() {
 										</Form.Item>
 									</Col>
 									<Col span={3}>
-										<Form.Item label="Tamanho" name="size">
+										<Form.Item label="Tamanho/Volume" name="size">
 											<Input className="input-radius" onKeyUp={handleChangeSize} />
 										</Form.Item>
 									</Col>
@@ -232,10 +232,10 @@ function AddProduct() {
 									<Col span={24}>
 										<Button onClick={() => form.submit()} shape="round" className="button ac">
 											Salvar
-								    	</Button>
+										</Button>
 										<Button onClick={() => { form.resetFields() }} shape="round" className="button-cancel ac">
 											Cancelar
-									    </Button>
+										</Button>
 									</Col>
 								</Row>
 							</Form>
@@ -247,4 +247,5 @@ function AddProduct() {
 		</div>
 	);
 }
+
 export default AddProduct;
