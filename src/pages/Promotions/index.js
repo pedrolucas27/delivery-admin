@@ -15,7 +15,8 @@ import {
 	message,
 	Popconfirm,
 	Switch,
-	Drawer
+	Drawer,
+	Typography
 } from 'antd';
 import 'antd/dist/antd.css';
 import '../../global.css';
@@ -31,6 +32,7 @@ import ListProductsPromotion from "../../components/ListProductsPromotion";
 const { Content } = Layout;
 const { Option } = Select;
 const { TextArea } = Input;
+const { Title } = Typography;
 function Promotions() {
 	isLoggedAdmin();
 
@@ -388,6 +390,11 @@ function Promotions() {
 								expandable={{
 									expandedRowRender: record => <ListProductsPromotion dataProducts={record.products} />,
 									rowExpandable: record => record.products.length !== 0,
+								}}
+								locale={{ 
+									emptyText: (
+										<Title level={4} style={{ margin: 30 }}>Não existe promoções cadastradas.</Title>
+									)
 								}}
 							/>
 						</Content>

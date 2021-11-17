@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from "react";
 import moment from "moment";
 import API from "../../api.js";
-import { getStorageERP, maskPhoneCell, isLoggedAdmin } from "../../helpers.js";
+import { 
+	getStorageERP, 
+	maskPhoneCell, 
+	isLoggedAdmin 
+} from "../../helpers.js";
 import {
 	Layout,
 	Table,
 	Tooltip,
 	message,
 	Popconfirm,
-	Spin
+	Spin,
+	Typography
 } from 'antd';
 import {
 	DeleteOutlined
@@ -19,7 +24,7 @@ import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 const { Content } = Layout;
-
+const { Title } = Typography;
 function Clients() {
 	isLoggedAdmin();
 
@@ -140,6 +145,11 @@ function Clients() {
 								size="middle"
 								columns={columns}
 								dataSource={dataClient}
+								locale={{ 
+									emptyText: (
+										<Title level={4} style={{ margin: 30 }}>Não existe clientes cadastrados no Delivery.</Title>
+									)
+								}}
 							/>
 						</Content>
 						<FooterSite />

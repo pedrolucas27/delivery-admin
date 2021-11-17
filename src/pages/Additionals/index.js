@@ -15,7 +15,8 @@ import {
 	Drawer,
 	Popconfirm,
 	message,
-	Spin
+	Spin,
+	Typography
 } from 'antd';
 import {
 	DeleteOutlined,
@@ -29,6 +30,7 @@ import FooterSite from "../../components/Footer";
 const { Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
+const { Title } = Typography;
 function Additionals() {
 	isLoggedAdmin();
 
@@ -103,7 +105,6 @@ function Additionals() {
 	const getAdditionals = async () => {
 		try {
 			API.get("category/" + idEstablishment).then((response) => {
-				console.log(response.data);
 				setDataCategory(response.data);
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
@@ -216,6 +217,11 @@ function Additionals() {
 								size="middle"
 								columns={columns}
 								dataSource={data}
+								locale={{ 
+									emptyText: (
+										<Title level={4} style={{ margin: 30 }}>Não existe adicionais cadastrados.</Title>
+									)
+								}}
 							/>
 						</Content>
 						<FooterSite />

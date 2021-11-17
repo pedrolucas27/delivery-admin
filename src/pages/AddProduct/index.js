@@ -218,7 +218,16 @@ function AddProduct() {
 										</Form.Item>
 									</Col>
 									<Col span={24}>
-										<Form.Item label="" name="image">
+										<Form.Item 
+											label="" 
+											name="image"
+											rules={[
+												{
+													required: true,
+													message: "Escolha uma imagem para o produto."
+												}
+											]}
+										>
 											<Upload
 												action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
 												listType="picture-card"

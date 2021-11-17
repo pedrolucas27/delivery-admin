@@ -14,7 +14,8 @@ import {
 	Drawer,
 	message,
 	Popconfirm,
-	Spin
+	Spin,
+	Typography
 } from 'antd';
 import {
 	DeleteOutlined,
@@ -27,6 +28,7 @@ import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 const { Content } = Layout;
 const { TextArea } = Input;
+const { Title } = Typography;
 function Coupons() {
 	isLoggedAdmin();
 
@@ -207,6 +209,11 @@ function Coupons() {
 								size="middle"
 								columns={columns}
 								dataSource={dataCoupons}
+								locale={{ 
+									emptyText: (
+										<Title level={4} style={{ margin: 30 }}>Não existe cupons cadastrados.</Title>
+									)
+								}}
 							/>
 						</Content>
 						<FooterSite />

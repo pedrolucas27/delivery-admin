@@ -23,9 +23,13 @@ function MenuSite(props) {
     const { idAdmin } = getStorageERP();
     API.get("establishment-admin/" + idAdmin).then((response) => {
       setImage(response.data[0].image);
-      setCompany(response.data[0]);
+      if(response.data[0]){
+        setCompany(response.data[0]);
+      }else{
+        window.location.href = "/registerEstablishment";
+      }
     }).catch((error) => {
-       console.log("Errorrrrr");
+      window.location.href = "/";
     });
 
     if(props.openCurrent !== ''){

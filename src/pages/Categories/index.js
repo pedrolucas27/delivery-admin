@@ -15,7 +15,8 @@ import {
 	message,
 	Popconfirm,
 	Upload,
-	Spin
+	Spin,
+	Typography
 } from 'antd';
 import {
 	DeleteOutlined,
@@ -28,7 +29,7 @@ import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
 const { Content } = Layout;
-
+const { Title } = Typography;
 function getBase64(file) {
 	return new Promise((resolve, reject) => {
 		const reader = new FileReader();
@@ -219,6 +220,11 @@ function Categories() {
 								size="middle"
 								columns={columns}
 								dataSource={dataCategory}
+								locale={{ 
+									emptyText: (
+										<Title level={4} style={{ margin: 30 }}>Não existe categorias cadastradas.</Title>
+									)
+								}}
 							/>
 						</Content>
 						<FooterSite />

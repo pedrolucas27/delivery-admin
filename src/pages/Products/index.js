@@ -16,7 +16,8 @@ import {
 	Popconfirm,
 	Drawer,
 	Tooltip,
-	Spin
+	Spin,
+	Typography
 } from 'antd';
 import {
 	DeleteOutlined,
@@ -31,7 +32,7 @@ import FooterSite from "../../components/Footer";
 const { Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
-
+const { Title } = Typography;
 function getBase64(file) {
 	return new Promise((resolve, reject) => {
 		const reader = new FileReader();
@@ -61,11 +62,6 @@ function Products() {
 			setLoading(true);
 			API.get("category/" + idEstablishment).then((response) => {
 				setDataCategory(response.data);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
-			API.get("flavor/" + idEstablishment).then((response) => {
-				setDataFlavor(response.data);
 			}).catch((error) => {
 				message.error("Erro de comunicação com o servidor.");
 			});
@@ -247,6 +243,7 @@ function Products() {
 	const setFildsDrawer = (id) => {
 		const line = dataProduct.filter((item) => item.key === id)[0];
 		setIdUpdate(id);
+		getFlavorsByCategory(line.id_category);
 		if(line.urlImage){
 			setImageProduct(line.urlImage);
 		}
@@ -298,6 +295,11 @@ function Products() {
 								size="middle"
 								columns={columns}
 								dataSource={dataProduct}
+								locale={{ 
+									emptyText: (
+										<Title level={4} style={{ margin: 30 }}>Não existe produtos cadastrados.</Title>
+									)
+								}}
 							/>
 						</Content>
 						<FooterSite />

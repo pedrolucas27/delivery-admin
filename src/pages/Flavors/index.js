@@ -15,7 +15,8 @@ import {
 	Spin,
 	Select,
 	message,
-	Popconfirm
+	Popconfirm,
+	Typography
 } from 'antd';
 import {
 	DeleteOutlined,
@@ -29,6 +30,7 @@ import FooterSite from "../../components/Footer";
 const { Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
+const { Title } = Typography;
 function Flavors() {
 	isLoggedAdmin();
 
@@ -108,7 +110,7 @@ function Flavors() {
 						code: flavor.code,
 						name: flavor.name_flavor,
 						description: flavor.description || "-",
-						category: nameFromCategory,
+						category: nameFromCategory && nameFromCategory,
 						status: flavor.is_active
 					})
 				})
@@ -207,6 +209,11 @@ function Flavors() {
 								size="middle"
 								columns={columns}
 								dataSource={data}
+								locale={{ 
+									emptyText: (
+										<Title level={4} style={{ margin: 30 }}>Não existe sabores cadastrados.</Title>
+									)
+								}}
 							/>
 						</Content>
 						<FooterSite />

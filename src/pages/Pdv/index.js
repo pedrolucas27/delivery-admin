@@ -213,7 +213,7 @@ function Pdv() {
 						id_2: productsFlavorTwo[j].id_product,
 						name: "Pizza: 1/2 " + productsFlavorOne[i].name_flavor + " + 1/2 " + productsFlavorTwo[j].name_flavor,
 						description: "Produto misto.",
-						price: parseFloat(productsFlavorOne[i].price + productsFlavorTwo[j].price),
+						price: productsFlavorOne[i].price > productsFlavorTwo[j].price ? parseFloat(productsFlavorOne[i].price):parseFloat(productsFlavorTwo[j].price),
 						size: productsFlavorOne[i].size_product + " (" + productsFlavorOne[i].unit + " - " + productsFlavorOne[i].abreviation + ")"
 					});
 				}
@@ -439,7 +439,7 @@ function Pdv() {
 		setDataAdditionalsByCategory(array);
 	}
 
-	//especificamente para pizza (no caso o adicional seria a borda).
+	//Especificamente para pizza (no caso o adicional seria a borda).
 	const onChangeAdditional = (id) => {
 		const additional = dataAdditionalsByCategory.filter((item) => item.id === id)[0];
 		const newAdditional = {

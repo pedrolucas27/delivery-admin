@@ -14,7 +14,8 @@ import {
 	Form,
 	message,
 	Popconfirm,
-	Spin
+	Spin,
+	Typography
 } from 'antd';
 import {
 	DeleteOutlined,
@@ -25,7 +26,8 @@ import '../../global.css';
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
-const { Content } = Layout;
+const { Content } = Layout; 
+const { Title } = Typography;
 function FormsPayments() {
 	isLoggedAdmin();
 
@@ -165,6 +167,11 @@ function FormsPayments() {
 								size="middle"
 								columns={columns}
 								dataSource={dataFormPayment}
+								locale={{ 
+									emptyText: (
+										<Title level={4} style={{ margin: 30 }}>Não existe formas de pagamento cadastradas.</Title>
+									)
+								}}
 							/>
 						</Content>
 						<FooterSite />

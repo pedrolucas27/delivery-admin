@@ -78,6 +78,11 @@ export async function isLoggedAdmin() {
 		}).then((response) => {
 			if(response.status !== 200){
 				window.location.href = "/";	
+			}else{
+				if(response.data.hasEstablishment === false){
+					localStorage.clear();
+					window.location.href = "/";
+				}
 			}
 		}).catch((error) => {
 			window.location.href = "/";

@@ -72,6 +72,7 @@ function OrderTracking() {
 			title: 'Data',
 			dataIndex: 'dateRequest',
 			key: 'dateRequest',
+			sorter: (a, b) => new Date(a.dateRequest) - new Date(b.dateRequest),
 			render: (__, record) => {
 				return (
 					<div>
@@ -243,7 +244,6 @@ function OrderTracking() {
 			let arrayInReadyForDelivery = [];
 			let arrayInHistoryOfDeliveredOrders = [];
 			API.get("order/" + idEstablishment).then((response) => {
-				console.log(response);
 				response.data.forEach((order) => {
 					if (order.status_order === 0) {
 						arrayInAnalysis.push({
@@ -351,6 +351,7 @@ function OrderTracking() {
 														/>,
 													rowExpandable: record => record.products.length !== 0,
 												}}
+												showSorterTooltip={false}
 											/>
 										):(
 											<EmptyData title='Não existe pedido (s) em análise no momento ...' />
@@ -381,6 +382,7 @@ function OrderTracking() {
 														/>,
 													rowExpandable: record => record.products.length !== 0,
 												}}
+												showSorterTooltip={false}
 											/>
 										):(
 											<EmptyData title='Não existe pedido (s) em produção no momento ...' />
@@ -411,6 +413,7 @@ function OrderTracking() {
 														/>,
 													rowExpandable: record => record.products.length !== 0,
 												}}
+												showSorterTooltip={false}
 											/>
 										):(
 											<EmptyData title='Não existe pedido (s) aguardando retirada no momento ...' />
@@ -441,6 +444,7 @@ function OrderTracking() {
 														/>,
 													rowExpandable: record => record.products.length !== 0,
 												}}
+												showSorterTooltip={false}
 											/>
 										):(
 											<EmptyData title='Histórico de pedidos está vázio ...' />
