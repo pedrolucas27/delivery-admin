@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import API from "../../api.js";
+import API, { API_SOCKET } from "../../api.js";
 import { changeCommaForPoint, isLoggedAdmin, getStorageERP } from "../../helpers.js";
 import moment from "moment";
 import 'moment/locale/pt-br';
@@ -51,7 +51,7 @@ function OrderTracking() {
 
 	const [checkDeliveryOrder, setCheckDeliveryOrder] = useState(null);
 
-	const socket = io(API);
+	const socket = io(API_SOCKET);
 	socket.on("pedidorealizadoserver", (data) => {
 		setCheckDeliveryOrder(data);
 
@@ -61,6 +61,7 @@ function OrderTracking() {
 
 	useEffect(() => {
 		getOrders();
+		console.log(sound)
 		setCheckDeliveryOrder(null);
 	}, [checkDeliveryOrder]);
 
