@@ -61,7 +61,6 @@ function OrderTracking() {
 
 	useEffect(() => {
 		getOrders();
-		console.log(sound)
 		setCheckDeliveryOrder(null);
 	}, [checkDeliveryOrder]);
 
@@ -149,7 +148,7 @@ function OrderTracking() {
 								<Tooltip placement="top" title='Atualizar status do pedido para uma etapa anterior'>
 									<UndoOutlined
 										className="icon-table"
-										onClick={() => updateStatusOrder(record.key, false, record.status)}
+										onClick={() => updateStatusOrder(record.key, record.id_client_fk, false, record.status)}
 									/>
 								</Tooltip>
 							)
@@ -159,7 +158,7 @@ function OrderTracking() {
 								<Tooltip placement="top" title='Atualizar status do pedido para à próxima etapa'>
 									<RedoOutlined
 										className="icon-table"
-										onClick={() => updateStatusOrder(record.key, true, record.status)}
+										onClick={() => updateStatusOrder(record.key, record.id_client_fk, true, record.status)}
 									/>
 								</Tooltip>
 							)
@@ -227,7 +226,7 @@ function OrderTracking() {
 		}
 	}
 
-	const updateStatusOrder = async (idOrder, flag, status) => {
+	const updateStatusOrder = async (idOrder, idClient, flag, status) => {
 		setLoading(true);
 		const newStatus = flag ? (status + 1) : (status - 1)
 		try {
@@ -241,7 +240,7 @@ function OrderTracking() {
 			if (response.status === 200) {
 				getOrders();
 
-				socket.emit("pedidostatus", { msg: "Envio do status do pedido para o delivery" });
+				socket.emit("pedidostatus", { id_client: idClient });
 				setTimeout(() => {
 					setLoading(false);
 					message.success(response.data.message);
@@ -264,8 +263,10 @@ function OrderTracking() {
 			let arrayInHistoryOfDeliveredOrders = [];
 			API.get("order/" + idEstablishment).then((response) => {
 				response.data.forEach((order) => {
+					console.log(response.data)
 					if (order.status_order === 0) {
 						arrayInAnalysis.push({
+							id_client_fk: order.id_client_fk,
 							key: order.id_order,
 							code: order.code,
 							value: order.price_final,
@@ -280,6 +281,7 @@ function OrderTracking() {
 						});
 					} else if (order.status_order === 1) {
 						arrayInProduction.push({
+							id_client_fk: order.id_client_fk,
 							key: order.id_order,
 							code: order.code,
 							value: order.price_final,
@@ -294,6 +296,7 @@ function OrderTracking() {
 						});
 					} else if (order.status_order === 2) {
 						arrayInReadyForDelivery.push({
+							id_client_fk: order.id_client_fk,
 							key: order.id_order,
 							code: order.code,
 							value: order.price_final,
@@ -308,6 +311,7 @@ function OrderTracking() {
 						});
 					} else {
 						arrayInHistoryOfDeliveredOrders.push({
+							id_client_fk: order.id_client_fk,
 							key: order.id_order,
 							code: order.code,
 							value: order.price_final,
