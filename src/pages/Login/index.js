@@ -13,8 +13,8 @@ import {
 } from 'antd';
 import 'antd/dist/antd.css';
 import './loginAdmin.css';
-import { 
-	maskPhoneCell, 
+import {
+	maskPhoneCell,
 	setTokenIdAdmin,
 	getStorageERP
 } from "../../helpers.js";
@@ -23,19 +23,19 @@ const { Title } = Typography;
 
 const isAuthenticated = () => {
 	const { token, idAdmin } = getStorageERP();
-	try{
-		API.post("adminLogged", {  
+	try {
+		API.post("adminLogged", {
 			id: idAdmin
-		},{
+		}, {
 			headers: { Authorization: 'Bearer '.concat(token) }
 		}).then((response) => {
-			if(response.status === 200){
-				window.location.href = "/dashboard";	
+			if (response.status === 200) {
+				window.location.href = "/dashboard";
 			}
 		}).catch((error) => {
 			console.log("Usuário não autenticado.");
 		});
-	} catch(error){
+	} catch (error) {
 		console.log("Usuário não autenticado.");
 	}
 }
@@ -49,30 +49,30 @@ function Login() {
 	const [loading, setLoading] = useState(false);
 	const updateStepRegister = (flag) => {
 		setLoading(true);
-		if(flag === 0){
+		if (flag === 0) {
 			setLoading(false);
-			if(stepRegister === 1){
+			if (stepRegister === 1) {
 				setAction("login");
-			}else{
+			} else {
 				setStepRegister(stepRegister - 1);
 			}
-		}else{
-			if(stepRegister === 1){
+		} else {
+			if (stepRegister === 1) {
 				setLoading(false);
-				if(form.getFieldValue("name_u") && form.getFieldValue("phone")){
+				if (form.getFieldValue("name_u") && form.getFieldValue("phone")) {
 					setStepRegister(stepRegister + 1);
 				} else {
 					message.error("Preencha todos os campos pedidos.");
 				}
-			}else{
+			} else {
 				setLoading(false);
-				if(form.getFieldValue("email") && form.getFieldValue("password")){
-					if(form.getFieldValue("password") === form.getFieldValue("password_confirm")){
+				if (form.getFieldValue("email") && form.getFieldValue("password")) {
+					if (form.getFieldValue("password") === form.getFieldValue("password_confirm")) {
 						registerAdmin();
-					}else{
+					} else {
 						message.error("Senhas incompatíveis.");
 					}
-				}else{
+				} else {
 					message.error("Preencha todos os campos pedidos.");
 				}
 			}
@@ -87,52 +87,52 @@ function Login() {
 			password: form.getFieldValue("password"),
 			phone: form.getFieldValue("phone")
 		}
-		try{
+		try {
 			const response = await API.post("createAccount/admin", admin);
 			setLoading(false);
-			if(response.status === 200){
+			if (response.status === 200) {
 				message.success(response.data.message);
 				window.location.reload(true);
-			}else{
+			} else {
 				message.error(response.data.message);
 			}
-		}catch(error){
+		} catch (error) {
 			setLoading(false);
 			message.error("Erro ao tentar realizar cadastrado.");
 		}
 	}
 
 	const authenticationAdmin = async (values) => {
-		if(values.username && values.password_auth){
+		if (values.username && values.password_auth) {
 			setLoading(true);
-			try{
+			try {
 				const response = await API.post("authentication/admin", { user: values.username, password: values.password_auth });
 				setLoading(false);
-				if(response.status === 200){
+				if (response.status === 200) {
 					message.success(response.data.message);
-					if(response.data.id_establishment){
+					if (response.data.id_establishment) {
 						setTokenIdAdmin(
-							response.data.token, 
+							response.data.token,
 							response.data.id_establishment,
 							response.data.idAdmin
 						);
 						window.location.href = "/dashboard";
-					}else{
+					} else {
 						setTokenIdAdmin(
-							response.data.token, 
+							response.data.token,
 							null,
 							response.data.idAdmin
 						);
 						window.location.href = "/registerEstablishment";
 					}
-				}else{
+				} else {
 					message.error(response.data.message);
 				}
-			}catch(error){
+			} catch (error) {
 				setLoading(false);
 				message.error("Erro ao tentar realizar login.");
 			}
-		}else{
+		} else {
 			message.error("Preencha todos os campos antes de tentar realizar login.");
 		}
 	}
@@ -174,25 +174,25 @@ function Login() {
 															block
 														>
 															Entrar
-											        	</Button>
+														</Button>
 													</Col>
 												</Row>
 											</Form.Item>
 										</Form>
 										<Row>
 											<Col span={24}>
-												<Button 
+												<Button
 													onClick={() => setAction("register")}
-													style={{ marginTop: "5px", color: "#D62828" }} 
-													type="link" 
+													style={{ marginTop: "5px", color: "#D62828" }}
+													type="link"
 													block
 												>
-			      									Não possui conta ? Registre-se.
-			    								</Button>		
+													Não possui conta ? Registre-se.
+												</Button>
 											</Col>
 										</Row>
 									</Card>
-								):(
+								) : (
 									<Card title={<Title level={3}>Cadastro</Title>} className="card-login-admin">
 										<Form layout="vertical" form={form}>
 											{
@@ -202,15 +202,15 @@ function Login() {
 															<Input className="input-radius" placeholder="Ex.: João" />
 														</Form.Item>
 														<Form.Item name="phone" label="Telefone celular">
-															<Input 
-																maxLength={15} 
-																className="input-radius" 
+															<Input
+																maxLength={15}
+																className="input-radius"
 																placeholder="Ex.: (84) 9 9999-9999"
-																onChange={handleChangePhoneCell} 
+																onChange={handleChangePhoneCell}
 															/>
 														</Form.Item>
 													</div>
-												):(
+												) : (
 													<div>
 														<Form.Item name="email" label="E-mail">
 															<Input className="input-radius" placeholder="Ex.: joao@gmail.com" />
@@ -233,8 +233,8 @@ function Login() {
 															style={{ marginTop: "10px" }}
 															onClick={() => updateStepRegister(0)}
 														>
-															{stepRegister === 1 ? "Cancelar":"Voltar"}
-											        	</Button>
+															{stepRegister === 1 ? "Cancelar" : "Voltar"}
+														</Button>
 													</Col>
 													<Col span={12}>
 														<Button
@@ -243,8 +243,8 @@ function Login() {
 															style={{ marginTop: "10px", float: "right" }}
 															onClick={() => updateStepRegister(1)}
 														>
-															{stepRegister === 1 ? "Seguir":"Cadastrar"}
-											        	</Button>
+															{stepRegister === 1 ? "Seguir" : "Cadastrar"}
+														</Button>
 													</Col>
 												</Row>
 											</Form.Item>
