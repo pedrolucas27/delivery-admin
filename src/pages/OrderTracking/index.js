@@ -263,7 +263,6 @@ function OrderTracking() {
 			let arrayInHistoryOfDeliveredOrders = [];
 			API.get("order/" + idEstablishment).then((response) => {
 				response.data.forEach((order) => {
-					console.log(response.data)
 					if (order.status_order === 0) {
 						arrayInAnalysis.push({
 							id_client_fk: order.id_client_fk,
