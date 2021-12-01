@@ -103,9 +103,9 @@ function MenuSite(props) {
           Pdv
         </Menu.Item>
         <SubMenu className="i-menu" key="register" onTitleClick={() => subMenuChange('register')} icon={<FormOutlined />} title="Cadastros">
-          <Menu.Item className="i-menu" key="addProduct" onClick={() => redirect('/addProduct')}>Produto</Menu.Item>
           <Menu.Item className="i-menu" key="addCategory" onClick={() => redirect('/addCategory')}>Categoria</Menu.Item>
           <Menu.Item className="i-menu" key="addFlavor" onClick={() => redirect('/addFlavor')}>Sabor</Menu.Item>
+          <Menu.Item className="i-menu" key="addProduct" onClick={() => redirect('/addProduct')}>Produto</Menu.Item>
           <Menu.Item className="i-menu" key="addAdditional" onClick={() => redirect('/addAdditional')}>Adiconal</Menu.Item>
           <Menu.Item className="i-menu" key="addCoupom" onClick={() => redirect('/addCoupom')}>Cupom</Menu.Item>
           <Menu.Item className="i-menu" key="addPromotion" onClick={() => redirect('/addPromotion')}>Promoção</Menu.Item>
@@ -113,9 +113,9 @@ function MenuSite(props) {
           <Menu.Item className="i-menu" key="addFreight" onClick={() => redirect('/addFreight')}>Frete</Menu.Item>
         </SubMenu>
         <SubMenu className="i-menu" key="list" onTitleClick={() => subMenuChange('list')} icon={<OrderedListOutlined />} title="Listagens">
-          <Menu.Item className="i-menu" key="products" onClick={() => redirect('/products')}>Produtos</Menu.Item>
           <Menu.Item className="i-menu" key="categories" onClick={() => redirect('/categories')}>Categorias</Menu.Item>
           <Menu.Item className="i-menu" key="flavors" onClick={() => redirect('/flavors')}>Sabores</Menu.Item>
+          <Menu.Item className="i-menu" key="products" onClick={() => redirect('/products')}>Produtos</Menu.Item>
           <Menu.Item className="i-menu" key="additionals" onClick={() => redirect('/additionals')}>Adicionais</Menu.Item>
           <Menu.Item className="i-menu" key="coupons" onClick={() => redirect('/coupons')}>Cupons</Menu.Item>
           <Menu.Item className="i-menu" key="promotions" onClick={() => redirect('/promotions')}>Promoções</Menu.Item>

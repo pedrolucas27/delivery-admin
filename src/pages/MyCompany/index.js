@@ -47,20 +47,22 @@ function MyCompany() {
 	const [editableCompany, setEditableCompany] = useState(false);
 	const [timeWorkEstablishment, setTimeWorkEstablishment] = useState(null);
 	const [isUpdateImage, setIsUpdateImage] = useState(false);
+	const [dayOperationCompany, setDayOperationCompany] = useState(false);
 
 	useEffect(() => {
 		setFildsCompany();
 	}, []);
-    
+
 	const setFildsCompany = async () => {
 		setLoading(true);
-		try{
-			const response = await API.get("establishment/"+idEstablishment);
-			if(response.data.length !== 0){
+		try {
+			const response = await API.get("establishment/" + idEstablishment);
+			if (response.data.length !== 0) {
 				setTimeWorkEstablishment(
 					[response.data[0].start_time, response.data[0].end_time]
 				);
 				setImageCompany(`https://api-master-pizza.herokuapp.com/${response.data[0].image}`);
+				setDayOperationCompany(response.data[0].is_active);
 				form.setFieldsValue({
 					name_establishment: response.data[0].name,
 					phone_cell: maskPhoneCell(response.data[0].phone),
@@ -75,11 +77,11 @@ function MyCompany() {
 					user_instagram: response.data[0].user_instagram,
 				});
 				setLoading(false);
-			} else{
+			} else {
 				setLoading(false);
 				message.error("Erro ao tentar listar informações da empresa!");
 			}
-		}catch(error){
+		} catch (error) {
 			setLoading(false);
 			message.error("Erro ao tentar listar informações da empresa!");
 		}
@@ -87,36 +89,58 @@ function MyCompany() {
 
 	const onUpdateCompany = async (values) => {
 		setLoading(true);
-		try{
+		try {
 			const response = await API.put("establishment", {
-			    name: values.name_establishment, 
-			    phone: values.phone_cell,
-		        image: imageCompany,
-		        user_instagram: values.user_instagram,
-		        user_facebook: values.user_facebook,
-			    user_whatsapp: values.user_whatsapp,
-			    cep: values.cep,
-		        city: values.city,
-			    street: values.street,
-			    district: values.district,
-			    number_house: values.number_house,
-			    start_time: timeWorkEstablishment[0],
-			    end_time: timeWorkEstablishment[1],
-			    isUpdateImage: isUpdateImage,
-			    id_establishment: idEstablishment
+				name: values.name_establishment,
+				phone: values.phone_cell,
+				image: imageCompany,
+				user_instagram: values.user_instagram,
+				user_facebook: values.user_facebook,
+				user_whatsapp: values.user_whatsapp,
+				cep: values.cep,
+				city: values.city,
+				street: values.street,
+				district: values.district,
+				number_house: values.number_house,
+				start_time: timeWorkEstablishment[0],
+				end_time: timeWorkEstablishment[1],
+				isUpdateImage: isUpdateImage,
+				id_establishment: idEstablishment
 			});
 			setLoading(false);
-			if(response.status === 200){
+			if (response.status === 200) {
 				message.success(response.data.message);
 				setTimeout(() => {
 					window.location.reload(true);
 				}, 500);
-			}else{
+			} else {
 				message.error(response.data.message);
 			}
-		}catch (error) {
+		} catch (error) {
 			setLoading(false);
 			message.error("Erro ao tentar atualizar dados da empresa. Tente novamente!");
+		}
+	}
+
+	const onChangeOperationCompany = async (status) => {
+		setLoading(true);
+		try {
+			const response = await API.put("operation-establishment", {
+				is_active: status,
+				id_establishment: idEstablishment
+			});
+			setLoading(false);
+			if (response.status === 200) {
+				message.success(response.data.message);
+				setTimeout(() => {
+					setFildsCompany();
+				}, 500);
+			} else {
+				message.error(response.data.message);
+			}
+		} catch (error) {
+			setLoading(false);
+			message.error("Erro ao tentar atualizar o status de funciomanto da empresa. Tente novamente!");
 		}
 	}
 
@@ -136,8 +160,16 @@ function MyCompany() {
 		form.setFieldsValue({ user_whatsapp: await maskPhoneCell(field) });
 	}
 
-	function onChangeTimeWork(time, timeString){
+	function onChangeTimeWork(time, timeString) {
 		setTimeWorkEstablishment(timeString);
+	}
+
+	function onLoggout() {
+		localStorage.removeItem('@masterpizza-admin-app/idEstablishment');
+		localStorage.removeItem('@masterpizza-admin-app/token');
+		localStorage.removeItem('@masterpizza-admin-app/idAdmin');
+
+		window.location.href = "/";
 	}
 
 	const uploadButton = (
@@ -154,7 +186,14 @@ function MyCompany() {
 				<Layout className="container-body">
 					<MenuSite open={expand} current={'myCompany'} openCurrent={''} />
 					<Layout>
-						<HeaderSite title={'Dados cadastrais'} isHeaderMyCompany={true} isListView={false} expandMenu={expand} updateExpandMenu={() => setExpand(!expand)} />
+						<HeaderSite 
+							title={'Dados cadastrais'} 
+							isHeaderMyCompany={true} 
+							isListView={false} expandMenu={expand} 
+							updateExpandMenu={() => setExpand(!expand)}
+							changeOperation={(status) => onChangeOperationCompany(status)}
+							defaultOperation={dayOperationCompany && dayOperationCompany}
+						/>
 						<Content className="container-main">
 							<Form
 								layout="vertical"
@@ -168,9 +207,9 @@ function MyCompany() {
 										</Title>
 									</Col>
 									<Col span={14}>
-										<Form.Item 
-											label="Nome" 
-											name="name_establishment" 
+										<Form.Item
+											label="Nome"
+											name="name_establishment"
 											rules={[
 												{
 													required: true,
@@ -181,8 +220,8 @@ function MyCompany() {
 										</Form.Item>
 									</Col>
 									<Col span={5}>
-										<Form.Item 
-											label="Telefone celular" 
+										<Form.Item
+											label="Telefone celular"
 											name="phone_cell"
 											rules={[
 												{
@@ -194,8 +233,8 @@ function MyCompany() {
 										</Form.Item>
 									</Col>
 									<Col span={5}>
-										<Form.Item 
-											label="Horário de funcionamento" 
+										<Form.Item
+											label="Horário de funcionamento"
 											name="time_work"
 											rules={[
 												{
@@ -203,7 +242,7 @@ function MyCompany() {
 												}
 											]}
 										>
-											<RangePicker disabled={!editableCompany} onChange={onChangeTimeWork} className="input-radius" format="h:mm:ss"/>
+											<RangePicker disabled={!editableCompany} onChange={onChangeTimeWork} className="input-radius" format="h:mm:ss" />
 										</Form.Item>
 									</Col>
 									<Col span={24}>
@@ -212,8 +251,8 @@ function MyCompany() {
 										</Title>
 									</Col>
 									<Col span={5}>
-										<Form.Item 
-											label="Cep" 
+										<Form.Item
+											label="Cep"
 											name="cep"
 											rules={[
 												{
@@ -225,8 +264,8 @@ function MyCompany() {
 										</Form.Item>
 									</Col>
 									<Col span={5}>
-										<Form.Item 
-											label="Cidade" 
+										<Form.Item
+											label="Cidade"
 											name="city"
 											rules={[
 												{
@@ -238,8 +277,8 @@ function MyCompany() {
 										</Form.Item>
 									</Col>
 									<Col span={6}>
-										<Form.Item 
-											label="Rua" 
+										<Form.Item
+											label="Rua"
 											name="street"
 											rules={[
 												{
@@ -251,8 +290,8 @@ function MyCompany() {
 										</Form.Item>
 									</Col>
 									<Col span={5}>
-										<Form.Item 
-											label="Bairro" 
+										<Form.Item
+											label="Bairro"
 											name="district"
 											rules={[
 												{
@@ -264,8 +303,8 @@ function MyCompany() {
 										</Form.Item>
 									</Col>
 									<Col span={3}>
-										<Form.Item 
-											label="Número" 
+										<Form.Item
+											label="Número"
 											name="number_house"
 											rules={[
 												{
@@ -309,34 +348,44 @@ function MyCompany() {
 											</Upload>
 										</Form.Item>
 									</Col>
-									<Col span={24}>
-										<Button 
-											disabled={!editableCompany} 
-											onClick={() => form.submit()} 
-											shape="round" 
+									<Col span={12}>
+										<Button
+											onClick={() => onLoggout()}
+											shape="round"
+											className="button-cancel"
+										>
+											Sair da conta
+										</Button>
+
+									</Col>
+									<Col span={12}>
+										<Button
+											disabled={!editableCompany}
+											onClick={() => form.submit()}
+											shape="round"
 											className="button ac"
 										>
 											Atualizar
-								    	</Button>
-										<Button 
-											disabled={!editableCompany} 
+										</Button>
+										<Button
+											disabled={!editableCompany}
 											onClick={() => {
 												setEditableCompany(!editableCompany);
 												setFildsCompany();
-											}} 
-											shape="round" 
+											}}
+											shape="round"
 											className="button-cancel ac"
 										>
 											Cancelar
-									    </Button>
-									    <Button 
-									    	disabled={editableCompany} 
-									    	onClick={() => setEditableCompany(!editableCompany)} 
-									    	shape="round" 
-									    	className="button ac"
-									    >
+										</Button>
+										<Button
+											disabled={editableCompany}
+											onClick={() => setEditableCompany(!editableCompany)}
+											shape="round"
+											className="button ac"
+										>
 											Habilitar campos para edição
-								    	</Button>
+										</Button>
 									</Col>
 								</Row>
 							</Form>

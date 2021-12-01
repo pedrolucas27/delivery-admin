@@ -511,7 +511,7 @@ function Pdv() {
 			})
 
 			//DESCONTAR O VALOR DO CUPOM
-			price_order = price_order - valueDiscountCoupom;
+			price_order = price_order - ((valueDiscountCoupom/100.0) * price_order);
 
 			const responseProductCart = await API.post("cart_product",
 				{
@@ -544,7 +544,8 @@ function Pdv() {
 					freight: freight,
 					status_order: 0,
 					observation: values.observation || null,
-					address_client: String(address),
+					address_client: address,
+					reference_point: values.reference_point || null,
 					id_coupom_fk: fkIdCoupom,
 					id_client_fk: null,
 					is_pdv: true,

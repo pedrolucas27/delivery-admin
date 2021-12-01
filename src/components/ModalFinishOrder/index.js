@@ -60,7 +60,7 @@ function ModalFinishOrder(props) {
 					if (response.status === 200) {
 						if (response.data) {
 							setFlagConsultCoupom(true);
-							setValueDiscount(response.data[0].value_discount);
+							setValueDiscount(response.data[0].discount_percentage);
 							setFkIdCoupom(response.data[0].id_coupom);
 						}
 					}
@@ -80,7 +80,7 @@ function ModalFinishOrder(props) {
 		const objFreight = values.freight ? dataFreight.filter((item) => item.id === values.freight)[0]:null;
 		const valueFreight = objFreight ? objFreight.delivery_value:0;
 		if(values.amount_paid){
-			if(Number(values.amount_paid.replace(",", ".")) >= Number(String(props.valueOrder).replace(",", "."))){
+			if(Number(values.amount_paid.replace(",", ".")) >= props.valueOrder){
 				form.resetFields();
 				props.insertDataOrder(values, valueFreight, valueDiscount, fkIdCoupom);
 				setLoading(false);
@@ -221,6 +221,11 @@ function ModalFinishOrder(props) {
 									</Form.Item>
 								</Col>
 								<Col span={24}>
+									<Form.Item label="Ponto de referência" name="reference_point">
+										<TextArea rows={3} className="input-radius" />
+									</Form.Item>
+								</Col>
+								<Col span={24}>
 									<Title level={5}>
 										Pagamento
 									</Title>
@@ -297,7 +302,10 @@ function ModalFinishOrder(props) {
 											<div>
 												{
 													flagConsultCoupom && (
-														<p>Você terá um desconto de R$ {changeCommaForPoint(valueDiscount)}</p>
+														<p>
+															Você terá um desconto de R$ 
+															 {changeCommaForPoint(props.valueOrder * (valueDiscount / 100.0))}
+														</p>
 													)
 												}
 											</div>

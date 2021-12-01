@@ -97,6 +97,7 @@ function OrderTracking() {
 				);
 			}
 		},
+		{ title: 'Ponto de referência', dataIndex: 'reference_point', key: 'reference_point' },
 		{ title: 'Observação', dataIndex: 'observation', key: 'observation' },
 		{
 			title: 'Valor do pedido',
@@ -276,7 +277,8 @@ function OrderTracking() {
 							addressClient: order.address_client,
 							status: order.status_order,
 							products: order.products,
-							additionais: order.additionais
+							additionais: order.additionais,
+							reference_point: order.reference_point || "-"
 						});
 					} else if (order.status_order === 1) {
 						arrayInProduction.push({
@@ -291,7 +293,8 @@ function OrderTracking() {
 							addressClient: order.address_client,
 							status: order.status_order,
 							products: order.products,
-							additionais: order.additionais
+							additionais: order.additionais,
+							reference_point: order.reference_point || "-"
 						});
 					} else if (order.status_order === 2) {
 						arrayInReadyForDelivery.push({
@@ -306,7 +309,8 @@ function OrderTracking() {
 							addressClient: order.address_client,
 							status: order.status_order,
 							products: order.products,
-							additionais: order.additionais
+							additionais: order.additionais,
+							reference_point: order.reference_point || "-"
 						});
 					} else {
 						arrayInHistoryOfDeliveredOrders.push({
@@ -321,7 +325,8 @@ function OrderTracking() {
 							addressClient: order.address_client,
 							status: order.status_order,
 							products: order.products,
-							additionais: order.additionais
+							additionais: order.additionais,
+							reference_point: order.reference_point || "-"
 						});
 					}
 				})

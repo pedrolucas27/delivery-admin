@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
-import { maskMoney, changeCommaForPoint, getStorageERP, isLoggedAdmin } from "../../helpers.js";
+import { 
+	maskNumer, 
+	getStorageERP, 
+	isLoggedAdmin 
+} from "../../helpers.js";
 import {
 	Layout,
 	Button,
@@ -51,13 +55,13 @@ function Coupons() {
 		{ title: 'Nome', dataIndex: 'name', key: 'name' },
 		{ title: 'Descrição', dataIndex: 'description', key: 'description' },
 		{
-			title: 'Desconto (R$)',
-			dataIndex: 'value_discount',
-			key: 'value_discount',
+			title: 'Desconto (%)',
+			dataIndex: 'discount_percentage',
+			key: 'discount_percentage',
 			render: (__, record) => {
 				return (
 					<div>
-						{changeCommaForPoint(record.value_discount)}
+						{record.discount_percentage}
 					</div>
 				);
 			}
@@ -111,7 +115,7 @@ function Coupons() {
 						code: coupom.code,
 						name: coupom.name_coupom,
 						description: coupom.description || "-",
-						value_discount: coupom.value_discount,
+						discount_percentage: coupom.discount_percentage,
 						status: coupom.is_active
 					})
 				})
@@ -123,7 +127,6 @@ function Coupons() {
 			message.error("Erro de comunicação com o servidor.");
 		}
 	}
-
 
 	const deleteCoupom = async (id) => {
 		try {
@@ -150,13 +153,13 @@ function Coupons() {
 	const updateCoupom = async (values) => {
 		setLoading(true);
 		try {
-			if (values.name_coupom && values.price) {
+			if (values.name_coupom && Number(values.discount_percentage) !== 0) {
 				const response = await API.put("coupom",
 					{
 						id_coupom: idUpdate,
 						name_coupom: values.name_coupom,
 						description: values.description,
-						value_discount: Number(values.price.replace(",", ".")),
+						discount_percentage: Number(values.discount_percentage),
 						is_active: values.is_active,
 						id_company: idEstablishment
 					}
@@ -185,16 +188,20 @@ function Coupons() {
 		setIdUpdate(id);
 		form.setFieldsValue({
 			name_coupom: line.name,
-			price: changeCommaForPoint(line.value_discount),
+			discount_percentage: maskNumer(line.discount_percentage),
 			is_active: line.status,
 			description: line.description
 		});
 		setExpandEditRow(!expandEditRow);
 	}
 
-	const handleChangePrice = async () => {
-		const field = form.getFieldValue("price");
-		form.setFieldsValue({ price: await maskMoney(field) });
+	const handleChangePercentage = async () => {
+		const field = form.getFieldValue("discount_percentage");
+		if(Number(field) < 100){
+			form.setFieldsValue({ discount_percentage: await maskNumer(field) });
+		}else{
+			form.setFieldsValue({ discount_percentage: '' });
+		}
 	}
 
 	return (
@@ -233,8 +240,8 @@ function Coupons() {
 								</Form.Item>
 							</Col>
 							<Col span={4}>
-								<Form.Item label="Valor (R$)" name="price">
-									<Input className="input-radius" onKeyUp={handleChangePrice} />
+								<Form.Item label="Porcentagem de desconto (%)" name="discount_percentage">
+									<Input className="input-radius" onKeyUp={handleChangePercentage} />
 								</Form.Item>
 							</Col>
 							<Col span={4}>

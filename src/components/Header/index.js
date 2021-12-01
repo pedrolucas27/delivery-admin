@@ -7,7 +7,7 @@ import {
 	Row,
 	Col,
 	Typography,
-	Button,
+	Switch,
 	Radio,
 	Space,
 	DatePicker,
@@ -42,17 +42,14 @@ function HeaderSite(props) {
 		setFilterDash(type);
 	}
 
-	function onLoggout() {
-		localStorage.removeItem('@masterpizza-admin-app/idEstablishment');
-		localStorage.removeItem('@masterpizza-admin-app/token');
-		localStorage.removeItem('@masterpizza-admin-app/idAdmin');
-
-		window.location.href = "/";
+	const onChangeOperationCompany = (status) => {
+		props.changeOperation(status);
 	}
+
 	return (
 		<Header style={{ padding: 0, backgroundColor: '#fff' }}>
 			<Row>
-				<Col span={16}>
+				<Col span={props.isHeaderMyCompany ? 19:16}>
 					{
 						props.expandMenu ? (
 							<MenuUnfoldOutlined className='trigger' onClick={props.updateExpandMenu} />
@@ -62,21 +59,25 @@ function HeaderSite(props) {
 					}
 					<h2 style={{ display: 'inline-block' }}>{props.title}</h2>
 				</Col>
-				<Col span={8} style={{ float: 'right' }}>
-					{
-						props.isHeaderMyCompany && (
-							<Button
-								onClick={() => onLoggout()}
-								shape="round"
-								className="button-cancel ac"
-								style={{ marginTop: '15px' }}
-							>
-								Sair da conta
-							</Button>
-						)
-					}
-					{
-						props.isDashboard && (
+
+
+				{
+					props.isHeaderMyCompany && (
+						<Col span={4} style={{ float: 'right' }}>
+							<Switch
+								checkedChildren="Estabelecimento aberto no dia de hoje"
+								unCheckedChildren="Estabelecimento fechado no dia de hoje"
+								checked={props.defaultOperation}
+								onChange={onChangeOperationCompany}
+							/>
+						</Col>
+
+					)
+				}
+
+				{
+					props.isDashboard && (
+						<Col span={8} style={{ float: 'right' }}>
 							<Row>
 								<Col span={6}>
 									<Title level={4} style={{ paddingTop: "15px", margin: 0 }}>
@@ -120,9 +121,10 @@ function HeaderSite(props) {
 									</Row>
 								</Col>
 							</Row>
-						)
-					}
-				</Col>
+						</Col>
+					)
+				}
+
 			</Row>
 		</Header>
 	);

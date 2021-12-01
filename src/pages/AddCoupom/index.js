@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import API from "../../api.js";
 import {
 	Layout,
@@ -13,7 +13,11 @@ import {
 } from 'antd';
 import 'antd/dist/antd.css';
 import '../../global.css';
-import { maskMoney, getStorageERP, isLoggedAdmin } from "../../helpers.js";
+import { 
+	maskNumer, 
+	getStorageERP, 
+	isLoggedAdmin 
+} from "../../helpers.js";
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
@@ -27,19 +31,15 @@ function AddCoupom() {
 	const [expand, setExpand] = useState(false);
 	const [loading, setLoading] = useState(false);
 
-	useEffect(() => {
-		form.setFieldsValue({ price: maskMoney(0) });
-	}, []);
-
 	const onSaveCoupom = async (values) => {
 		try {
 			setLoading(true);
-			if (values.name_coupom && values.price) {
+			if (values.name_coupom && Number(values.discount_percentage > 0)) {
 				const response = await API.post("coupom",
 					{
 						name_coupom: values.name_coupom,
 						description: values.description || null,
-						value_discount: Number(values.price.replace(",", ".")),
+						discount_percentage: Number(values.discount_percentage),
 						is_active: values.is_active !== undefined ? values.is_active : true,
 						id_company: idEstablishment
 					}
@@ -48,7 +48,6 @@ function AddCoupom() {
 				if (response.status === 200) {
 					message.success(response.data.message);
 					form.resetFields();
-					form.setFieldsValue({ price: maskMoney(0) });
 				} else {
 					message.error(response.data.message);
 				}
@@ -62,9 +61,13 @@ function AddCoupom() {
 		}
 	}
 
-	const handleChangePrice = async () => {
-		const field = form.getFieldValue("price");
-		form.setFieldsValue({ price: await maskMoney(field) });
+	const handleChangePercentage = async () => {
+		const field = form.getFieldValue("discount_percentage");
+		if(Number(field) < 100){
+			form.setFieldsValue({ discount_percentage: await maskNumer(field) });
+		}else{
+			form.setFieldsValue({ discount_percentage: '' });
+		}
 	}
 
 	return (
@@ -83,8 +86,8 @@ function AddCoupom() {
 										</Form.Item>
 									</Col>
 									<Col span={4}>
-										<Form.Item label="Valor (R$)" name="price">
-											<Input className="input-radius" onKeyUp={handleChangePrice} />
+										<Form.Item label="Porcentagem de desconto (%)" name="discount_percentage">
+											<Input className="input-radius" onKeyUp={handleChangePercentage} />
 										</Form.Item>
 									</Col>
 									<Col span={4}>
