@@ -49,7 +49,7 @@ function HeaderSite(props) {
 	return (
 		<Header style={{ padding: 0, backgroundColor: '#fff' }}>
 			<Row>
-				<Col span={props.isHeaderMyCompany ? 19:16}>
+				<Col span={props.isHeaderMyCompany ? 19 : 16}>
 					{
 						props.expandMenu ? (
 							<MenuUnfoldOutlined className='trigger' onClick={props.updateExpandMenu} />
@@ -80,7 +80,7 @@ function HeaderSite(props) {
 						<Col span={8} style={{ float: 'right' }}>
 							<Row>
 								<Col span={6}>
-									<Title level={4} style={{ paddingTop: "15px", margin: 0 }}>
+									<Title level={5} style={{ marginTop: 20 }}>
 										Filtrar por:
 									</Title>
 								</Col>

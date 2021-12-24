@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import API from "../../api.js";
-import { 
-	getStorageERP, 
-	changeCommaForPoint, 
-	maskMoney, 
-	maskNumer 
+import {
+	getStorageERP,
+	changeCommaForPoint,
+	maskMoney,
+	maskNumer
 } from "../../helpers.js";
 import {
 	Button,
@@ -45,7 +45,7 @@ function ModalFinishOrder(props) {
 			message.error("Erro de comunicação com o servidor.");
 		});
 
-		API.get("freight/" + idEstablishment).then((response) => {			
+		API.get("freight/" + idEstablishment).then((response) => {
 			setDataFreight(response.data);
 		}).catch((error) => {
 			message.error("Erro de comunicação com o servidor.");
@@ -77,22 +77,22 @@ function ModalFinishOrder(props) {
 
 	const insertDataClientOrder = (values) => {
 		setLoading(true);
-		const objFreight = values.freight ? dataFreight.filter((item) => item.id === values.freight)[0]:null;
-		const valueFreight = objFreight ? objFreight.delivery_value:0;
-		if(values.amount_paid){
-			if(Number(values.amount_paid.replace(",", ".")) >= props.valueOrder){
+		const objFreight = values.freight ? dataFreight.filter((item) => item.id === values.freight)[0] : null;
+		const valueFreight = objFreight ? objFreight.delivery_value : 0;
+		if (values.amount_paid) {
+			if (Number(values.amount_paid.replace(",", ".")) >= props.valueOrder) {
 				form.resetFields();
 				props.insertDataOrder(values, valueFreight, valueDiscount, fkIdCoupom);
 				setLoading(false);
-			}else{
+			} else {
 				setLoading(false);
 				message.error("O valor a ser pago tem que ser maior/igual ao valor total do pedido.");
 			}
-		}else{
+		} else {
 			form.resetFields();
 			props.insertDataOrder(values, valueFreight, valueDiscount, fkIdCoupom);
 			setLoading(false);
-		}		
+		}
 	}
 
 	const setFildsPhoneCell = () => {
@@ -303,8 +303,8 @@ function ModalFinishOrder(props) {
 												{
 													flagConsultCoupom && (
 														<p>
-															Você terá um desconto de R$ 
-															 {changeCommaForPoint(props.valueOrder * (valueDiscount / 100.0))}
+															Você terá um desconto de R$
+															{changeCommaForPoint(props.valueOrder * (valueDiscount / 100.0))}
 														</p>
 													)
 												}

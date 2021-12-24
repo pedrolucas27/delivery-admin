@@ -23,18 +23,18 @@ function MenuSite(props) {
     const { idAdmin } = getStorageERP();
     API.get("establishment-admin/" + idAdmin).then((response) => {
       setImage(response.data[0].image);
-      if(response.data[0]){
+      if (response.data[0]) {
         setCompany(response.data[0]);
-      }else{
+      } else {
         window.location.href = "/registerEstablishment";
       }
     }).catch((error) => {
       window.location.href = "/";
     });
 
-    if(props.openCurrent !== ''){
+    if (props.openCurrent !== '') {
       setOpenKeys([...openKeys, props.openCurrent]);
-    }else{
+    } else {
       setOpenKeys([]);
     }
   }, []);
@@ -45,9 +45,9 @@ function MenuSite(props) {
 
   const subMenuChange = (key) => {
     let result = openKeys.includes(key);
-    if(result){
+    if (result) {
       setOpenKeys(openKeys.filter((item) => item !== key));
-    }else{
+    } else {
       setOpenKeys([...openKeys, key]);
     }
   }
@@ -60,16 +60,16 @@ function MenuSite(props) {
             <a href="/dashboard">
               {
                 !props.open ? (
-                  <img 
-                    src={`https://api-master-pizza.herokuapp.com/${image}`} 
-                    alt="logo" 
+                  <img
+                    src={`https://api-master-pizza.herokuapp.com/${image}`}
+                    alt="logo"
                     width="100"
                     style={{ borderRadius: '50%' }}
                   />
-                ):(
-                  <img 
-                    src={`https://api-master-pizza.herokuapp.com/${image}`} 
-                    alt="logo" 
+                ) : (
+                  <img
+                    src={`https://api-master-pizza.herokuapp.com/${image}`}
+                    alt="logo"
                     width="50"
                     style={{ borderRadius: '50%' }}
                   />
@@ -86,8 +86,8 @@ function MenuSite(props) {
             </Title>
           )
         }
-        
-        <Divider style={{ marginTop: '4px', marginBottom: '4px', color: '#fff' }}  />
+
+        <Divider style={{ marginTop: '4px', marginBottom: '4px', color: '#fff' }} />
       </div>
       <Menu className="menu" mode="inline" selectedKeys={[props.current]} openKeys={openKeys}>
         <Menu.Item className="i-menu" key="dashboard" icon={<LineChartOutlined />} onClick={() => redirect('/dashboard')}>
@@ -106,7 +106,7 @@ function MenuSite(props) {
           <Menu.Item className="i-menu" key="addCategory" onClick={() => redirect('/addCategory')}>Categoria</Menu.Item>
           <Menu.Item className="i-menu" key="addFlavor" onClick={() => redirect('/addFlavor')}>Sabor</Menu.Item>
           <Menu.Item className="i-menu" key="addProduct" onClick={() => redirect('/addProduct')}>Produto</Menu.Item>
-          <Menu.Item className="i-menu" key="addAdditional" onClick={() => redirect('/addAdditional')}>Adiconal</Menu.Item>
+          <Menu.Item className="i-menu" key="addAdditional" onClick={() => redirect('/addAdditional')}>Adicional</Menu.Item>
           <Menu.Item className="i-menu" key="addCoupom" onClick={() => redirect('/addCoupom')}>Cupom</Menu.Item>
           <Menu.Item className="i-menu" key="addPromotion" onClick={() => redirect('/addPromotion')}>Promoção</Menu.Item>
           <Menu.Item className="i-menu" key="addFormPayment" onClick={() => redirect('/addFormPayment')}>F. de Pagamento</Menu.Item>

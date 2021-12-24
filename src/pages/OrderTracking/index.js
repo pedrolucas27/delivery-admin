@@ -347,6 +347,7 @@ function OrderTracking() {
 
 	return (
 		<div>
+			<audio preload="auto" src={sound}></audio>
 			<Spin size="large" spinning={loading}>
 				<Layout className="container-body">
 					<MenuSite open={expand} current={'orders'} openCurrent={''} />

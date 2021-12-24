@@ -66,7 +66,7 @@ function Categories() {
 			render: (__, record) => {
 				return (
 					<div>
-						{ record.status ? "Ativo" : "Inativo"}
+						{record.status ? "Ativo" : "Inativo"}
 					</div>
 				);
 			}
@@ -80,11 +80,11 @@ function Categories() {
 					<div>
 						<Tooltip placement="top" title='Deletar categoria'>
 							<Popconfirm
-								 title="Tem certeza que deseja deletar ?"
-								 onConfirm={() => deleteCategory(record.key)}
-								 okText="Sim"
-								 cancelText="Não"
-							 >
+								title="Tem certeza que deseja deletar ?"
+								onConfirm={() => deleteCategory(record.key)}
+								okText="Sim"
+								cancelText="Não"
+							>
 								<DeleteOutlined className="icon-table" />
 							</Popconfirm>
 						</Tooltip>
@@ -108,7 +108,7 @@ function Categories() {
 						code: category.code,
 						name: category.name_category,
 						status: category.is_active,
-						urlImage: category.image ? `https://api-master-pizza.herokuapp.com/${category.image}`:null
+						urlImage: category.image ? `https://api-master-pizza.herokuapp.com/${category.image}` : null
 					})
 				})
 				setDataCategory(array);
@@ -185,7 +185,7 @@ function Categories() {
 	const setFildsDrawer = (id) => {
 		const line = dataCategory.filter((item) => item.key === id)[0];
 		setIdUpdate(id);
-		if(line.urlImage){
+		if (line.urlImage) {
 			setImageCategory(line.urlImage);
 		}
 		form.setFieldsValue({
@@ -220,7 +220,7 @@ function Categories() {
 								size="middle"
 								columns={columns}
 								dataSource={dataCategory}
-								locale={{ 
+								locale={{
 									emptyText: (
 										<Title level={4} style={{ margin: 30 }}>Não existe categorias cadastradas.</Title>
 									)
@@ -266,7 +266,7 @@ function Categories() {
 								</Button>
 								<Button onClick={() => setExpandEditRow(!expandEditRow)} shape="round" className="button-cancel ac">
 									Cancelar
-							    </Button>
+								</Button>
 							</Col>
 						</Row>
 					</Form>
