@@ -11,8 +11,8 @@ import {
 	CheckCircleOutlined,
 	PlusOutlined
 } from '@ant-design/icons';
-import '../../global.css';
-import { changeCommaForPoint } from "../../helpers.js";
+import '../../../../global.css';
+import { changeCommaForPoint } from "../../../../helpers.js";
 const { Title } = Typography;
 function CardAdditional(props) {
 	return (

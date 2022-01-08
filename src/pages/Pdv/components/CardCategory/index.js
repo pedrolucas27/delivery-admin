@@ -6,7 +6,7 @@ import {
 import {
 	CheckCircleOutlined
 } from '@ant-design/icons';
-import '../../global.css';
+import '../../../../global.css';
 const { Title } = Typography;
 function CardCategory(props) {
 	return (

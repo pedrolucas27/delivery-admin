@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import API from "../../api.js";
-import { changeCommaForPoint, isLoggedAdmin, getStorageERP } from "../../helpers.js";
+import { 
+	changeCommaForPoint, 
+	isLoggedAdmin, 
+	getStorageERP 
+} from "../../helpers.js";
 import {
 	Layout,
 	Button,
@@ -17,18 +21,18 @@ import {
 import {
 	DeleteOutlined
 } from '@ant-design/icons';
-import 'antd/dist/antd.css';
-import '../../global.css';
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
-import CardProduct from "../../components/CardProduct";
-import CardFlavor from "../../components/CardFlavor";
-import CardCategory from "../../components/CardCategory";
-import CardAdditional from "../../components/CardAdditional";
-import ModalAddProductCart from "../../components/ModalAddProductCart";
-import ModalFinishOrder from "../../components/ModalFinishOrder";
+import CardProduct from "./components/CardProduct";
+import CardFlavor from "./components/CardFlavor";
+import CardCategory from "./components/CardCategory";
+import CardAdditional from "./components/CardAdditional";
+import ModalAddProductCart from "./components/ModalAddProductCart";
+import ModalFinishOrder from "./components/ModalFinishOrder";
 import EmptyData from "../../components/EmptyData";
+import 'antd/dist/antd.css';
+import '../../global.css';
 const { Content } = Layout;
 const { Step } = Steps;
 const { Title } = Typography;

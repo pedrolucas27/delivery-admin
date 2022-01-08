@@ -291,3 +291,11 @@
     background: #D62828;
     border-color: #D62828;
 }
+
+.ant-modal-content{
+    border-radius: 10px !important;
+}
+
+.ant-modal-header{
+    border-radius: 10px 10px 0 0 !important;
+}

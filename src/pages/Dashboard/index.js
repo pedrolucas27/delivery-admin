@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import API from "../../api.js";
-import { getStorageERP, isLoggedAdmin } from "../../helpers.js";
+
 import moment from "moment";
 import {
 	Layout,	
@@ -12,18 +11,21 @@ import {
 	Statistic,
 	Spin
 } from 'antd';
+import HeaderSite from "../../components/Header";
+import MenuSite from "../../components/Menu";
+import FooterSite from "../../components/Footer";
+import PieChart from "./components/PieChart";
+import LineChartComponent from "./components/LineChartComponent";
 import {
 	UserOutlined,
 	DeliveredProcedureOutlined,
 	ShopOutlined
 } from '@ant-design/icons';
-import HeaderSite from "../../components/Header";
-import MenuSite from "../../components/Menu";
-import FooterSite from "../../components/Footer";
-import PieChart from "../../components/PieChart";
-import LineChartComponent from "../../components/LineChartComponent";
+import API from "../../api.js";
+import { getStorageERP, isLoggedAdmin } from "../../helpers.js";
 const { Content } = Layout;
 const { Title } = Typography;
+
 function Dashboard(){
 	isLoggedAdmin();
 	

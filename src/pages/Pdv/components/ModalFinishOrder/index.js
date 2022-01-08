@@ -1,11 +1,4 @@
 import React, { useEffect, useState } from "react";
-import API from "../../api.js";
-import {
-	getStorageERP,
-	changeCommaForPoint,
-	maskMoney,
-	maskNumer
-} from "../../helpers.js";
 import {
 	Button,
 	Row,
@@ -20,12 +13,20 @@ import {
 	Checkbox,
 	Modal
 } from 'antd';
-import { maskPhoneCell } from "../../helpers.js";
 import 'antd/dist/antd.css';
-import '../../global.css';
+import '../../../../global.css';
+import API from "../../../../api.js";
+import {
+	getStorageERP,
+	changeCommaForPoint,
+	maskMoney,
+	maskNumer,
+	maskPhoneCell
+} from "../../../../helpers.js";;
 const { TextArea } = Input;
 const { Title } = Typography;
 const { Option } = Select;
+
 function ModalFinishOrder(props) {
 	const { idEstablishment } = getStorageERP();
 

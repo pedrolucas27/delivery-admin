@@ -13,13 +13,13 @@ import {
 	MinusOutlined
 } from '@ant-design/icons';
 import 'antd/dist/antd.css';
-import '../../global.css';
-import { changeCommaForPoint } from "../../helpers.js";
+import '../../../../global.css';
+import { changeCommaForPoint } from "../../../../helpers.js";
 const { Title } = Typography;
 function ModalAddProductCart(props) {
 	const [quantity, setQuantity] = useState(1);
 	const [loading, setLoading] = useState(false);
-	const addroductOrder = () => {
+	const addProductOrder = () => {
 		setLoading(true);
 		props.onAddOrder(quantity);
 		setLoading(false);
@@ -43,12 +43,11 @@ function ModalAddProductCart(props) {
 						<Button
 							shape="round"
 							className="button"
-							onClick={() => addroductOrder()}
+							onClick={() => addProductOrder()}
 							key={1}
 						>
 							Adicionar e seguir
 						</Button>
-
 					]}
 				>
 					<Row>

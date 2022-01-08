@@ -8,8 +8,8 @@ import {
 import {
 	CheckCircleOutlined
 } from '@ant-design/icons';
-import '../../global.css';
-import { changeCommaForPoint } from "../../helpers.js";
+import '../../../../global.css';
+import { changeCommaForPoint } from "../../../../helpers.js";
 const { Title } = Typography;
 function CardProduct(props) {
 	return (
