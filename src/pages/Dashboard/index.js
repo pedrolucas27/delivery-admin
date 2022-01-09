@@ -14,8 +14,8 @@ import {
 import HeaderSite from "../../components/Header";
 import MenuSite from "../../components/Menu";
 import FooterSite from "../../components/Footer";
-import PieChart from "./components/PieChart";
-import LineChartComponent from "./components/LineChartComponent";
+import PieChart from "../../components/PieChart";
+import LineChartComponent from "../../components/LineChartComponent";
 import {
 	UserOutlined,
 	DeliveredProcedureOutlined,
