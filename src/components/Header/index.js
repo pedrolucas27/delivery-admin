@@ -63,10 +63,10 @@ function HeaderSite(props) {
 
 				{
 					props.isHeaderMyCompany && (
-						<Col span={4} style={{ float: 'right' }}>
+						<Col span={4} style={{ position: 'absolute', right: '0' }}>
 							<Switch
-								checkedChildren="Estabelecimento aberto no dia de hoje"
-								unCheckedChildren="Estabelecimento fechado no dia de hoje"
+								checkedChildren="Estabelecimento aberto"
+								unCheckedChildren="Estabelecimento fechado"
 								checked={props.defaultOperation}
 								onChange={onChangeOperationCompany}
 							/>
@@ -126,7 +126,7 @@ function HeaderSite(props) {
 				}
 
 			</Row>
-		</Header>
+		</Header >
 	);
 }
 export default HeaderSite;
