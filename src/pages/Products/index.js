@@ -17,6 +17,7 @@ import {
 	Drawer,
 	Tooltip,
 	Spin,
+	Checkbox,
 	Typography
 } from 'antd';
 import {
@@ -57,21 +58,22 @@ function Products() {
 	const [dataProduct, setDataProduct] = useState([]);
 	const [imageProduct, setImageProduct] = useState(null);
 	const [isUpdateImage, setIsUpdateImage] = useState(false);
+	const [isBorder, setIsBorder] = useState(false);
 
 	useEffect(() => {
-			setLoading(true);
-			API.get("category/" + idEstablishment).then((response) => {
-				setDataCategory(response.data);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
-			API.get("unitMensuration").then((response) => {
-				setDataUnitMensuration(response.data);
-			}).catch((error) => {
-				message.error("Erro de comunicação com o servidor.");
-			});
-			getProducts();
-			setLoading(false);
+		setLoading(true);
+		API.get("category/" + idEstablishment).then((response) => {
+			setDataCategory(response.data);
+		}).catch((error) => {
+			message.error("Erro de comunicação com o servidor.");
+		});
+		API.get("unitMensuration").then((response) => {
+			setDataUnitMensuration(response.data);
+		}).catch((error) => {
+			message.error("Erro de comunicação com o servidor.");
+		});
+		getProducts();
+		setLoading(false);
 	}, []);
 
 	const getFlavorsByCategory = async (idCategory) => {
@@ -117,7 +119,7 @@ function Products() {
 			render: (__, record) => {
 				return (
 					<div>
-						{ record.status ? "Ativo" : "Inativo"}
+						{record.status ? "Ativo" : "Inativo"}
 					</div>
 				);
 			}
@@ -131,11 +133,11 @@ function Products() {
 					<div>
 						<Tooltip placement="top" title='Deletar produto'>
 							<Popconfirm
-								 title="Tem certeza que deseja deletar ?"
-								 onConfirm={() => deleteProduct(record.key)}
-								 okText="Sim"
-								 cancelText="Não"
-							 >
+								title="Tem certeza que deseja deletar ?"
+								onConfirm={() => deleteProduct(record.key)}
+								okText="Sim"
+								cancelText="Não"
+							>
 								<DeleteOutlined className="icon-table" />
 							</Popconfirm>
 						</Tooltip>
@@ -167,7 +169,7 @@ function Products() {
 						size_value: product.size_product,
 						id_unit_fk: product.fk_id_unit,
 						size: product.size_product + " (" + product.unit + " - " + product.abreviation + ")",
-						urlImage: product.image ? `https://api-master-pizza.herokuapp.com/${product.image}`:null
+						urlImage: product.image ? `https://api-master-pizza.herokuapp.com/${product.image}` : null
 					})
 				})
 				setDataProduct(array);
@@ -225,6 +227,7 @@ function Products() {
 					getProducts();
 					setLoading(false);
 					message.success(response.data.message);
+					setIsBorder(false);
 					setExpandEditRow(!expandEditRow);
 				} else {
 					setLoading(false);
@@ -244,9 +247,10 @@ function Products() {
 		const line = dataProduct.filter((item) => item.key === id)[0];
 		setIdUpdate(id);
 		getFlavorsByCategory(line.id_category);
-		if(line.urlImage){
+		if (line.urlImage) {
 			setImageProduct(line.urlImage);
 		}
+		
 		form.setFieldsValue({
 			name_product: line.product,
 			description: line.description,
@@ -257,6 +261,10 @@ function Products() {
 			unitMensuration: line.id_unit_fk,
 			size: line.size_value
 		});
+
+		const name_c = String(line.category).toLowerCase();
+		setIsBorder(name_c === 'borda' || name_c === 'bordas');
+
 		setExpandEditRow(!expandEditRow);
 	}
 
@@ -295,7 +303,7 @@ function Products() {
 								size="middle"
 								columns={columns}
 								dataSource={dataProduct}
-								locale={{ 
+								locale={{
 									emptyText: (
 										<Title level={4} style={{ margin: 30 }}>Não existe produtos cadastrados.</Title>
 									)
@@ -374,31 +382,48 @@ function Products() {
 								<Form.Item label="Preço" name="price_product">
 									<Input className="input-radius" onKeyUp={handleChangePrice} />
 								</Form.Item>
+							</Col><Col span={24}>
+								<Checkbox checked={isBorder} onChange={() => setIsBorder(!isBorder)}>
+									Este produto é uma borda
+								</Checkbox>
 							</Col>
-							<Col span={24}>
+							<Col span={24} style={{ marginTop: 15 }}>
 								<Form.Item label="Descrição" name="description">
 									<TextArea rows={4} className="input-radius" />
 								</Form.Item>
 							</Col>
+							{
+								!isBorder && (
+									<Col span={24}>
+										<Form.Item
+											label=""
+											name="image"
+											rules={[
+												{
+													required: !isBorder,
+													message: "Escolha uma imagem para o produto."
+												}
+											]}
+										>
+											<Upload
+												action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+												listType="picture-card"
+												showUploadList={false}
+												onChange={handleChangeImage}
+											>
+												{imageProduct ? <img src={imageProduct} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+											</Upload>
+										</Form.Item>
+									</Col>
+								)
+							}
 							<Col span={24}>
-								<Form.Item label="" name="image">
-									<Upload
-										action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-										listType="picture-card"
-										showUploadList={false}
-										onChange={handleChangeImage}
-									>
-										{imageProduct ? <img src={imageProduct} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
-									</Upload>
-								</Form.Item>
-							</Col>
-							<Col span={24}>
-							<Button onClick={() => form.submit()} shape="round" className="button ac">
-								Editar
-							</Button>
-							<Button onClick={() => { form.resetFields() }} shape="round" className="button-cancel ac">
-								Cancelar
-							</Button>
+								<Button onClick={() => form.submit()} shape="round" className="button ac">
+									Editar
+								</Button>
+								<Button onClick={() => { form.resetFields(); setIsBorder(false); }} shape="round" className="button-cancel ac">
+									Cancelar
+								</Button>
 							</Col>
 						</Row>
 					</Form>

@@ -12,6 +12,7 @@ import {
 	Col,
 	message,
 	Upload,
+	Checkbox,
 	Spin
 } from 'antd';
 import {
@@ -47,6 +48,8 @@ function AddProduct() {
 	const [dataCategory, setDataCategory] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [imageProduct, setImageProduct] = useState(null);
+	const [isBorder, setIsBorder] = useState(false);
+
 	useEffect(() => {
 		form.setFieldsValue({ size: 1, price_product: maskMoney(0) });
 		API.get("unitMensuration").then((response) => {
@@ -100,6 +103,7 @@ function AddProduct() {
 					message.success(response.data.message);
 					form.resetFields();
 					setImageProduct(null);
+					setIsBorder(false);
 					form.setFieldsValue({ size: 1, price_product: maskMoney(0) });
 				} else {
 					message.error(response.data.message);
@@ -213,36 +217,53 @@ function AddProduct() {
 										</Form.Item>
 									</Col>
 									<Col span={24}>
+										<Checkbox checked={isBorder} onChange={() => setIsBorder(!isBorder)}>
+											Este produto é uma borda
+										</Checkbox>
+									</Col>
+									<Col span={24} style={{ marginTop: 15 }}>
 										<Form.Item label="Descrição" name="description">
 											<TextArea rows={4} className="input-radius" />
 										</Form.Item>
 									</Col>
-									<Col span={24}>
-										<Form.Item 
-											label="" 
-											name="image"
-											rules={[
-												{
-													required: true,
-													message: "Escolha uma imagem para o produto."
-												}
-											]}
-										>
-											<Upload
-												action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-												listType="picture-card"
-												showUploadList={false}
-												onChange={handleChangeImage}
-											>
-												{imageProduct ? <img src={imageProduct} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
-											</Upload>
-										</Form.Item>
-									</Col>
+									{
+										!isBorder && (
+											<Col span={24}>
+												<Form.Item
+													label=""
+													name="image"
+													rules={[
+														{
+															required: !isBorder,
+															message: "Escolha uma imagem para o produto."
+														}
+													]}
+												>
+													<Upload
+														action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+														listType="picture-card"
+														showUploadList={false}
+														onChange={handleChangeImage}
+													>
+														{imageProduct ? <img src={imageProduct} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+													</Upload>
+												</Form.Item>
+											</Col>
+										)
+									}
+
 									<Col span={24}>
 										<Button onClick={() => form.submit()} shape="round" className="button ac">
 											Salvar
 										</Button>
-										<Button onClick={() => { form.resetFields() }} shape="round" className="button-cancel ac">
+										<Button
+											onClick={() => {
+												form.resetFields();
+												setIsBorder(false);
+											}}
+											shape="round"
+											className="button-cancel ac"
+										>
 											Cancelar
 										</Button>
 									</Col>
