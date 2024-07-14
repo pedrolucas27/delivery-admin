@@ -1,1 +1,1 @@
-# Sistema para Administração de E-Commerce
+# Sistema para Administração de Delivery
